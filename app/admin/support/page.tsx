@@ -148,17 +148,17 @@ export default function AdminSupportPage() {
   }
 
   return (
-    <div className="container mx-auto px-4 py-8 bg-gradient-to-b from-slate-50 to-cyan-50 dark:from-slate-950 dark:to-cyan-950">
-      <h1 className="mb-6 text-3xl font-bold text-cyan-900 dark:text-cyan-100 flex items-center gap-2">
-        <LifeBuoy className="h-6 w-6 text-cyan-700 dark:text-cyan-300" />
+    <div className="container mx-auto px-4 py-8 bg-gradient-to-b from-slate-50 to-amber-50 dark:from-slate-950 dark:to-amber-950">
+      <h1 className="mb-6 text-3xl font-bold text-amber-900 dark:text-amber-100 flex items-center gap-2">
+        <LifeBuoy className="h-6 w-6 text-amber-700 dark:text-amber-300" />
         Sailor Support Management
       </h1>
 
-      <Card className="border-cyan-200 shadow-lg shadow-cyan-100 dark:border-cyan-900 dark:shadow-none">
-        <CardHeader className="border-b border-cyan-100 dark:border-cyan-900 bg-gradient-to-r from-cyan-50 to-white dark:from-slate-900 dark:to-cyan-950">
+      <Card className="border-amber-200 shadow-lg shadow-amber-100 dark:border-amber-900 dark:shadow-none">
+        <CardHeader className="border-b border-amber-100 dark:border-amber-900 bg-gradient-to-r from-amber-50 to-white dark:from-slate-900 dark:to-amber-950">
           <div className="flex flex-col md:flex-row md:items-center md:justify-between gap-4">
             <div>
-              <CardTitle className="text-cyan-900 dark:text-cyan-100">Support Requests</CardTitle>
+              <CardTitle className="text-amber-900 dark:text-amber-100">Support Requests</CardTitle>
               <CardDescription>Manage and respond to sailor support requests</CardDescription>
             </div>
 
@@ -167,7 +167,7 @@ export default function AdminSupportPage() {
               <Input
                 type="search"
                 placeholder="Search requests..."
-                className="pl-8 border-cyan-200 dark:border-cyan-900 w-full md:w-64"
+                className="pl-8 border-amber-200 dark:border-amber-900 w-full md:w-64"
                 value={searchQuery}
                 onChange={(e) => setSearchQuery(e.target.value)}
               />
@@ -177,35 +177,35 @@ export default function AdminSupportPage() {
 
         <CardContent className="p-0">
           <Tabs defaultValue="all" onValueChange={(value) => setFilter(value as any)}>
-            <div className="border-b border-cyan-100 dark:border-cyan-900 px-4">
+            <div className="border-b border-amber-100 dark:border-amber-900 px-4">
               <TabsList className="bg-transparent h-12">
                 <TabsTrigger
                   value="all"
-                  className="data-[state=active]:bg-cyan-100 dark:data-[state=active]:bg-cyan-900"
+                  className="data-[state=active]:bg-amber-100 dark:data-[state=active]:bg-amber-900"
                 >
                   All
                 </TabsTrigger>
                 <TabsTrigger
                   value="pending"
-                  className="data-[state=active]:bg-cyan-100 dark:data-[state=active]:bg-cyan-900"
+                  className="data-[state=active]:bg-amber-100 dark:data-[state=active]:bg-amber-900"
                 >
                   Pending
                 </TabsTrigger>
                 <TabsTrigger
                   value="in-review"
-                  className="data-[state=active]:bg-cyan-100 dark:data-[state=active]:bg-cyan-900"
+                  className="data-[state=active]:bg-amber-100 dark:data-[state=active]:bg-amber-900"
                 >
                   In Review
                 </TabsTrigger>
                 <TabsTrigger
                   value="resolved"
-                  className="data-[state=active]:bg-cyan-100 dark:data-[state=active]:bg-cyan-900"
+                  className="data-[state=active]:bg-amber-100 dark:data-[state=active]:bg-amber-900"
                 >
                   Resolved
                 </TabsTrigger>
                 <TabsTrigger
                   value="dismissed"
-                  className="data-[state=active]:bg-cyan-100 dark:data-[state=active]:bg-cyan-900"
+                  className="data-[state=active]:bg-amber-100 dark:data-[state=active]:bg-amber-900"
                 >
                   Dismissed
                 </TabsTrigger>
@@ -237,7 +237,7 @@ export default function AdminSupportPage() {
     if (loading) {
       return (
         <div className="p-8 text-center text-slate-500 dark:text-slate-400">
-          <div className="animate-spin h-8 w-8 border-4 border-cyan-600 border-t-transparent rounded-full mx-auto mb-4"></div>
+          <div className="animate-spin h-8 w-8 border-4 border-amber-600 border-t-transparent rounded-full mx-auto mb-4"></div>
           <p>Loading support requests...</p>
         </div>
       )
@@ -264,13 +264,13 @@ export default function AdminSupportPage() {
     }
 
     return (
-      <div className="divide-y divide-cyan-100 dark:divide-cyan-900">
+      <div className="divide-y divide-amber-100 dark:divide-amber-900">
         {requests.map((request) => (
-          <div key={request.id} className="p-4 hover:bg-cyan-50 dark:hover:bg-cyan-950/50 transition-colors">
+          <div key={request.id} className="p-4 hover:bg-amber-50 dark:hover:bg-amber-950/50 transition-colors">
             <div className="flex flex-col md:flex-row md:items-center md:justify-between gap-4">
               <div className="flex-1">
                 <div className="flex items-center gap-2 mb-1">
-                  <h3 className="font-medium text-cyan-900 dark:text-cyan-100">{request.title}</h3>
+                  <h3 className="font-medium text-amber-900 dark:text-amber-100">{request.title}</h3>
                   {getStatusBadge(request.status)}
                 </div>
 
@@ -287,7 +287,7 @@ export default function AdminSupportPage() {
 
               <div>
                 <Link href={`/admin/support/${request.id}`}>
-                  <Button className="bg-cyan-600 hover:bg-cyan-700 dark:bg-cyan-700 dark:hover:bg-cyan-600">
+                  <Button className="bg-amber-600 hover:bg-amber-700 dark:bg-amber-700 dark:hover:bg-amber-600">
                     View Details
                   </Button>
                 </Link>

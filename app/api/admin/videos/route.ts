@@ -1,27 +1,35 @@
-import { type NextRequest, NextResponse } from "next/server";
-import { getVideosCollection } from "@/lib/mongodb-server";
+import { type NextRequest, NextResponse } from "next/server"
+import { getServerSession } from "next-auth/next"
+import { authOptions } from "@/app/api/auth/[...nextauth]/route"
+import { getVideosCollection } from "@/lib/mongodb"
 
-export async function GET() {
+export async function GET(request: NextRequest) {
   try {
-    // Get videos collection
-    const collection = await getVideosCollection();
+    // Check if user is authenticated and is an admin
+    const session = await getServerSession(authOptions)
+    if (!session || session.user.role !== "admin") {
+      return NextResponse.json({ error: "Unauthorized" }, { status: 401 })
+    }
 
-    // Get all videos, sorted by creation date (newest first)
-    const videos = await collection.find({}).sort({ createdAt: -1 }).toArray();
+    // Get videos collection
+    const collection = await getVideosCollection()
+
+    // Get all videos
+    const videos = await collection.find({}).sort({ created_at: -1 }).toArray()
 
     // Transform MongoDB _id to id for client-side compatibility
     const formattedVideos = videos.map((video) => ({
       id: video._id.toString(),
-      public_id: video.publicId,
-      url: video.url,
-      resource_type: video.resourceType,
-      created_at: video.createdAt?.toISOString?.() || new Date().toISOString(),
-    }));
+      ...video,
+      _id: undefined,
+    }))
 
-    return NextResponse.json(formattedVideos);
+    return NextResponse.json(formattedVideos)
   } catch (error) {
-    console.error("GET /api/admin/videos - Error fetching videos:", error);
-    // Return empty array with a 200 status instead of an error
-    return NextResponse.json([]);
+    console.error("Error fetching videos:", error)
+    return NextResponse.json(
+      { error: "Failed to fetch videos", details: error instanceof Error ? error.message : "Unknown error" },
+      { status: 500 },
+    )
   }
 }

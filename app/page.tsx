@@ -29,6 +29,8 @@ import {
   CloudLightningIcon as Lightning,
   Radio,
   AlertCircle,
+  Sparkles,
+  Sailboat,
 } from "lucide-react"
 
 import VideoGallery from "@/components/video-gallery"
@@ -252,81 +254,149 @@ export default function Home() {
 
   return (
     <div className="flex flex-col min-h-screen">
-      {/* Hero Section with Video Background */}
-      <section className="relative overflow-hidden bg-slate-900 dark:bg-slate-950">
-        <div className="absolute inset-0 z-0 opacity-40">
-          <div className="absolute inset-0 bg-gradient-to-b from-slate-900 via-transparent to-slate-900"></div>
-          <video
-            autoPlay
-            loop
-            muted
-            playsInline
-            className="w-full h-full object-cover"
-            poster="/placeholder.svg?key=lgb0a"
-          >
-            <source
-              src="https://res.cloudinary.com/demo/video/upload/v1612928366/ocean_waves_sunset_mrvora.mp4"
-              type="video/mp4"
-            />
-            Your browser does not support the video tag.
-          </video>
+      {/* Light Gray Hero Section */}
+      <section className="relative bg-gradient-to-b from-gray-100 to-gray-200 overflow-hidden">
+        {/* Subtle Pattern Overlay */}
+        <div className="absolute inset-0 opacity-5">
+          <svg width="100%" height="100%" xmlns="http://www.w3.org/2000/svg">
+            <defs>
+              <pattern id="grid" width="40" height="40" patternUnits="userSpaceOnUse">
+                <path d="M 0 10 L 40 10 M 10 0 L 10 40" stroke="black" strokeWidth="0.5" fill="none" />
+              </pattern>
+            </defs>
+            <rect width="100%" height="100%" fill="url(#grid)" />
+          </svg>
         </div>
 
-        <div className="container relative z-10 mx-auto px-4 py-20 md:py-32">
-          <motion.div
-            className="max-w-3xl mx-auto text-center"
-            initial="hidden"
-            animate="visible"
-            variants={{
-              hidden: { opacity: 0 },
-              visible: {
-                opacity: 1,
-                transition: {
-                  staggerChildren: 0.1,
+        {/* Decorative Elements */}
+        <div className="absolute top-20 right-10 w-64 h-64 bg-gradient-to-br from-gray-300/40 to-gray-400/20 rounded-full blur-3xl"></div>
+        <div className="absolute bottom-10 left-10 w-40 h-40 bg-gradient-to-tr from-gray-300/40 to-gray-400/20 rounded-full blur-3xl"></div>
+
+        <div className="container mx-auto px-4 py-16 md:py-24 relative z-10">
+          <div className="grid grid-cols-1 lg:grid-cols-2 gap-12 items-center">
+            <motion.div
+              initial="hidden"
+              animate="visible"
+              variants={{
+                hidden: { opacity: 0 },
+                visible: {
+                  opacity: 1,
+                  transition: {
+                    staggerChildren: 0.1,
+                  },
                 },
-              },
-            }}
-          >
-            <motion.div variants={fadeIn}>
-              <Badge className="mb-6 px-3 py-1 text-sm bg-cyan-500/20 text-cyan-200 border-cyan-500/30">
-                Welcome to Sailor's Media Voyage
-              </Badge>
-            </motion.div>
+              }}
+            >
+              <motion.div variants={fadeIn} className="mb-6">
+                <Badge className="px-3 py-1 text-sm bg-gray-700 text-white border-none">
+                  <Sparkles className="w-4 h-4 mr-1" /> Maritime Community
+                </Badge>
+              </motion.div>
 
-            <motion.h1 className="text-4xl sm:text-5xl md:text-6xl font-bold mb-6 text-white" variants={fadeIn}>
-              Navigate the Digital{" "}
-              <span className="text-transparent bg-clip-text bg-gradient-to-r from-cyan-300 to-teal-200">Ocean</span>
-            </motion.h1>
+              <motion.h1
+                className="text-4xl sm:text-5xl md:text-6xl font-bold mb-6 text-gray-800 leading-tight"
+                variants={fadeIn}
+              >
+                Discover the <br />
+                <span className="relative">
+                  <span className="relative z-10">Sailor's World</span>
+                  <span className="absolute bottom-2 left-0 w-full h-3 bg-gray-300 rounded-full -z-10"></span>
+                </span>
+              </motion.h1>
 
-            <motion.p className="text-lg md:text-xl mb-8 text-slate-300" variants={fadeIn}>
-              Share your maritime stories, discover content from fellow sailors, and connect with your seafaring
-              community.
-            </motion.p>
+              <motion.p className="text-lg md:text-xl mb-8 text-gray-600 max-w-lg" variants={fadeIn}>
+                Connect with fellow sailors, share your maritime adventures, and explore a sea of content created by our
+                vibrant community.
+              </motion.p>
 
-            <motion.div className="flex flex-wrap justify-center gap-4" variants={fadeIn}>
-              <Link href="/videos">
-                <Button size="lg" className="bg-cyan-600 hover:bg-cyan-700 text-white">
-                  Explore Content <Compass className="ml-2 h-5 w-5" />
-                </Button>
-              </Link>
-              {!isAuthenticated ? (
-                <Link href="/signup">
-                  <Button size="lg" variant="outline" className="border-cyan-400/30 text-cyan-300 hover:bg-cyan-900/50">
-                    Join the Crew <Anchor className="ml-2 h-5 w-5" />
+              <motion.div className="flex flex-wrap gap-4" variants={fadeIn}>
+                <Link href="/videos">
+                  <Button size="lg" className="bg-gray-800 hover:bg-gray-700 text-white">
+                    Explore Content <Compass className="ml-2 h-5 w-5" />
                   </Button>
                 </Link>
-              ) : (
-                <Link href="/upload">
-                  <Button size="lg" variant="outline" className="border-cyan-400/30 text-cyan-300 hover:bg-cyan-900/50">
-                    Upload Content <Upload className="ml-2 h-5 w-5" />
-                  </Button>
-                </Link>
-              )}
+                {!isAuthenticated ? (
+                  <Link href="/signup">
+                    <Button size="lg" variant="outline" className="border-gray-400 text-gray-700 hover:bg-gray-100">
+                      Join the Crew <Anchor className="ml-2 h-5 w-5" />
+                    </Button>
+                  </Link>
+                ) : (
+                  <Link href="/upload">
+                    <Button size="lg" variant="outline" className="border-gray-400 text-gray-700 hover:bg-gray-100">
+                      Upload Content <Upload className="ml-2 h-5 w-5" />
+                    </Button>
+                  </Link>
+                )}
+              </motion.div>
             </motion.div>
-          </motion.div>
+
+            <motion.div
+              className="relative"
+              initial={{ opacity: 0, scale: 0.9 }}
+              animate={{ opacity: 1, scale: 1 }}
+              transition={{ duration: 0.5, delay: 0.2 }}
+            >
+              <div className="relative aspect-video md:aspect-square max-w-md mx-auto">
+                {/* Card Frame */}
+                <div className="absolute -top-4 -left-4 -bottom-4 -right-4 bg-gray-200 rounded-2xl transform rotate-3"></div>
+                <div className="absolute -top-2 -left-2 -bottom-2 -right-2 bg-gray-300/50 rounded-2xl transform -rotate-2"></div>
+
+                {/* Main image container */}
+                <div className="relative z-10 bg-white rounded-xl overflow-hidden shadow-lg border border-gray-200">
+                  <img
+                    src="/placeholder.svg?key=nf3pd"
+                    alt="Sailor's Community"
+                    className="w-full h-full object-cover"
+                  />
+
+                  {/* Overlay with gradient */}
+                  <div className="absolute inset-0 bg-gradient-to-t from-gray-900/70 to-transparent"></div>
+
+                  {/* Floating elements over the image */}
+                  <div className="absolute top-4 left-4 bg-white/90 backdrop-blur-sm rounded-full p-3 shadow-md">
+                    <Sailboat className="h-6 w-6 text-gray-700" />
+                  </div>
+
+                  {/* Stats overlay */}
+                  <div className="absolute bottom-0 left-0 right-0 p-6">
+                    <div className="flex justify-between text-white">
+                      <div className="text-center">
+                        <p className="text-xl font-bold">{latestVideos.length || "10K+"}</p>
+                        <p className="text-xs text-gray-200">Videos</p>
+                      </div>
+                      <div className="text-center">
+                        <p className="text-xl font-bold">{latestPhotos.length || "25K+"}</p>
+                        <p className="text-xs text-gray-200">Photos</p>
+                      </div>
+                      <div className="text-center">
+                        <p className="text-xl font-bold">{featuredSailors.length || "5K+"}</p>
+                        <p className="text-xs text-gray-200">Sailors</p>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </motion.div>
+          </div>
         </div>
 
-        <div className="absolute bottom-0 left-0 right-0 h-24 bg-gradient-to-t from-white dark:from-slate-900 to-transparent"></div>
+        {/* Bottom wave */}
+        <div className="absolute bottom-0 left-0 right-0">
+          <svg
+            viewBox="0 0 1440 120"
+            fill="none"
+            xmlns="http://www.w3.org/2000/svg"
+            className="w-full"
+            preserveAspectRatio="none"
+          >
+            <path
+              d="M0 120L48 105C96 90 192 60 288 55C384 50 480 70 576 75C672 80 768 70 864 65C960 60 1056 60 1152 65C1248 70 1344 80 1392 85L1440 90V120H1392C1344 120 1248 120 1152 120C1056 120 960 120 864 120C768 120 672 120 576 120C480 120 384 120 288 120C192 120 96 120 48 120H0Z"
+              fill="white"
+              className="dark:fill-slate-900"
+            />
+          </svg>
+        </div>
       </section>
 
       {/* Trending Now Section */}
@@ -334,7 +404,7 @@ export default function Home() {
         <div className="container mx-auto px-4">
           <div className="flex items-center justify-between mb-8">
             <div className="flex items-center gap-3">
-              <div className="bg-red-500 p-2 rounded-md text-white">
+              <div className="bg-gray-800 p-2 rounded-md text-white">
                 <TrendingUp className="h-5 w-5" />
               </div>
               <h2 className="text-2xl font-bold text-slate-900 dark:text-white">Trending Now</h2>
@@ -407,14 +477,14 @@ export default function Home() {
 
                   <CardContent className="p-3">
                     <Link href={`/${item.type}s/${item._id || item.id}`}>
-                      <h3 className="font-medium text-sm line-clamp-1 group-hover:text-cyan-700 dark:group-hover:text-cyan-400 transition-colors">
+                      <h3 className="font-medium text-sm line-clamp-1 group-hover:text-gray-700 dark:group-hover:text-gray-300 transition-colors">
                         {item.title || (item.type === "video" ? item.public_id?.split("/")?.pop() : "Untitled")}
                       </h3>
                     </Link>
 
                     <div className="flex items-center justify-between mt-2 text-xs text-slate-500">
                       <div className="flex items-center">
-                        <Lightning className="h-3 w-3 mr-1 text-red-500" />
+                        <Lightning className="h-3 w-3 mr-1 text-gray-500" />
                         {item.views.toLocaleString()} views
                       </div>
                       <Badge variant="outline" className="font-normal">
@@ -429,8 +499,9 @@ export default function Home() {
         </div>
       </section>
 
+      {/* Rest of the sections remain unchanged */}
       {/* Media Categories */}
-      <section className="py-12 bg-slate-50 dark:bg-slate-950">
+      <section className="py-12 bg-gray-50 dark:bg-slate-950">
         <div className="container mx-auto px-4">
           <h2 className="text-2xl font-bold text-slate-900 dark:text-white mb-8 text-center">
             Explore Maritime Content
@@ -441,42 +512,42 @@ export default function Home() {
               title="Videos"
               icon={<Film className="h-6 w-6" />}
               href="/videos"
-              bgClass="from-blue-500 to-cyan-600"
+              bgClass="from-gray-700 to-gray-800"
               count={latestVideos.length}
             />
             <CategoryCard
               title="Photos"
               icon={<ImageIcon className="h-6 w-6" />}
               href="/photos"
-              bgClass="from-emerald-500 to-green-600"
+              bgClass="from-gray-600 to-gray-700"
               count={latestPhotos.length}
             />
             <CategoryCard
               title="Podcasts"
               icon={<Radio className="h-6 w-6" />}
               href="/podcasts"
-              bgClass="from-purple-500 to-indigo-600"
+              bgClass="from-gray-500 to-gray-600"
               count={latestPodcasts.length}
             />
             <CategoryCard
               title="News"
               icon={<Newspaper className="h-6 w-6" />}
               href="/news"
-              bgClass="from-amber-500 to-orange-600"
+              bgClass="from-gray-600 to-gray-700"
               count={12}
             />
             <CategoryCard
               title="Blogs"
               icon={<BookOpen className="h-6 w-6" />}
               href="/blogs"
-              bgClass="from-rose-500 to-pink-600"
+              bgClass="from-gray-700 to-gray-800"
               count={8}
             />
             <CategoryCard
               title="Community"
               icon={<Users className="h-6 w-6" />}
               href="/community"
-              bgClass="from-slate-600 to-slate-800"
+              bgClass="from-gray-800 to-gray-900"
               count={featuredSailors.length}
             />
           </div>
@@ -488,7 +559,7 @@ export default function Home() {
         <div className="container mx-auto px-4">
           <div className="flex items-center justify-between mb-6">
             <div className="flex items-center gap-2">
-              <Tv className="h-6 w-6 text-cyan-600 dark:text-cyan-400" />
+              <Tv className="h-6 w-6 text-gray-700 dark:text-gray-300" />
               <h2 className="text-2xl font-bold text-slate-900 dark:text-white">Featured Videos</h2>
             </div>
             <Link href="/videos">
@@ -506,11 +577,11 @@ export default function Home() {
       </section>
 
       {/* Featured Sailors Section */}
-      <section className="py-12 bg-gradient-to-b from-slate-50 to-white dark:from-slate-950 dark:to-slate-900">
+      <section className="py-12 bg-gradient-to-b from-gray-50 to-white dark:from-slate-950 dark:to-slate-900">
         <div className="container mx-auto px-4">
           <div className="flex items-center justify-between mb-8">
             <div className="flex items-center gap-2">
-              <Crown className="h-6 w-6 text-amber-500" />
+              <Crown className="h-6 w-6 text-gray-700 dark:text-gray-300" />
               <h2 className="text-2xl font-bold text-slate-900 dark:text-white">Featured Sailors</h2>
             </div>
             <Link href="/sailors">
@@ -533,7 +604,7 @@ export default function Home() {
                   >
                     <div className="flex flex-col items-center text-center">
                       <div className="relative w-20 h-20 sm:w-24 sm:h-24 mb-3">
-                        <div className="absolute inset-0 rounded-full bg-gradient-to-br from-cyan-400 to-blue-500 animate-pulse opacity-70 group-hover:opacity-100 transition-opacity"></div>
+                        <div className="absolute inset-0 rounded-full bg-gradient-to-br from-gray-300 to-gray-400 animate-pulse opacity-70 group-hover:opacity-100 transition-opacity"></div>
                         <div className="absolute inset-1 rounded-full overflow-hidden bg-white dark:bg-slate-800">
                           <Avatar className="h-full w-full">
                             <AvatarImage
@@ -541,6 +612,7 @@ export default function Home() {
                                 sailor.profileImage ||
                                 sailor.image ||
                                 "/placeholder.svg?height=200&width=200&query=sailor%20profile" ||
+                                "/placeholder.svg" ||
                                 "/placeholder.svg"
                               }
                               alt={sailor.name || "Sailor"}
@@ -551,7 +623,7 @@ export default function Home() {
                           </Avatar>
                         </div>
                       </div>
-                      <h3 className="font-medium text-slate-900 dark:text-white group-hover:text-cyan-700 dark:group-hover:text-cyan-400 transition-colors">
+                      <h3 className="font-medium text-slate-900 dark:text-white group-hover:text-gray-700 dark:group-hover:text-gray-300 transition-colors">
                         {sailor.name}
                       </h3>
                       <p className="text-xs text-slate-500 dark:text-slate-400 mb-1">
@@ -559,7 +631,7 @@ export default function Home() {
                       </p>
                       <Badge
                         variant="outline"
-                        className="text-xs font-normal px-2 border-cyan-200 dark:border-cyan-900"
+                        className="text-xs font-normal px-2 border-gray-200 dark:border-gray-700"
                       >
                         <Ship className="h-3 w-3 mr-1" />
                         {Math.floor(Math.random() * 100) + 10} Voyages
@@ -584,7 +656,7 @@ export default function Home() {
         <div className="container mx-auto px-4">
           <div className="flex items-center justify-between mb-8">
             <div className="flex items-center gap-2">
-              <Mic className="h-6 w-6 text-purple-600 dark:text-purple-400" />
+              <Mic className="h-6 w-6 text-gray-700 dark:text-gray-300" />
               <h2 className="text-2xl font-bold text-slate-900 dark:text-white">Featured Podcasts</h2>
             </div>
             <Link href="/podcasts">
@@ -613,7 +685,7 @@ export default function Home() {
                       />
                       <div className="absolute inset-0 bg-gradient-to-t from-black/70 to-transparent"></div>
                       <div className="absolute bottom-4 left-4 right-4">
-                        <Badge className="bg-purple-600 mb-2 hover:bg-purple-700">Podcast</Badge>
+                        <Badge className="bg-gray-700 mb-2 hover:bg-gray-600">Podcast</Badge>
                         <h3 className="text-white font-semibold text-lg line-clamp-1">{podcast.title}</h3>
                         <p className="text-white/70 text-sm line-clamp-1">{podcast.description}</p>
                       </div>
@@ -657,10 +729,10 @@ export default function Home() {
       </section>
 
       {/* CTA Section */}
-      <section className="py-16 bg-gradient-to-r from-cyan-900 to-blue-900 text-white">
+      <section className="py-16 bg-gradient-to-r from-gray-700 to-gray-800 text-white">
         <div className="container mx-auto px-4 text-center">
           <h2 className="text-3xl md:text-4xl font-bold mb-6">Ready to Set Sail?</h2>
-          <p className="text-lg md:text-xl text-cyan-100 mb-8 max-w-3xl mx-auto">
+          <p className="text-lg md:text-xl text-gray-200 mb-8 max-w-3xl mx-auto">
             Join our growing community of sailors. Share your stories, discover new content, and connect with fellow
             maritime enthusiasts.
           </p>
@@ -669,7 +741,7 @@ export default function Home() {
             {!isAuthenticated ? (
               <>
                 <Link href="/signup">
-                  <Button size="lg" className="bg-white text-cyan-900 hover:bg-slate-100">
+                  <Button size="lg" className="bg-white text-gray-800 hover:bg-gray-100">
                     Create Account <Users className="ml-2 h-5 w-5" />
                   </Button>
                 </Link>
@@ -682,7 +754,7 @@ export default function Home() {
             ) : (
               <>
                 <Link href="/upload">
-                  <Button size="lg" className="bg-white text-cyan-900 hover:bg-slate-100">
+                  <Button size="lg" className="bg-white text-gray-800 hover:bg-gray-100">
                     Upload Content <Upload className="ml-2 h-5 w-5" />
                   </Button>
                 </Link>

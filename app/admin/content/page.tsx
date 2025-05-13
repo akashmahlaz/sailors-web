@@ -156,72 +156,80 @@ export default function AdminContentPage() {
           <CardDescription>Manage all content across the platform</CardDescription>
         </CardHeader>
         <CardContent className="pt-6">
-          <Tabs value={activeTab} onValueChange={setActiveTab} className="w-full">
-            <TabsList className="grid grid-cols-4 w-full">
-              <TabsTrigger value="videos">Videos</TabsTrigger>
-              <TabsTrigger value="audios">Audio</TabsTrigger>
-              <TabsTrigger value="blogs">Blogs</TabsTrigger>
-              <TabsTrigger value="photos">Photos</TabsTrigger>
-            </TabsList>
-            <div className="mb-6">
-              <Input
-                placeholder={`Search ${activeTab}...`}
-                value={searchQuery}
-                onChange={(e) => setSearchQuery(e.target.value)}
-                className="max-w-md"
-              />
-            </div>
-            {error && (
-              <Alert variant="destructive" className="mb-4">
-                <AlertCircle className="h-4 w-4" />
-                <AlertDescription>{error}</AlertDescription>
-              </Alert>
-            )}
-            <TabsContent value="videos" className="mt-0">
-              <ContentTable
-                items={filteredContent}
-                loading={loading}
-                contentType="videos"
-                onDelete={(item) => {
-                  setItemToDelete(item)
-                  setDeleteDialogOpen(true)
-                }}
-              />
-            </TabsContent>
-            <TabsContent value="audios" className="mt-0">
-              <ContentTable
-                items={filteredContent}
-                loading={loading}
-                contentType="audios"
-                onDelete={(item) => {
-                  setItemToDelete(item)
-                  setDeleteDialogOpen(true)
-                }}
-              />
-            </TabsContent>
-            <TabsContent value="blogs" className="mt-0">
-              <ContentTable
-                items={filteredContent}
-                loading={loading}
-                contentType="blogs"
-                onDelete={(item) => {
-                  setItemToDelete(item)
-                  setDeleteDialogOpen(true)
-                }}
-              />
-            </TabsContent>
-            <TabsContent value="photos" className="mt-0">
-              <ContentTable
-                items={filteredContent}
-                loading={loading}
-                contentType="photos"
-                onDelete={(item) => {
-                  setItemToDelete(item)
-                  setDeleteDialogOpen(true)
-                }}
-              />
-            </TabsContent>
-          </Tabs>
+          <div className="flex justify-between items-center mb-6">
+            <Tabs value={activeTab} onValueChange={setActiveTab} className="w-full">
+              <TabsList className="grid grid-cols-4 w-full">
+                <TabsTrigger value="videos">Videos</TabsTrigger>
+                <TabsTrigger value="audios">Audio</TabsTrigger>
+                <TabsTrigger value="blogs">Blogs</TabsTrigger>
+                <TabsTrigger value="photos">Photos</TabsTrigger>
+              </TabsList>
+            </Tabs>
+          </div>
+
+          <div className="mb-6">
+            <Input
+              placeholder={`Search ${activeTab}...`}
+              value={searchQuery}
+              onChange={(e) => setSearchQuery(e.target.value)}
+              className="max-w-md"
+            />
+          </div>
+
+          {error && (
+            <Alert variant="destructive" className="mb-4">
+              <AlertCircle className="h-4 w-4" />
+              <AlertDescription>{error}</AlertDescription>
+            </Alert>
+          )}
+
+          <TabsContent value="videos" className="mt-0">
+            <ContentTable
+              items={filteredContent}
+              loading={loading}
+              contentType="videos"
+              onDelete={(item) => {
+                setItemToDelete(item)
+                setDeleteDialogOpen(true)
+              }}
+            />
+          </TabsContent>
+
+          <TabsContent value="audios" className="mt-0">
+            <ContentTable
+              items={filteredContent}
+              loading={loading}
+              contentType="audios"
+              onDelete={(item) => {
+                setItemToDelete(item)
+                setDeleteDialogOpen(true)
+              }}
+            />
+          </TabsContent>
+
+          <TabsContent value="blogs" className="mt-0">
+            <ContentTable
+              items={filteredContent}
+              loading={loading}
+              contentType="blogs"
+              onDelete={(item) => {
+                setItemToDelete(item)
+                setDeleteDialogOpen(true)
+              }}
+            />
+          </TabsContent>
+
+          <TabsContent value="photos" className="mt-0">
+            <ContentTable
+              items={filteredContent}
+              loading={loading}
+              contentType="photos"
+              onDelete={(item) => {
+                setItemToDelete(item)
+                setDeleteDialogOpen(true)
+              }}
+            />
+          </TabsContent>
         </CardContent>
       </Card>
 
@@ -272,9 +280,7 @@ interface ContentTableProps {
 }
 
 function ContentTable({ items, loading, contentType, onDelete }: ContentTableProps) {
-  console.log("ContentTable:", { items, loading, contentType });
   if (loading) {
-    console.log("ContentTable (loading):", { items, loading, contentType });
     return (
       <div className="py-8 text-center">
         <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-cyan-700 mx-auto"></div>
@@ -284,7 +290,6 @@ function ContentTable({ items, loading, contentType, onDelete }: ContentTablePro
   }
 
   if (items.length === 0) {
-    console.log("ContentTable (empty):", { items, loading, contentType });
     return (
       <div className="py-8 text-center">
         <p className="text-muted-foreground">No {contentType} found.</p>
@@ -294,7 +299,6 @@ function ContentTable({ items, loading, contentType, onDelete }: ContentTablePro
 
   return (
     <div className="rounded-md border border-cyan-100 dark:border-cyan-900 overflow-hidden">
-      <Tabs>
       <Table>
         <TableHeader className="bg-cyan-50 dark:bg-cyan-950">
           <TableRow>
@@ -369,7 +373,6 @@ function ContentTable({ items, loading, contentType, onDelete }: ContentTablePro
           ))}
         </TableBody>
       </Table>
-      </Tabs>
     </div>
   )
 }

@@ -1,242 +1,398 @@
 "use client"
 
-import type React from "react"
-
-import { useState } from "react"
-import { Button } from "@/components/ui/button"
+import { useState, useRef, useEffect } from "react"
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card"
-import { Progress } from "@/components/ui/progress"
-import { Upload, CheckCircle, AlertCircle } from "lucide-react"
+import { Button } from "@/components/ui/button"
+import { Slider } from "@/components/ui/slider"
+import {
+  Play,
+  Pause,
+  Volume2,
+  VolumeX,
+  Maximize,
+  Minimize,
+  SkipBack,
+  SkipForward,
+  Settings,
+  Download,
+} from "lucide-react"
+import {
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuItem,
+  DropdownMenuLabel,
+  DropdownMenuSeparator,
+  DropdownMenuTrigger,
+} from "@/components/ui/dropdown-menu"
 
-interface VideoUploaderProps {
-  onUploadSuccess?: () => void
+interface AdvancedVideoPlayerProps {
+  video: {
+    id: string
+    url: string
+    title: string
+    public_id: string
+  }
+  onNext?: () => void
+  onPrevious?: () => void
 }
 
-export default function VideoUploader({ onUploadSuccess }: VideoUploaderProps) {
-  const [file, setFile] = useState<File | null>(null)
-  const [uploading, setUploading] = useState(false)
-  const [progress, setProgress] = useState(0)
-  const [error, setError] = useState<string | null>(null)
-  const [success, setSuccess] = useState(false)
+export default function AdvancedVideoPlayer({ video, onNext, onPrevious, relatedVideos = [] }: AdvancedVideoPlayerProps & { relatedVideos?: Array<{ id: string, url: string, title: string, public_id: string, thumbnail_url?: string }> }) {
+  const videoRef = useRef<HTMLVideoElement>(null)
+  const containerRef = useRef<HTMLDivElement>(null)
+  const [isPlaying, setIsPlaying] = useState(true)
+  const [volume, setVolume] = useState(1)
+  const [isMuted, setIsMuted] = useState(false)
+  const [currentTime, setCurrentTime] = useState(0)
+  const [duration, setDuration] = useState(0)
+  const [isFullscreen, setIsFullscreen] = useState(false)
+  const [showControls, setShowControls] = useState(true)
+  const [playbackRate, setPlaybackRate] = useState(1)
+  const controlsTimeoutRef = useRef<NodeJS.Timeout | null>(null)
+  const [isLoaded, setIsLoaded] = useState(false)
 
-  const handleFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    if (e.target.files && e.target.files[0]) {
-      setFile(e.target.files[0])
-      setError(null)
+  useEffect(() => {
+    const videoElement = videoRef.current
+    if (!videoElement) return
+
+    const handleTimeUpdate = () => {
+      setCurrentTime(videoElement.currentTime)
+    }
+
+    const handleDurationChange = () => {
+      setDuration(videoElement.duration)
+    }
+
+    const handlePlay = () => {
+      setIsPlaying(true)
+    }
+
+    const handlePause = () => {
+      setIsPlaying(false)
+    }
+
+    const handleVolumeChange = () => {
+      setVolume(videoElement.volume)
+      setIsMuted(videoElement.muted)
+    }
+
+    const handleLoadedData = () => {
+      setIsLoaded(true)
+      console.log("Video loaded successfully")
+    }
+
+    const handleError = (e: any) => {
+      console.error("Video error:", e)
+    }
+
+    videoElement.addEventListener("timeupdate", handleTimeUpdate)
+    videoElement.addEventListener("durationchange", handleDurationChange)
+    videoElement.addEventListener("play", handlePlay)
+    videoElement.addEventListener("pause", handlePause)
+    videoElement.addEventListener("volumechange", handleVolumeChange)
+    videoElement.addEventListener("loadeddata", handleLoadedData)
+    videoElement.addEventListener("error", handleError)
+
+    return () => {
+      videoElement.removeEventListener("timeupdate", handleTimeUpdate)
+      videoElement.removeEventListener("durationchange", handleDurationChange)
+      videoElement.removeEventListener("play", handlePlay)
+      videoElement.removeEventListener("pause", handlePause)
+      videoElement.removeEventListener("volumechange", handleVolumeChange)
+      videoElement.removeEventListener("loadeddata", handleLoadedData)
+      videoElement.removeEventListener("error", handleError)
+    }
+  }, [video])
+
+  useEffect(() => {
+    const handleFullscreenChange = () => {
+      setIsFullscreen(!!document.fullscreenElement)
+    }
+
+    document.addEventListener("fullscreenchange", handleFullscreenChange)
+
+    return () => {
+      document.removeEventListener("fullscreenchange", handleFullscreenChange)
+    }
+  }, [])
+
+  // Reset video state when video changes
+  useEffect(() => {
+    setIsLoaded(false)
+    setIsPlaying(false)
+    setCurrentTime(0)
+    setDuration(0)
+
+    if (videoRef.current) {
+      videoRef.current.load() // Force reload when video source changes
+    }
+  }, [video.url])
+
+  const togglePlay = () => {
+    if (!videoRef.current) return
+
+    if (isPlaying) {
+      videoRef.current.pause()
+    } else {
+      // Add a try-catch to handle any playback errors
+      try {
+        const playPromise = videoRef.current.play()
+        if (playPromise !== undefined) {
+          playPromise.catch((error) => {
+            console.error("Playback error:", error)
+          })
+        }
+      } catch (error) {
+        console.error("Error during play:", error)
+      }
     }
   }
 
-  const uploadVideo = async () => {
-    if (!file) {
-      setError("Please select a file to upload")
-      return
+  const toggleMute = () => {
+    if (!videoRef.current) return
+
+    videoRef.current.muted = !isMuted
+  }
+
+  const handleVolumeChange = (value: number[]) => {
+    if (!videoRef.current) return
+
+    const newVolume = value[0]
+    videoRef.current.volume = newVolume
+    if (newVolume === 0) {
+      videoRef.current.muted = true
+    } else if (isMuted) {
+      videoRef.current.muted = false
     }
+  }
 
-    try {
-      setUploading(true)
-      setProgress(0)
-      setError(null)
-      setSuccess(false)
+  const handleSeek = (value: number[]) => {
+    if (!videoRef.current) return
 
-      // Get signature from our API
-      const signatureResponse = await fetch("/api/cloudinary/signature", {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-        },
-        body: JSON.stringify({
-          resourceType: "video",
-        }),
+    videoRef.current.currentTime = value[0]
+  }
+
+  const toggleFullscreen = () => {
+    if (!containerRef.current) return
+
+    if (!document.fullscreenElement) {
+      containerRef.current.requestFullscreen().catch((err) => {
+        console.error(`Error attempting to enable fullscreen: ${err.message}`)
       })
-
-      if (!signatureResponse.ok) {
-        const errorText = await signatureResponse.text()
-        console.error("Signature response error:", errorText)
-        try {
-          const errorData = JSON.parse(errorText)
-          throw new Error(`Failed to get upload signature: ${errorData.error || signatureResponse.statusText}`)
-        } catch (e) {
-          throw new Error(`Failed to get upload signature: ${signatureResponse.statusText}`)
-        }
-      }
-
-      let signatureData
-      try {
-        signatureData = await signatureResponse.json()
-      } catch (e) {
-        console.error("Error parsing signature response:", e)
-        throw new Error("Invalid response from signature endpoint")
-      }
-
-      const { signature, timestamp, cloudName, apiKey } = signatureData
-
-      // Validate the signature response
-      if (!signature) {
-        throw new Error("Missing signature in response")
-      }
-      if (!timestamp) {
-        throw new Error("Missing timestamp in response")
-      }
-      if (!cloudName) {
-        throw new Error("Missing cloudName in response")
-      }
-      if (!apiKey) {
-        throw new Error("Missing apiKey in response")
-      }
-
-      // Create form data for Cloudinary upload
-      const formData = new FormData()
-      formData.append("file", file)
-      formData.append("api_key", apiKey)
-      formData.append("timestamp", timestamp.toString())
-      formData.append("signature", signature)
-      formData.append("resource_type", "auto") // Allow any resource type
-
-      // Upload to Cloudinary with progress tracking
-      const xhr = new XMLHttpRequest()
-      xhr.open("POST", `https://api.cloudinary.com/v1_1/${cloudName}/auto/upload`)
-
-      xhr.upload.onprogress = (event) => {
-        if (event.lengthComputable) {
-          const percentComplete = Math.round((event.loaded / event.total) * 100)
-          setProgress(percentComplete)
-        }
-      }
-
-      xhr.onload = async () => {
-        if (xhr.status >= 200 && xhr.status < 300) {
-          let response
-          try {
-            response = JSON.parse(xhr.responseText)
-          } catch (e) {
-            console.error("Error parsing Cloudinary response:", e, "Response text:", xhr.responseText)
-            throw new Error("Invalid response from Cloudinary")
-          }
-
-          try {
-            // Save video metadata to our MongoDB database
-            const saveResponse = await fetch("/api/videos", {
-              method: "POST",
-              headers: {
-                "Content-Type": "application/json",
-              },
-              body: JSON.stringify({
-                publicId: response.public_id,
-                url: response.secure_url,
-                resourceType: response.resource_type,
-              }),
-            })
-
-            if (!saveResponse.ok) {
-              const saveErrorText = await saveResponse.text()
-              console.warn("Video uploaded to Cloudinary but metadata could not be saved to database:", saveErrorText)
-              throw new Error("Failed to save video metadata")
-            }
-
-            await saveResponse.json() // Ensure we can parse the response
-          } catch (e) {
-            console.error("Error saving video metadata:", e)
-            throw new Error("Video uploaded but metadata could not be saved")
-          }
-
-          setSuccess(true)
-          setFile(null)
-          // Reset file input
-          const fileInput = document.getElementById("video-upload") as HTMLInputElement
-          if (fileInput) fileInput.value = ""
-
-          // Call the onUploadSuccess callback if provided
-          if (onUploadSuccess) {
-            onUploadSuccess()
-          }
-        } else {
-          let errorMessage = "Upload failed"
-          try {
-            const errorResponse = JSON.parse(xhr.responseText)
-            errorMessage = errorResponse.error?.message || "Upload failed"
-          } catch (e) {
-            // If we can't parse the error response, use the default message
-            console.error("Error parsing Cloudinary error response:", e, "Response text:", xhr.responseText)
-          }
-          throw new Error(errorMessage)
-        }
-        setUploading(false)
-      }
-
-      xhr.onerror = () => {
-        console.error("Network error during upload")
-        setError("Network error during upload")
-        setUploading(false)
-      }
-
-      xhr.send(formData)
-    } catch (err) {
-      console.error("Upload error:", err)
-      setError(err instanceof Error ? err.message : "Upload failed")
-      setUploading(false)
+    } else {
+      document.exitFullscreen()
     }
+  }
+
+  const handleMouseMove = () => {
+    setShowControls(true)
+
+    if (controlsTimeoutRef.current) {
+      clearTimeout(controlsTimeoutRef.current)
+    }
+
+    if (isPlaying) {
+      controlsTimeoutRef.current = setTimeout(() => {
+        setShowControls(false)
+      }, 3000)
+    }
+  }
+
+  const handleMouseLeave = () => {
+    if (isPlaying) {
+      setShowControls(false)
+    }
+  }
+
+  const changePlaybackRate = (rate: number) => {
+    if (!videoRef.current) return
+
+    videoRef.current.playbackRate = rate
+    setPlaybackRate(rate)
+  }
+
+  const formatTime = (seconds: number) => {
+    const mins = Math.floor(seconds / 60)
+    const secs = Math.floor(seconds % 60)
+    return `${mins}:${secs.toString().padStart(2, "0")}`
+  }
+
+  const downloadVideo = () => {
+    // Create a temporary anchor element
+    const a = document.createElement("a")
+    a.href = video.url
+    a.download = `${video.title || "video"}.mp4`
+    document.body.appendChild(a)
+    a.click()
+    document.body.removeChild(a)
   }
 
   return (
-    <Card className="w-full max-w-md mx-auto">
-      <CardHeader>
-        <CardTitle>Capture the Seas</CardTitle>
-        <CardDescription>Upload your maritime adventures without size limits</CardDescription>
-      </CardHeader>
-      <CardContent>
-        <div className="space-y-4">
-          <div className="grid w-full items-center gap-1.5">
-            <label htmlFor="video-upload" className="text-sm font-medium">
-              Select Video
-            </label>
-            <input
-              id="video-upload"
-              type="file"
-              accept="video/*"
-              className="flex h-10 w-full rounded-md border border-input bg-background px-3 py-2 text-sm file:border-0 file:bg-transparent file:text-sm file:font-medium"
-              onChange={handleFileChange}
-              disabled={uploading}
+    <div className="flex flex-col items-center w-full min-h-screen bg-slate-50 dark:bg-slate-900 py-6">
+      <Card className="w-full max-w-3xl mx-auto shadow-xl rounded-2xl bg-white dark:bg-slate-900">
+        <CardHeader>
+          <CardTitle>{video.title || "Video Player"}</CardTitle>
+          <CardDescription>Advanced video player with controls</CardDescription>
+        </CardHeader>
+        <CardContent className="p-0">
+          <div
+            ref={containerRef}
+            className="relative bg-black rounded-b-2xl"
+            onMouseMove={handleMouseMove}
+            onMouseLeave={handleMouseLeave}
+          >
+            <video
+              ref={videoRef}
+              src={video.url}
+              className="w-full aspect-video rounded-b-2xl"
+              poster={`https://res.cloudinary.com/${process.env.NEXT_PUBLIC_CLOUDINARY_CLOUD_NAME}/video/upload/so_0/${video.public_id}.jpg`}
+              onClick={togglePlay}
+              controls={false}
+              preload="metadata"
+              crossOrigin="anonymous"
             />
-          </div>
 
-          {file && (
-            <div className="text-sm">
-              Selected: <span className="font-medium">{file.name}</span> ({(file.size / (1024 * 1024)).toFixed(2)} MB)
-            </div>
-          )}
-
-          {uploading && (
-            <div className="space-y-2">
-              <Progress value={progress} className="h-2 w-full" />
-              <p className="text-xs text-center">{progress}% uploaded</p>
-            </div>
-          )}
-
-          {error && (
-            <div className="flex items-center gap-2 text-destructive text-sm">
-              <AlertCircle className="h-4 w-4" />
-              <span>{error}</span>
-            </div>
-          )}
-
-          {success && (
-            <div className="flex items-center gap-2 text-green-600 text-sm">
-              <CheckCircle className="h-4 w-4" />
-              <span>Voyage recorded successfully!</span>
-            </div>
-          )}
-
-          <Button onClick={uploadVideo} disabled={uploading || !file} className="w-full bg-cyan-600 hover:bg-cyan-700">
-            {uploading ? (
-              "Setting Sail..."
-            ) : (
-              <>
-                <Upload className="mr-2 h-4 w-4" /> Chart Your Course
-              </>
+            {!isLoaded && (
+              <div className="absolute inset-0 flex items-center justify-center bg-black/50">
+                <div className="animate-spin rounded-full h-12 w-12 border-t-2 border-b-2 border-cyan-500"></div>
+              </div>
             )}
-          </Button>
+
+            {/* Video Controls */}
+            <div
+              className={`absolute bottom-0 left-0 right-0 bg-gradient-to-t from-black/80 to-transparent p-4 transition-opacity ${
+                showControls ? "opacity-100" : "opacity-0"
+              }`}
+            >
+              <div className="flex flex-col gap-2">
+                {/* Progress bar */}
+                <div className="flex items-center gap-2 text-white">
+                  <span className="text-xs">{formatTime(currentTime)}</span>
+                  <Slider
+                    value={[currentTime]}
+                    min={0}
+                    max={duration || 100}
+                    step={0.1}
+                    onValueChange={handleSeek}
+                    className="flex-1"
+                  />
+                  <span className="text-xs">{formatTime(duration)}</span>
+                </div>
+
+                {/* Controls */}
+                <div className="flex items-center justify-between">
+                  <div className="flex items-center gap-2">
+                    {onPrevious && (
+                      <Button variant="ghost" size="icon" className="text-white" onClick={onPrevious}>
+                        <SkipBack className="h-5 w-5" />
+                      </Button>
+                    )}
+
+                    <Button variant="ghost" size="icon" className="text-white" onClick={togglePlay}>
+                      {isPlaying ? <Pause className="h-5 w-5" /> : <Play className="h-5 w-5" />}
+                    </Button>
+
+                    {onNext && (
+                      <Button variant="ghost" size="icon" className="text-white" onClick={onNext}>
+                        <SkipForward className="h-5 w-5" />
+                      </Button>
+                    )}
+
+                    <div className="flex items-center gap-1">
+                      <Button variant="ghost" size="icon" className="text-white" onClick={toggleMute}>
+                        {isMuted ? <VolumeX className="h-5 w-5" /> : <Volume2 className="h-5 w-5" />}
+                      </Button>
+                      <Slider
+                        value={[isMuted ? 0 : volume]}
+                        min={0}
+                        max={1}
+                        step={0.01}
+                        onValueChange={handleVolumeChange}
+                        className="w-20"
+                      />
+                    </div>
+                  </div>
+
+                  <div className="flex items-center gap-2">
+                    <DropdownMenu>
+                      <DropdownMenuTrigger asChild>
+                        <Button variant="ghost" size="icon" className="text-white">
+                          <Settings className="h-5 w-5" />
+                        </Button>
+                      </DropdownMenuTrigger>
+                      <DropdownMenuContent align="end">
+                        <DropdownMenuLabel>Playback Speed</DropdownMenuLabel>
+                        <DropdownMenuSeparator />
+                        {[0.5, 0.75, 1, 1.25, 1.5, 2].map((rate) => (
+                          <DropdownMenuItem
+                            key={rate}
+                            onClick={() => changePlaybackRate(rate)}
+                            className={playbackRate === rate ? "bg-accent" : ""}
+                          >
+                            {rate === 1 ? "Normal" : `${rate}x`}
+                          </DropdownMenuItem>
+                        ))}
+                      </DropdownMenuContent>
+                    </DropdownMenu>
+
+                    <Button variant="ghost" size="icon" className="text-white" onClick={downloadVideo}>
+                      <Download className="h-5 w-5" />
+                    </Button>
+
+                    <Button variant="ghost" size="icon" className="text-white" onClick={toggleFullscreen}>
+                      {isFullscreen ? <Minimize className="h-5 w-5" /> : <Maximize className="h-5 w-5" />}
+                    </Button>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </CardContent>
+      </Card>
+      {/* Video Previews Row */}
+      {relatedVideos && relatedVideos.length > 0 && (
+        <div className="w-full max-w-5xl mt-8">
+          <h3 className="mb-4 text-lg font-semibold text-slate-800 dark:text-slate-100 px-2">Up Next</h3>
+          <div className="flex gap-4 overflow-x-auto pb-2 px-2">
+            {relatedVideos.map((vid) => (
+              <div
+                key={vid.id}
+                className="min-w-[200px] max-w-[220px] flex-shrink-0 cursor-pointer group"
+                onClick={() => window.location.href = `/videos/${vid.id}`}
+              >
+                <div className="relative aspect-video rounded-lg overflow-hidden shadow group-hover:shadow-lg bg-black">
+                  {/* Use ReactPlayer for video preview, fallback to Cloudinary thumbnail if not hovered */}
+                  <div className="w-full h-full">
+                    <video
+                      src={vid.url}
+                      poster={
+                        vid.thumbnail_url
+                          ? vid.thumbnail_url
+                          : vid.public_id && process.env.NEXT_PUBLIC_CLOUDINARY_CLOUD_NAME
+                            ? `https://res.cloudinary.com/${process.env.NEXT_PUBLIC_CLOUDINARY_CLOUD_NAME}/video/upload/so_1/${vid.public_id}.jpg`
+                            : "/placeholder.svg"
+                      }
+                      className="object-cover w-full h-full transition-transform group-hover:scale-105 rounded-lg"
+                      preload="metadata"
+                      muted
+                      playsInline
+                      onMouseOver={e => e.currentTarget.play()}
+                      onFocus={e => e.currentTarget.play()}
+                      onMouseOut={e => { e.currentTarget.pause(); e.currentTarget.currentTime = 0; }}
+                      onBlur={e => { e.currentTarget.pause(); e.currentTarget.currentTime = 0; }}
+                    />
+                  </div>
+                  <div className="absolute bottom-1 right-1 bg-black/70 text-white text-xs px-2 py-0.5 rounded">
+                    {/* Optionally show duration if available */}
+                  </div>
+                </div>
+                <div className="mt-2 text-sm font-medium text-slate-900 dark:text-slate-100 line-clamp-2">
+                  {vid.title}
+                </div>
+              </div>
+            ))}
+          </div>
         </div>
-      </CardContent>
-    </Card>
+      )}
+    </div>
   )
 }

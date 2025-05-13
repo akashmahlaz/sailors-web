@@ -73,7 +73,7 @@ export async function POST(request: NextRequest, { params }: { params: { id: str
 
 export async function GET(request: NextRequest, { params }: { params: { id: string } }) {
   try {
-    const podcastId = params.id
+    const podcastId = await params.id
 
     // Get podcast episodes collection
     const collection = await getPodcastEpisodesCollection()

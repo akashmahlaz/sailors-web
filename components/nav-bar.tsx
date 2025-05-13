@@ -21,10 +21,13 @@ import {
   Bell,
   LifeBuoy,
   UserCircle,
+  Search,
+  Menu,
 } from "lucide-react"
 import { ThemeToggle } from "./theme-toggle"
 import { useNotifications } from "@/hooks/use-notifications"
 import { NotificationPanel } from "./notification-panel"
+import { useState } from "react"
 
 export default function NavBar() {
   const pathname = usePathname()
@@ -32,6 +35,7 @@ export default function NavBar() {
   const isAuthenticated = status === "authenticated"
   const isAdmin = isAuthenticated && session?.user?.role === "admin"
   const { notifications, unreadCount, toggleNotificationPanel, isNotificationPanelOpen } = useNotifications()
+  const [mobileMenuOpen, setMobileMenuOpen] = useState(false)
 
   const mainDropdowns = [
     {
@@ -55,37 +59,46 @@ export default function NavBar() {
   ]
 
   return (
-    <div className="border-b border-cyan-800/30 bg-slate-900/95 backdrop-blur-xl supports-[backdrop-filter]:bg-slate-900/75 dark:bg-slate-950/90 dark:border-cyan-950/30 sticky top-0 z-50">
+    <div className="bg-white border-b border-gray-200 sticky top-0 z-50 shadow-sm dark:bg-gray-800 dark:border-gray-700">
       <div className="container mx-auto flex h-16 items-center px-4 sm:px-6 lg:px-8">
         <div className="mr-4 flex flex-shrink-0 items-center">
           <Link
             href="/"
-            className="flex items-center text-xl font-bold text-white hover:text-cyan-300 transition-colors"
+            className="flex items-center text-xl font-bold text-gray-800 hover:text-gray-600 transition-colors dark:text-white dark:hover:text-gray-300"
           >
-            <Sailboat className="mr-2 h-6 w-6 text-cyan-400 transition-transform hover:rotate-12 duration-300" />
-            Sailor's Platform 
+            <Sailboat className="mr-2 h-6 w-6 text-gray-700 transition-transform hover:rotate-12 duration-300 dark:text-gray-300" />
+            <span className="hidden sm:inline">Sailor's Platform</span>
           </Link>
         </div>
 
-        <nav className="flex items-center space-x-6">
+        {/* Mobile menu button */}
+        <button
+          className="sm:hidden ml-auto text-gray-700 p-2 rounded-full hover:bg-gray-100 transition-colors dark:text-gray-300 dark:hover:bg-gray-700"
+          onClick={() => setMobileMenuOpen(!mobileMenuOpen)}
+        >
+          <Menu className="h-6 w-6" />
+        </button>
+
+        {/* Desktop Navigation */}
+        <nav className="hidden sm:flex items-center space-x-4 ml-6">
           {mainDropdowns.map((dropdown) => (
             <div key={dropdown.label} className="group relative inline-block">
-              <button className="flex items-center text-sm font-medium text-cyan-100 hover:text-white transition-all duration-300 hover:bg-slate-800/30 px-3 py-1.5 rounded-lg dark:text-cyan-200 dark:hover:bg-slate-900/50">
-                <dropdown.icon className="mr-2 h-5 w-5 text-cyan-400 transition-transform group-hover:rotate-12 duration-300" />
+              <button className="flex items-center text-sm font-medium text-gray-700 hover:text-gray-900 transition-all duration-300 hover:bg-gray-100 px-3 py-1.5 rounded-lg dark:text-gray-300 dark:hover:text-white dark:hover:bg-gray-700">
+                <dropdown.icon className="mr-2 h-5 w-5 text-gray-500 transition-transform group-hover:rotate-12 duration-300 dark:text-gray-400" />
                 {dropdown.label}
-                <ChevronDown className="ml-1 h-4 w-4 text-cyan-300 transform group-hover:rotate-180 transition-transform duration-300" />
+                <ChevronDown className="ml-1 h-4 w-4 text-gray-500 transform group-hover:rotate-180 transition-transform duration-300 dark:text-gray-400" />
               </button>
               {/* Added pointer-events-none by default and pointer-events-auto on hover */}
               <div className="absolute pt-2 top-full left-0 z-50 min-w-[240px] origin-top opacity-0 invisible group-hover:visible pointer-events-none group-hover:pointer-events-auto group-hover:opacity-100 translate-y-1 group-hover:translate-y-0 transition-all duration-300 ease-out">
-                <div className="bg-gradient-to-b from-cyan-50 to-white backdrop-blur-lg rounded-xl shadow-2xl shadow-cyan-500/10 ring-1 ring-cyan-100/50 p-2 space-y-1 dark:from-slate-800 dark:to-slate-900 dark:ring-cyan-900/50 dark:shadow-cyan-900/10">
+                <div className="bg-white backdrop-blur-lg rounded-xl shadow-lg ring-1 ring-gray-200 p-2 space-y-1 dark:bg-gray-800 dark:ring-gray-700">
                   {dropdown.subLinks.map((link) => (
                     <Link
                       key={link.href}
                       href={link.href}
                       className={`flex items-center px-4 py-2.5 text-sm rounded-lg transition-all duration-200 transform hover:scale-[1.02] ${
                         pathname.startsWith(link.href)
-                          ? "bg-cyan-600 text-white shadow-md dark:bg-cyan-700"
-                          : "text-slate-700 hover:bg-cyan-50 hover:text-cyan-900 hover:shadow-sm dark:text-slate-200 dark:hover:bg-slate-700 dark:hover:text-cyan-100"
+                          ? "bg-gray-800 text-white shadow-md dark:bg-gray-700"
+                          : "text-gray-700 hover:bg-gray-100 hover:text-gray-900 hover:shadow-sm dark:text-gray-300 dark:hover:bg-gray-700 dark:hover:text-white"
                       }`}
                     >
                       <link.icon className="mr-3 h-4 w-4 flex-shrink-0" />
@@ -103,26 +116,76 @@ export default function NavBar() {
             href="/support"
             className={`flex items-center text-sm font-medium px-3 py-1.5 rounded-lg transition-all duration-300 ${
               pathname.startsWith("/support")
-                ? "bg-cyan-700 text-white shadow-md dark:bg-cyan-800"
-                : "text-cyan-100 hover:text-white hover:bg-slate-800/30 dark:text-cyan-200 dark:hover:bg-slate-900/50"
+                ? "bg-gray-800 text-white shadow-md dark:bg-gray-700"
+                : "text-gray-700 hover:text-gray-900 hover:bg-gray-100 dark:text-gray-300 dark:hover:text-white dark:hover:bg-gray-700"
             }`}
           >
-            <LifeBuoy className="mr-2 h-5 w-5 text-cyan-400" />
+            <LifeBuoy className="mr-2 h-5 w-5" />
             Support
           </Link>
         </nav>
 
-        <div className="ml-auto flex items-center space-x-4">
+        {/* Mobile menu */}
+        {mobileMenuOpen && (
+          <div className="absolute top-16 left-0 right-0 bg-white sm:hidden p-4 shadow-lg z-50 dark:bg-gray-800">
+            <div className="space-y-4">
+              {mainDropdowns.map((dropdown) => (
+                <div key={dropdown.label} className="space-y-2">
+                  <div className="flex items-center text-gray-800 font-medium dark:text-white">
+                    <dropdown.icon className="mr-2 h-5 w-5" />
+                    {dropdown.label}
+                  </div>
+                  <div className="pl-7 space-y-2">
+                    {dropdown.subLinks.map((link) => (
+                      <Link
+                        key={link.href}
+                        href={link.href}
+                        className={`flex items-center py-2 text-sm ${
+                          pathname.startsWith(link.href)
+                            ? "text-gray-900 font-medium dark:text-white"
+                            : "text-gray-700 dark:text-gray-300"
+                        }`}
+                        onClick={() => setMobileMenuOpen(false)}
+                      >
+                        <link.icon className="mr-2 h-4 w-4" />
+                        {link.label}
+                      </Link>
+                    ))}
+                  </div>
+                </div>
+              ))}
+              <Link
+                href="/support"
+                className="flex items-center text-gray-700 py-2 dark:text-gray-300"
+                onClick={() => setMobileMenuOpen(false)}
+              >
+                <LifeBuoy className="mr-2 h-5 w-5" />
+                Support
+              </Link>
+            </div>
+          </div>
+        )}
+
+        <div className="ml-auto hidden sm:flex items-center space-x-4">
+          {/* Search button */}
+          <Button
+            variant="ghost"
+            size="icon"
+            className="text-gray-700 hover:bg-gray-100 hover:text-gray-900 dark:text-gray-300 dark:hover:bg-gray-700 dark:hover:text-white"
+          >
+            <Search className="h-5 w-5" />
+          </Button>
+
           {isAuthenticated && (
             <Button
               variant="ghost"
               size="icon"
-              className="relative text-cyan-100 hover:text-white hover:bg-slate-800/30"
+              className="relative text-gray-700 hover:bg-gray-100 hover:text-gray-900 dark:text-gray-300 dark:hover:bg-gray-700 dark:hover:text-white"
               onClick={toggleNotificationPanel}
             >
               <Bell className="h-5 w-5" />
               {unreadCount > 0 && (
-                <span className="absolute -top-1 -right-1 bg-red-500 text-white text-xs rounded-full h-5 w-5 flex items-center justify-center">
+                <span className="absolute -top-1 -right-1 bg-gray-800 text-white text-xs rounded-full h-5 w-5 flex items-center justify-center font-medium dark:bg-gray-600">
                   {unreadCount > 9 ? "9+" : unreadCount}
                 </span>
               )}
@@ -133,27 +196,27 @@ export default function NavBar() {
 
           {isAuthenticated ? (
             <div className="group relative inline-block">
-              <button className="flex items-center space-x-2 text-cyan-100 bg-slate-800/30 px-3 py-1.5 rounded-lg transition-all duration-300 hover:bg-slate-800/50 hover:text-white dark:bg-slate-900/50 dark:hover:bg-slate-900/80">
+              <button className="flex items-center space-x-2 text-gray-700 bg-gray-100 px-3 py-1.5 rounded-lg transition-all duration-300 hover:bg-gray-200 hover:text-gray-900 dark:text-gray-300 dark:bg-gray-700 dark:hover:bg-gray-600 dark:hover:text-white">
                 <div className="flex items-center space-x-2">
-                  <User className="h-6 w-6 text-cyan-400 transition-transform group-hover:rotate-12 duration-300" />
+                  <User className="h-6 w-6 text-gray-500 transition-transform group-hover:rotate-12 duration-300 dark:text-gray-400" />
                   <span className="text-sm font-medium">
                     {session?.user?.name}
                     {isAdmin && (
-                      <span className="ml-2 px-2 py-0.5 bg-cyan-100/80 text-cyan-800 text-xs rounded-full backdrop-blur-sm dark:bg-cyan-900/80 dark:text-cyan-200">
+                      <span className="ml-2 px-2 py-0.5 bg-gray-800 text-white text-xs rounded-full dark:bg-gray-600">
                         Admin
                       </span>
                     )}
                   </span>
                 </div>
-                <ChevronDown className="h-4 w-4 text-cyan-300 transform group-hover:rotate-180 transition-transform duration-300" />
+                <ChevronDown className="h-4 w-4 text-gray-500 transform group-hover:rotate-180 transition-transform duration-300 dark:text-gray-400" />
               </button>
               {/* Added pointer-events-none by default and pointer-events-auto on hover */}
               <div className="absolute right-0 top-full pt-2 z-50 min-w-[200px] origin-top-right opacity-0 invisible group-hover:visible pointer-events-none group-hover:pointer-events-auto group-hover:opacity-100 translate-y-1 group-hover:translate-y-0 transition-all duration-300 ease-out">
-                <div className="bg-gradient-to-b from-cyan-50 to-white backdrop-blur-lg rounded-xl shadow-2xl shadow-cyan-500/10 ring-1 ring-cyan-100/50 p-2 space-y-1 dark:from-slate-800 dark:to-slate-900 dark:ring-cyan-900/50 dark:shadow-cyan-900/10">
+                <div className="bg-white backdrop-blur-lg rounded-xl shadow-lg ring-1 ring-gray-200 p-2 space-y-1 dark:bg-gray-800 dark:ring-gray-700">
                   {/* Profile Link */}
                   <Link
                     href={`/profile/${session?.user?.id}`}
-                    className="flex items-center px-4 py-2.5 text-sm text-slate-700 hover:bg-cyan-50 hover:text-cyan-900 rounded-lg transition-all duration-200 transform hover:scale-[1.02] dark:text-slate-200 dark:hover:bg-slate-700 dark:hover:text-cyan-100"
+                    className="flex items-center px-4 py-2.5 text-sm text-gray-700 hover:bg-gray-100 hover:text-gray-900 rounded-lg transition-all duration-200 transform hover:scale-[1.02] dark:text-gray-300 dark:hover:bg-gray-700 dark:hover:text-white"
                   >
                     <UserCircle className="mr-3 h-4 w-4" />
                     Profile
@@ -164,8 +227,8 @@ export default function NavBar() {
                     href="/dashboard"
                     className={`flex items-center px-4 py-2.5 text-sm rounded-lg transition-all duration-200 transform hover:scale-[1.02] ${
                       pathname.startsWith("/dashboard")
-                        ? "bg-cyan-600 text-white shadow-md dark:bg-cyan-700"
-                        : "text-slate-700 hover:bg-cyan-50 hover:text-cyan-900 dark:text-slate-200 dark:hover:bg-slate-700 dark:hover:text-cyan-100"
+                        ? "bg-gray-800 text-white shadow-md dark:bg-gray-700"
+                        : "text-gray-700 hover:bg-gray-100 hover:text-gray-900 dark:text-gray-300 dark:hover:bg-gray-700 dark:hover:text-white"
                     }`}
                   >
                     <User className="mr-3 h-4 w-4" />
@@ -175,16 +238,16 @@ export default function NavBar() {
                   {isAdmin && (
                     <Link
                       href="/admin"
-                      className="flex items-center px-4 py-2.5 text-sm text-slate-700 hover:bg-cyan-50 hover:text-cyan-900 rounded-lg transition-all duration-200 transform hover:scale-[1.02] dark:text-slate-200 dark:hover:bg-slate-700 dark:hover:text-cyan-100"
+                      className="flex items-center px-4 py-2.5 text-sm text-gray-700 hover:bg-gray-100 hover:text-gray-900 rounded-lg transition-all duration-200 transform hover:scale-[1.02] dark:text-gray-300 dark:hover:bg-gray-700 dark:hover:text-white"
                     >
                       <Shield className="mr-3 h-4 w-4" />
-                      Admin Quarter's 
+                      Admin Quarter's
                       <span className="ml-auto opacity-0 group-hover:opacity-70 transition-opacity">⚓</span>
                     </Link>
                   )}
                   <button
                     onClick={() => signOut({ callbackUrl: "/" })}
-                    className="w-full flex items-center px-4 py-2.5 text-sm text-slate-700 hover:bg-cyan-50 hover:text-cyan-900 rounded-lg transition-all duration-200 transform hover:scale-[1.02] dark:text-slate-200 dark:hover:bg-slate-700 dark:hover:text-cyan-100"
+                    className="w-full flex items-center px-4 py-2.5 text-sm text-gray-700 hover:bg-gray-100 hover:text-gray-900 rounded-lg transition-all duration-200 transform hover:scale-[1.02] dark:text-gray-300 dark:hover:bg-gray-700 dark:hover:text-white"
                   >
                     <LogOut className="mr-3 h-4 w-4" />
                     Log out
@@ -198,18 +261,17 @@ export default function NavBar() {
               <Link href="/signin">
                 <Button
                   variant="ghost"
-                  className="text-cyan-100 hover:bg-cyan-800/50 hover:text-white
-                    transition-all duration-300 hover:scale-105 shadow-sm dark:hover:bg-cyan-900/50"
+                  className="text-gray-700 hover:bg-gray-100 hover:text-gray-900 dark:text-gray-300 dark:hover:bg-gray-700 dark:hover:text-white"
                 >
-                  Sign in 
+                  Sign in
                 </Button>
               </Link>
               <Link href="/signup">
                 <Button
-                  className="bg-cyan-600 hover:bg-cyan-700 text-white shadow-lg shadow-cyan-600/20
-                    transition-all duration-300 hover:scale-105 hover:shadow-cyan-600/40 dark:bg-cyan-700 dark:hover:bg-cyan-600 dark:shadow-cyan-900/20"
+                  className="bg-gray-800 hover:bg-gray-700 text-white shadow-sm
+                    transition-all duration-300 hover:scale-105 dark:bg-gray-700 dark:hover:bg-gray-600"
                 >
-                  Sign up 
+                  Sign up
                 </Button>
               </Link>
             </div>

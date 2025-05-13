@@ -128,6 +128,8 @@ export default function MultiMediaUploader({ onUploadSuccess }: MultiMediaUpload
     }
   }
 
+  const [isPending, setIsPending] = useState(false)
+
   return (
     <div className="space-y-4">
       <Tabs value={mediaType} onValueChange={(value) => setMediaType(value as "image" | "video" | "audio")}>
@@ -231,6 +233,13 @@ export default function MultiMediaUploader({ onUploadSuccess }: MultiMediaUpload
           </>
         )}
       </Button>
+      <button
+        type="submit"
+        disabled={isPending}
+        className="w-full flex justify-center py-2 px-4 border border-transparent rounded-md shadow-sm text-sm font-medium text-white bg-amber-600 hover:bg-amber-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-amber-500 disabled:opacity-50"
+      >
+        {isPending ? "Submitting..." : "Submit"}
+      </button>
     </div>
   )
 }

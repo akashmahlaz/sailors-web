@@ -35,17 +35,17 @@
     --radius: 0.5rem;
 
     /* Custom colors for sailor theme */
-    --cyan-50: 183 100% 96%;
-    --cyan-100: 185 96% 90%;
-    --cyan-200: 186 94% 82%;
-    --cyan-300: 187 92% 69%;
-    --cyan-400: 188 86% 53%;
-    --cyan-500: 189 94% 43%;
-    --cyan-600: 192 91% 36%;
-    --cyan-700: 193 82% 31%;
-    --cyan-800: 194 70% 27%;
-    --cyan-900: 196 64% 24%;
-    --cyan-950: 197 79% 15%;
+    --amber-50: 48 100% 96%;
+    --amber-100: 48 96% 89%;
+    --amber-200: 48 94% 76%;
+    --amber-300: 46 92% 62%;
+    --amber-400: 43 89% 53%;
+    --amber-500: 38 92% 50%;
+    --amber-600: 32 95% 44%;
+    --amber-700: 26 90% 37%;
+    --amber-800: 23 83% 31%;
+    --amber-900: 22 78% 26%;
+    --amber-950: 21 92% 14%;
   }
 
   .dark {
@@ -90,31 +90,31 @@
 
 /* Custom styles for dark mode */
 .dark .bg-gradient-to-b.from-white.to-cyan-50 {
-  @apply from-slate-800 to-slate-900;
+  @apply from-slate-800 to-amber-950;
 }
 
 .dark .border-cyan-100 {
-  @apply border-cyan-900;
+  @apply border-amber-900;
 }
 
 .dark .border-cyan-200 {
-  @apply border-cyan-900;
+  @apply border-amber-900;
 }
 
 .dark .text-cyan-900 {
-  @apply text-cyan-100;
+  @apply text-amber-100;
 }
 
 .dark .text-cyan-800 {
-  @apply text-cyan-200;
+  @apply text-amber-200;
 }
 
 .dark .text-cyan-700 {
-  @apply text-cyan-300;
+  @apply text-amber-300;
 }
 
 .dark .bg-cyan-100 {
-  @apply bg-cyan-900;
+  @apply bg-amber-900;
 }
 
 .dark .bg-cyan-50 {
@@ -124,12 +124,24 @@
 /* Fix for shadow classes with opacity modifiers */
 @layer utilities {
   .dark .shadow-cyan-600\/20 {
-    --tw-shadow-color: rgb(8 145 178 / 0.2);
+    --tw-shadow-color: rgb(217 119 6 / 0.2);
     --tw-shadow: var(--tw-shadow-colored);
   }
 
   .dark .shadow-cyan-500\/10 {
-    --tw-shadow-color: rgb(6 182 212 / 0.1);
+    --tw-shadow-color: rgb(245 158 11 / 0.1);
     --tw-shadow: var(--tw-shadow-colored);
+  }
+}
+
+@keyframes float {
+  0% {
+    transform: translateY(0px) translateX(0px);
+  }
+  50% {
+    transform: translateY(-20px) translateX(10px);
+  }
+  100% {
+    transform: translateY(0px) translateX(0px);
   }
 }
