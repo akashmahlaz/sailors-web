@@ -151,7 +151,7 @@ export function UserManagement() {
 
       {/* Bulk actions */}
       {selectedUsers.length > 0 && (
-        <div className="mb-4 p-2 bg-gray-100 rounded-lg flex items-center justify-between">
+        <div className="mb-4 p-2 bg-gray-600 rounded-lg flex items-center justify-between">
           <span>{selectedUsers.length} users selected</span>
           <div className="flex gap-2">
             <select
@@ -207,7 +207,7 @@ export function UserManagement() {
 
       {/* Users table */}
       <div className="overflow-x-auto">
-        <table className="min-w-full bg-white border rounded-lg">
+        <table className="min-w-full bg-green-300 border rounded-lg">
           <thead>
             <tr className="bg-gray-100 text-gray-700">
               <th className="py-2 px-4 border-b text-left">
