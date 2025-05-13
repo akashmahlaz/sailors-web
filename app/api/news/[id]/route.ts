@@ -5,14 +5,14 @@ import { ObjectId } from "mongodb"
 // Helper function to get the news collection
 async function getNewsCollection() {
   const client = await clientPromise
-  const db = client.db("cloudinary_media")
+  const db = client.db("sailor_platform")
   return db.collection("news")
 }
 
 // Update the GET method to include media items in the response
 export async function GET(request: NextRequest, { params }: { params: { id: string } }) {
   try {
-    const id = params.id
+    const id = await params.id
 
     // Get news collection
     const collection = await getNewsCollection()

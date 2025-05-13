@@ -51,15 +51,35 @@ export default function PhotoUploader({ onUploadSuccess }: PhotoUploaderProps) {
       setSuccess(false)
 
       // Get signature from our API
+      console.log("Getting Cloudinary signature...")
       const signatureResponse = await fetch("/api/cloudinary/signature")
 
       if (!signatureResponse.ok) {
-        const errorData = await signatureResponse.json()
-        throw new Error(`Failed to get upload signature: ${errorData.error || signatureResponse.statusText}`)
+        let errorMessage = "Failed to get upload signature"
+        try {
+          const errorData = await signatureResponse.json()
+          errorMessage = errorData.error || signatureResponse.statusText
+        } catch (e) {
+          errorMessage = `Failed to get upload signature: ${signatureResponse.status} ${signatureResponse.statusText}`
+        }
+        throw new Error(errorMessage)
       }
 
-      const signatureData = await signatureResponse.json()
+      // Parse the signature data
+      let signatureData
+      try {
+        signatureData = await signatureResponse.json()
+        console.log("Signature data received:", signatureData)
+      } catch (e) {
+        console.error("Error parsing signature response:", e)
+        throw new Error("Invalid signature data received from server")
+      }
+
       const { signature, timestamp, cloudName, apiKey } = signatureData
+
+      if (!signature || !timestamp || !cloudName || !apiKey) {
+        throw new Error("Incomplete signature data received from server")
+      }
 
       // Create form data for Cloudinary upload
       const formData = new FormData()
@@ -70,6 +90,7 @@ export default function PhotoUploader({ onUploadSuccess }: PhotoUploaderProps) {
       formData.append("resource_type", "image")
 
       // Upload to Cloudinary with progress tracking
+      console.log("Uploading to Cloudinary...")
       const xhr = new XMLHttpRequest()
       xhr.open("POST", `https://api.cloudinary.com/v1_1/${cloudName}/image/upload`)
 
@@ -82,9 +103,17 @@ export default function PhotoUploader({ onUploadSuccess }: PhotoUploaderProps) {
 
       xhr.onload = async () => {
         if (xhr.status >= 200 && xhr.status < 300) {
-          const response = JSON.parse(xhr.responseText)
+          let response
+          try {
+            response = JSON.parse(xhr.responseText)
+            console.log("Cloudinary upload successful:", response)
+          } catch (e) {
+            console.error("Error parsing Cloudinary response:", e, "Response:", xhr.responseText)
+            throw new Error("Invalid response from Cloudinary")
+          }
 
           // Save photo metadata to our MongoDB database
+          console.log("Saving photo metadata to database...")
           const saveResponse = await fetch("/api/photos", {
             method: "POST",
             headers: {
@@ -103,7 +132,16 @@ export default function PhotoUploader({ onUploadSuccess }: PhotoUploaderProps) {
           })
 
           if (!saveResponse.ok) {
-            console.warn("Photo uploaded to Cloudinary but metadata could not be saved to database")
+            let errorMessage = "Failed to save photo metadata"
+            try {
+              const errorData = await saveResponse.json()
+              errorMessage = errorData.error || saveResponse.statusText
+            } catch (e) {
+              errorMessage = `Failed to save photo metadata: ${saveResponse.status} ${saveResponse.statusText}`
+            }
+            console.warn(errorMessage)
+          } else {
+            console.log("Photo metadata saved successfully")
           }
 
           setSuccess(true)
@@ -126,7 +164,7 @@ export default function PhotoUploader({ onUploadSuccess }: PhotoUploaderProps) {
             const errorResponse = JSON.parse(xhr.responseText)
             errorMessage = errorResponse.error?.message || "Upload failed"
           } catch (e) {
-            // If we can't parse the error response, use the default message
+            errorMessage = `Upload failed with status ${xhr.status}: ${xhr.statusText}`
           }
           throw new Error(errorMessage)
         }
@@ -134,6 +172,7 @@ export default function PhotoUploader({ onUploadSuccess }: PhotoUploaderProps) {
       }
 
       xhr.onerror = () => {
+        console.error("Network error during upload")
         setError("Network error during upload")
         setUploading(false)
       }

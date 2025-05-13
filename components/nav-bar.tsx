@@ -47,9 +47,9 @@ export default function NavBar() {
       label: "Sailor's Buzz",
       icon: Waves,
       subLinks: [
-        { href: "/news", label: "Maritime Reports", icon: Newspaper },
+        { href: "/news", label: "Maritime News", icon: Newspaper },
         { href: "/blog", label: "Sea Blog", icon: FileText },
-        { href: "/podcasts", label: "Sea Waves", icon: Mic },
+        { href: "/podcasts", label: "Sailor's Podcast", icon: Mic },
       ],
     },
   ]
@@ -63,7 +63,7 @@ export default function NavBar() {
             className="flex items-center text-xl font-bold text-white hover:text-cyan-300 transition-colors"
           >
             <Sailboat className="mr-2 h-6 w-6 text-cyan-400 transition-transform hover:rotate-12 duration-300" />
-            Sailor's Voyage
+            Sailor's Platform 
           </Link>
         </div>
 
@@ -140,7 +140,7 @@ export default function NavBar() {
                     {session?.user?.name}
                     {isAdmin && (
                       <span className="ml-2 px-2 py-0.5 bg-cyan-100/80 text-cyan-800 text-xs rounded-full backdrop-blur-sm dark:bg-cyan-900/80 dark:text-cyan-200">
-                        Captain
+                        Admin
                       </span>
                     )}
                   </span>
@@ -156,7 +156,7 @@ export default function NavBar() {
                     className="flex items-center px-4 py-2.5 text-sm text-slate-700 hover:bg-cyan-50 hover:text-cyan-900 rounded-lg transition-all duration-200 transform hover:scale-[1.02] dark:text-slate-200 dark:hover:bg-slate-700 dark:hover:text-cyan-100"
                   >
                     <UserCircle className="mr-3 h-4 w-4" />
-                    My Profile
+                    Profile
                     <span className="ml-auto opacity-0 group-hover:opacity-70 transition-opacity">↗</span>
                   </Link>
 
@@ -169,7 +169,7 @@ export default function NavBar() {
                     }`}
                   >
                     <User className="mr-3 h-4 w-4" />
-                    Ship's Deck
+                    Dashboard
                     <span className="ml-auto opacity-0 group-hover:opacity-70 transition-opacity">↗</span>
                   </Link>
                   {isAdmin && (
@@ -178,7 +178,7 @@ export default function NavBar() {
                       className="flex items-center px-4 py-2.5 text-sm text-slate-700 hover:bg-cyan-50 hover:text-cyan-900 rounded-lg transition-all duration-200 transform hover:scale-[1.02] dark:text-slate-200 dark:hover:bg-slate-700 dark:hover:text-cyan-100"
                     >
                       <Shield className="mr-3 h-4 w-4" />
-                      Captain's Quarters
+                      Admin Quarter's 
                       <span className="ml-auto opacity-0 group-hover:opacity-70 transition-opacity">⚓</span>
                     </Link>
                   )}
@@ -187,7 +187,7 @@ export default function NavBar() {
                     className="w-full flex items-center px-4 py-2.5 text-sm text-slate-700 hover:bg-cyan-50 hover:text-cyan-900 rounded-lg transition-all duration-200 transform hover:scale-[1.02] dark:text-slate-200 dark:hover:bg-slate-700 dark:hover:text-cyan-100"
                   >
                     <LogOut className="mr-3 h-4 w-4" />
-                    Abandon Ship
+                    Log out
                     <span className="ml-auto opacity-0 group-hover:opacity-70 transition-opacity">↩</span>
                   </button>
                 </div>
@@ -201,7 +201,7 @@ export default function NavBar() {
                   className="text-cyan-100 hover:bg-cyan-800/50 hover:text-white
                     transition-all duration-300 hover:scale-105 shadow-sm dark:hover:bg-cyan-900/50"
                 >
-                  Board Ship
+                  Sign in 
                 </Button>
               </Link>
               <Link href="/signup">
@@ -209,7 +209,7 @@ export default function NavBar() {
                   className="bg-cyan-600 hover:bg-cyan-700 text-white shadow-lg shadow-cyan-600/20
                     transition-all duration-300 hover:scale-105 hover:shadow-cyan-600/40 dark:bg-cyan-700 dark:hover:bg-cyan-600 dark:shadow-cyan-900/20"
                 >
-                  Hoist the Colors
+                  Sign up 
                 </Button>
               </Link>
             </div>

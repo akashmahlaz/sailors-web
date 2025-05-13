@@ -27,6 +27,49 @@ async function generateSignature(paramsToSign: Record<string, any>, apiSecret: s
   return hashHex
 }
 
+export async function GET(request: NextRequest) {
+  try {
+    if (!process.env.CLOUDINARY_CLOUD_NAME) {
+      return NextResponse.json({ error: "Missing cloud name configuration" }, { status: 500 })
+    }
+    if (!process.env.CLOUDINARY_API_KEY) {
+      return NextResponse.json({ error: "Missing API key configuration" }, { status: 500 })
+    }
+    if (!process.env.CLOUDINARY_API_SECRET) {
+      return NextResponse.json({ error: "Missing API secret configuration" }, { status: 500 })
+    }
+
+    // Get parameters from query string
+    const { searchParams } = new URL(request.url)
+    const folder = searchParams.get("folder")
+    const resourceType = searchParams.get("resourceType")
+
+    const timestamp = Math.round(new Date().getTime() / 1000)
+    const paramsToSign: Record<string, any> = { timestamp }
+    if (folder) {
+      paramsToSign.folder = folder
+    }
+    const signature = await generateSignature(paramsToSign, process.env.CLOUDINARY_API_SECRET)
+
+    return NextResponse.json({
+      signature,
+      timestamp,
+      cloudName: process.env.CLOUDINARY_CLOUD_NAME,
+      apiKey: process.env.CLOUDINARY_API_KEY,
+      folder,
+      resourceType,
+    })
+  } catch (error) {
+    return NextResponse.json(
+      {
+        error: "Failed to generate upload signature",
+        details: error instanceof Error ? error.message : "Unknown error",
+      },
+      { status: 500 },
+    )
+  }
+}
+
 export async function POST(request: NextRequest) {
   try {
     // Check if all required environment variables are set

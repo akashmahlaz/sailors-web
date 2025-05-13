@@ -3,7 +3,7 @@ import CredentialsProvider from "next-auth/providers/credentials"
 import GoogleProvider from "next-auth/providers/google"
 import GithubProvider from "next-auth/providers/github"
 import { compare } from "bcryptjs"
-import clientPromise from "@/lib/mongodb"
+import { getUsersCollection } from "@/lib/mongodb"
 
 export const authOptions = {
   providers: [
@@ -18,8 +18,7 @@ export const authOptions = {
           throw new Error("Email and password required")
         }
 
-        const client = await clientPromise
-        const usersCollection = client.db().collection("users")
+        const usersCollection = await getUsersCollection()
         const user = await usersCollection.findOne({ email: credentials.email })
 
         if (!user) {

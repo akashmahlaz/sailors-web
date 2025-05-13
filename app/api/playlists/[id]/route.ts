@@ -12,7 +12,7 @@ async function getPlaylistsCollection() {
 // Get a specific playlist
 export async function GET(request: NextRequest, { params }: { params: { id: string } }) {
   try {
-    const id = params.id
+    const id = await params.id
 
     // Get playlists collection
     const collection = await getPlaylistsCollection()

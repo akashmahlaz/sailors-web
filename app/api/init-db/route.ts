@@ -1,34 +1,78 @@
-import { NextResponse } from "next/server"
-import clientPromise from "@/lib/mongodb"
+import { type NextRequest, NextResponse } from "next/server"
+import clientPromise from "@/lib/mongodb-server"
 
-export async function GET() {
+export async function GET(request: NextRequest) {
   try {
     // Connect to MongoDB
     const client = await clientPromise
-    const db = client.db("cloudinary_videos")
 
-    // Create a collection if it doesn't exist
-    // (MongoDB creates collections automatically when documents are inserted,
-    // but we can explicitly create it to verify connection)
-    const collections = await db.listCollections({ name: "videos" }).toArray()
+    // Target database
+    const db = client.db("sailor_platform")
 
-    if (collections.length === 0) {
-      await db.createCollection("videos")
+    // Collections to create
+    const collections = [
+      "videos",
+      "audio",
+      "playlists",
+      "photos",
+      "blogs",
+      "news",
+      "podcasts",
+      "podcast_episodes",
+      "users",
+      "user_profiles",
+      "follows",
+      "support_requests",
+      "support_templates",
+      "knowledge_base",
+      "admin_activity_logs",
+      "admin_notifications",
+    ]
+
+    // Create each collection
+    const results = []
+
+    for (const name of collections) {
+      try {
+        await db.createCollection(name)
+        results.push({
+          collection: name,
+          status: "created",
+        })
+      } catch (error) {
+        // Collection might already exist
+        results.push({
+          collection: name,
+          status: "exists",
+        })
+      }
     }
 
-    // Create an index on publicId for faster lookups and to ensure uniqueness
-    await db.collection("videos").createIndex({ publicId: 1 }, { unique: true })
+    // Create indexes for better performance
+    await db.collection("videos").createIndex({ createdAt: -1 })
+    await db.collection("audio").createIndex({ createdAt: -1 })
+    await db.collection("playlists").createIndex({ createdAt: -1 })
+    await db.collection("photos").createIndex({ createdAt: -1 })
+    await db.collection("blogs").createIndex({ createdAt: -1 })
+    await db.collection("news").createIndex({ publishedAt: -1 })
+    await db.collection("podcasts").createIndex({ createdAt: -1 })
+    await db.collection("users").createIndex({ email: 1 }, { unique: true })
+    await db.collection("user_profiles").createIndex({ userId: 1 }, { unique: true })
+    await db.collection("follows").createIndex({ followerId: 1, followingId: 1 }, { unique: true })
+    await db.collection("support_requests").createIndex({ createdAt: -1 })
+    await db.collection("admin_activity_logs").createIndex({ timestamp: -1 })
+    await db.collection("admin_notifications").createIndex({ createdAt: -1 })
 
     return NextResponse.json({
       success: true,
-      message: "MongoDB database initialized successfully",
+      message: "Database initialization completed",
+      results,
     })
   } catch (error) {
-    console.error("Error initializing database:", error)
+    console.error("Initialization error:", error)
     return NextResponse.json(
       {
-        success: false,
-        error: "Failed to initialize MongoDB database",
+        error: "Failed to initialize database",
         details: error instanceof Error ? error.message : "Unknown error",
       },
       { status: 500 },

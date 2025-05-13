@@ -1,7 +1,7 @@
 import { MongoClient, ServerApiVersion } from "mongodb"
 
 if (!process.env.MONGODB_URI) {
-  throw new Error("Please add your MongoDB URI to .env.local")
+  throw new Error('Invalid/Missing environment variable: "MONGODB_URI"')
 }
 
 const uri = process.env.MONGODB_URI
@@ -13,7 +13,7 @@ const options = {
   },
 }
 
-let client: MongoClient
+let client
 let clientPromise: Promise<MongoClient>
 
 if (process.env.NODE_ENV === "development") {
@@ -38,9 +38,63 @@ if (process.env.NODE_ENV === "development") {
 // separate module, the client can be shared across functions.
 export default clientPromise
 
-// Helper function to get the videos collection
+// Helper functions for collections
+export async function getPhotosCollection() {
+  const client = await clientPromise
+  const db = client.db("sailor_platform")
+  return db.collection("photos")
+}
+
+export async function getBlogsCollection() {
+  const client = await clientPromise
+  const db = client.db("sailor_platform")
+  return db.collection("blogs")
+}
+
 export async function getVideosCollection() {
   const client = await clientPromise
-  const db = client.db("cloudinary_videos")
+  const db = client.db("sailor_platform")
   return db.collection("videos")
+}
+
+export async function getAudioCollection() {
+  const client = await clientPromise
+  const db = client.db("sailor_platform")
+  return db.collection("audio")
+}
+
+export async function getPlaylistsCollection() {
+  const client = await clientPromise
+  const db = client.db("cloudinary_media")
+  return db.collection("playlists")
+}
+
+export async function getUsersCollection() {
+  const client = await clientPromise
+  const db = client.db("sailor_platform")
+  return db.collection("users")
+}
+
+export async function getAdminNotificationsCollection() {
+  const client = await clientPromise
+  const db = client.db("sailor_platform")
+  return db.collection("admin_notifications")
+}
+
+export async function getAdminActivityLogsCollection() {
+  const client = await clientPromise
+  const db = client.db("sailor_platform")
+  return db.collection("admin_activity_logs")
+}
+
+export async function getUserProfilesCollection() {
+  const client = await clientPromise
+  const db = client.db("sailor_platform")
+  return db.collection("user_profiles")
+}
+
+export async function getFollowsCollection() {
+  const client = await clientPromise
+  const db = client.db("sailor_platform")
+  return db.collection("follows")
 }

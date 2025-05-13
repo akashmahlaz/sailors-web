@@ -1,5 +1,5 @@
 import { type NextRequest, NextResponse } from "next/server"
-import { getSupportRequestsCollection } from "@/lib/support-requests"
+import { getSupportRequestsCollection } from "@/lib/mongodb-server"
 import { getServerSession } from "next-auth"
 import { authOptions } from "@/app/api/auth/[...nextauth]/route"
 

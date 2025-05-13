@@ -1,19 +1,5 @@
 import { type NextRequest, NextResponse } from "next/server"
-import clientPromise from "@/lib/mongodb"
-
-// Helper function to get the podcasts collection
-async function getPodcastsCollection() {
-  const client = await clientPromise
-  const db = client.db("cloudinary_media")
-  return db.collection("podcasts")
-}
-
-// Helper function to get the podcast episodes collection
-async function getPodcastEpisodesCollection() {
-  const client = await clientPromise
-  const db = client.db("cloudinary_media")
-  return db.collection("podcast_episodes")
-}
+import { getPodcastsCollection } from "@/lib/mongodb-server"
 
 export async function POST(request: NextRequest) {
   try {

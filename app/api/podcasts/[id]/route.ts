@@ -5,13 +5,13 @@ import { ObjectId } from "mongodb"
 // Helper function to get the podcasts collection
 async function getPodcastsCollection() {
   const client = await clientPromise
-  const db = client.db("cloudinary_media")
+  const db = client.db("sailor_platform")
   return db.collection("podcasts")
 }
 
 export async function GET(request: NextRequest, { params }: { params: { id: string } }) {
   try {
-    const id = params.id
+    const id = await params.id
 
     // Get podcasts collection
     const collection = await getPodcastsCollection()

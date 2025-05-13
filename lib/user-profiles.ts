@@ -1,4 +1,4 @@
-import clientPromise from "./mongodb"
+import { getUserProfilesCollection, getFollowsCollection } from "./mongodb"
 import { ObjectId } from "mongodb"
 
 export interface UserProfile {
@@ -24,18 +24,6 @@ export interface UserProfile {
   followers?: string[]
   interests?: string[]
   expertise?: string[]
-}
-
-export async function getUserProfilesCollection() {
-  const client = await clientPromise
-  const db = client.db("cloudinary_videos")
-  return db.collection("user_profiles")
-}
-
-export async function getFollowsCollection() {
-  const client = await clientPromise
-  const db = client.db("cloudinary_videos")
-  return db.collection("follows")
 }
 
 export async function getUserProfileByUserId(userId: string) {

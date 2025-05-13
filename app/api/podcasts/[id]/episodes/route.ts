@@ -5,14 +5,14 @@ import { ObjectId } from "mongodb"
 // Helper function to get the podcast episodes collection
 async function getPodcastEpisodesCollection() {
   const client = await clientPromise
-  const db = client.db("cloudinary_media")
+  const db = client.db("sailor_platform")
   return db.collection("podcast_episodes")
 }
 
 // Helper function to get the podcasts collection
 async function getPodcastsCollection() {
   const client = await clientPromise
-  const db = client.db("cloudinary_media")
+  const db = client.db("sailor_platform")
   return db.collection("podcasts")
 }
 
@@ -73,7 +73,7 @@ export async function POST(request: NextRequest, { params }: { params: { id: str
 
 export async function GET(request: NextRequest, { params }: { params: { id: string } }) {
   try {
-    const podcastId = params.id
+    const podcastId = await params.id
 
     // Get podcast episodes collection
     const collection = await getPodcastEpisodesCollection()

@@ -1,25 +1,33 @@
 import { type NextRequest, NextResponse } from "next/server"
-import clientPromise from "@/lib/mongodb"
-
-// Helper function to get the photos collection
-async function getPhotosCollection() {
-  const client = await clientPromise
-  const db = client.db("cloudinary_media")
-  return db.collection("photos")
-}
+import { getPhotosCollection } from "@/lib/mongodb-server"
 
 export async function POST(request: NextRequest) {
   try {
-    const { publicId, url, title, description, tags } = await request.json()
+    console.log("Photos API: POST request received")
+
+    // Parse request body with extra error handling
+    let body
+    try {
+      body = await request.json()
+      console.log("Photos API: Request body parsed successfully")
+    } catch (error) {
+      console.error("Photos API: Failed to parse request body as JSON", error)
+      return NextResponse.json({ error: "Invalid request format" }, { status: 400 })
+    }
+
+    const { publicId, url, title, description, tags } = body
 
     if (!publicId || !url) {
-      return NextResponse.json({ error: "Missing required fields" }, { status: 400 })
+      console.error("Photos API: Missing required fields", { publicId, url })
+      return NextResponse.json({ error: "Missing required fields: publicId and url are required" }, { status: 400 })
     }
 
     // Get photos collection
+    console.log("Photos API: Getting database collection")
     const collection = await getPhotosCollection()
 
     // Store photo metadata in MongoDB
+    console.log("Photos API: Storing photo metadata", { publicId, title })
     const result = await collection.insertOne({
       publicId,
       url,
@@ -29,12 +37,13 @@ export async function POST(request: NextRequest) {
       createdAt: new Date(),
     })
 
+    console.log("Photos API: Photo metadata stored successfully", { id: result.insertedId.toString() })
     return NextResponse.json({
       success: true,
       id: result.insertedId.toString(),
     })
   } catch (error) {
-    console.error("Error saving photo metadata:", error)
+    console.error("Photos API: Error processing request", error)
     return NextResponse.json(
       {
         error: "Failed to save photo metadata",
@@ -45,13 +54,17 @@ export async function POST(request: NextRequest) {
   }
 }
 
-export async function GET() {
+export async function GET(request: NextRequest) {
   try {
+    console.log("Photos API: GET request received")
+
     // Get photos collection
     const collection = await getPhotosCollection()
 
     // Get all photos, sorted by creation date (newest first)
+    console.log("Photos API: Fetching photos from database")
     const photos = await collection.find({}).sort({ createdAt: -1 }).toArray()
+    console.log(`Photos API: Found ${photos.length} photos`)
 
     // Transform MongoDB _id to id for client-side compatibility
     const formattedPhotos = photos.map((photo) => ({
@@ -66,7 +79,7 @@ export async function GET() {
 
     return NextResponse.json(formattedPhotos)
   } catch (error) {
-    console.error("Error fetching photos:", error)
+    console.error("Photos API: Error fetching photos", error)
     // Return empty array with a 200 status instead of an error
     return NextResponse.json([])
   }

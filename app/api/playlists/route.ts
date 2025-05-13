@@ -1,12 +1,5 @@
 import { type NextRequest, NextResponse } from "next/server"
-import clientPromise from "@/lib/mongodb"
-
-// Helper function to get the playlists collection
-async function getPlaylistsCollection() {
-  const client = await clientPromise
-  const db = client.db("cloudinary_media")
-  return db.collection("playlists")
-}
+import { getPlaylistsCollection } from "@/lib/mongodb"
 
 export async function POST(request: NextRequest) {
   try {

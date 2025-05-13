@@ -1,12 +1,5 @@
 import { type NextRequest, NextResponse } from "next/server"
-import clientPromise from "@/lib/mongodb"
-
-// Helper function to get the blogs collection
-async function getBlogsCollection() {
-  const client = await clientPromise
-  const db = client.db("cloudinary_media")
-  return db.collection("blogs")
-}
+import { getBlogsCollection } from "@/lib/mongodb-server"
 
 export async function POST(request: NextRequest) {
   try {

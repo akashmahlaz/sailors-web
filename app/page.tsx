@@ -28,6 +28,7 @@ import {
   TrendingUp,
   CloudLightningIcon as Lightning,
   Radio,
+  AlertCircle,
 } from "lucide-react"
 
 import VideoGallery from "@/components/video-gallery"
@@ -48,6 +49,7 @@ export default function Home() {
   const [featuredSailors, setFeaturedSailors] = useState<any[]>([])
   const [trendingContent, setTrendingContent] = useState<any[]>([])
   const [isLoading, setIsLoading] = useState(true)
+  const [fetchError, setFetchError] = useState<string | null>(null)
 
   useEffect(() => {
     fetchLatestContent()
@@ -55,78 +57,184 @@ export default function Home() {
 
   const fetchLatestContent = async () => {
     setIsLoading(true)
+    setFetchError(null)
+
     try {
+      console.log("Home: Fetching latest content")
+
       // Fetch latest videos
-      const videosRes = await fetch("/api/videos?limit=8")
-      const videosData = await videosRes.json()
-      setLatestVideos(Array.isArray(videosData) ? videosData : videosData.videos || [])
+      try {
+        console.log("Home: Fetching videos")
+        const videosRes = await fetch("/api/videos?limit=8")
+
+        if (!videosRes.ok) {
+          console.error(`Home: Failed to fetch videos: ${videosRes.status} ${videosRes.statusText}`)
+          throw new Error(`Failed to fetch videos: ${videosRes.status} ${videosRes.statusText}`)
+        }
+
+        // Parse the videos data
+        let videosData
+        try {
+          videosData = await videosRes.json()
+          console.log(
+            `Home: Fetched ${videosData.length || (videosData.videos && videosData.videos.length) || 0} videos`,
+          )
+        } catch (e) {
+          console.error("Home: Error parsing videos response:", e)
+          throw new Error("Invalid videos data received from server")
+        }
+
+        setLatestVideos(Array.isArray(videosData) ? videosData : videosData.videos || [])
+      } catch (error) {
+        console.error("Home: Error fetching videos:", error)
+        setLatestVideos([])
+      }
 
       // Fetch latest photos
-      const photosRes = await fetch("/api/photos?limit=6")
-      const photosData = await photosRes.json()
-      setLatestPhotos(Array.isArray(photosData) ? photosData : photosData.photos || [])
+      try {
+        console.log("Home: Fetching photos")
+        const photosRes = await fetch("/api/photos?limit=6")
+
+        if (!photosRes.ok) {
+          console.error(`Home: Failed to fetch photos: ${photosRes.status} ${photosRes.statusText}`)
+          throw new Error(`Failed to fetch photos: ${photosRes.status} ${photosRes.statusText}`)
+        }
+
+        // Parse the photos data
+        let photosData
+        try {
+          photosData = await photosRes.json()
+          console.log(
+            `Home: Fetched ${photosData.length || (photosData.photos && photosData.photos.length) || 0} photos`,
+          )
+        } catch (e) {
+          console.error("Home: Error parsing photos response:", e)
+          throw new Error("Invalid photos data received from server")
+        }
+
+        setLatestPhotos(Array.isArray(photosData) ? photosData : photosData.photos || [])
+      } catch (error) {
+        console.error("Home: Error fetching photos:", error)
+        setLatestPhotos([])
+      }
 
       // Fetch latest podcasts
-      const podcastsRes = await fetch("/api/podcasts?limit=3")
-      const podcastsData = await podcastsRes.json()
+      try {
+        console.log("Home: Fetching podcasts")
+        const podcastsRes = await fetch("/api/podcasts?limit=3")
 
-      // For each podcast, fetch the latest episode
-      const fetchedPodcasts = Array.isArray(podcastsData) ? podcastsData : podcastsData.podcasts || []
-      const podcastsWithEpisodes = await Promise.all(
-        fetchedPodcasts.map(async (podcast: any) => {
-          try {
-            const episodesRes = await fetch(`/api/podcasts/${podcast._id}/episodes`)
-            const episodesData = await episodesRes.json()
-            return {
-              ...podcast,
-              latestEpisode: episodesData.episodes?.[0] || null,
-            }
-          } catch (error) {
-            console.error(`Error fetching episodes for podcast ${podcast._id}:`, error)
-            return {
-              ...podcast,
-              latestEpisode: null,
-            }
-          }
-        }),
-      )
+        if (!podcastsRes.ok) {
+          console.error(`Home: Failed to fetch podcasts: ${podcastsRes.status} ${podcastsRes.statusText}`)
+          throw new Error(`Failed to fetch podcasts: ${podcastsRes.status} ${podcastsRes.statusText}`)
+        }
 
-      setLatestPodcasts(podcastsWithEpisodes)
+        // Parse the podcasts data
+        let podcastsData
+        try {
+          podcastsData = await podcastsRes.json()
+          console.log(
+            `Home: Fetched ${podcastsData.length || (podcastsData.podcasts && podcastsData.podcasts.length) || 0} podcasts`,
+          )
+        } catch (e) {
+          console.error("Home: Error parsing podcasts response:", e)
+          throw new Error("Invalid podcasts data received from server")
+        }
+
+        // For each podcast, fetch the latest episode
+        const fetchedPodcasts = Array.isArray(podcastsData) ? podcastsData : podcastsData.podcasts || []
+        const podcastsWithEpisodes = await Promise.all(
+          fetchedPodcasts.map(async (podcast: any) => {
+            try {
+              console.log(`Home: Fetching episodes for podcast ${podcast._id || podcast.id}`)
+              const episodesRes = await fetch(`/api/podcasts/${podcast._id || podcast.id}/episodes`)
+
+              if (!episodesRes.ok) {
+                console.error(`Home: Failed to fetch episodes: ${episodesRes.status} ${episodesRes.statusText}`)
+                return {
+                  ...podcast,
+                  latestEpisode: null,
+                }
+              }
+
+              const episodesData = await episodesRes.json()
+              return {
+                ...podcast,
+                latestEpisode: episodesData.episodes?.[0] || null,
+              }
+            } catch (error) {
+              console.error(`Home: Error fetching episodes for podcast ${podcast._id || podcast.id}:`, error)
+              return {
+                ...podcast,
+                latestEpisode: null,
+              }
+            }
+          }),
+        )
+
+        setLatestPodcasts(podcastsWithEpisodes)
+      } catch (error) {
+        console.error("Home: Error fetching podcasts:", error)
+        setLatestPodcasts([])
+      }
 
       // Fetch featured sailors (users)
       try {
+        console.log("Home: Fetching featured sailors")
         const sailorsRes = await fetch("/api/users?limit=6")
-        const sailorsData = await sailorsRes.json()
+
+        if (!sailorsRes.ok) {
+          console.error(`Home: Failed to fetch sailors: ${sailorsRes.status} ${sailorsRes.statusText}`)
+          throw new Error(`Failed to fetch sailors: ${sailorsRes.status} ${sailorsRes.statusText}`)
+        }
+
+        // Parse the sailors data
+        let sailorsData
+        try {
+          sailorsData = await sailorsRes.json()
+          console.log(
+            `Home: Fetched ${sailorsData.length || (sailorsData.users && sailorsData.users.length) || 0} sailors`,
+          )
+        } catch (e) {
+          console.error("Home: Error parsing sailors response:", e)
+          throw new Error("Invalid sailors data received from server")
+        }
+
         setFeaturedSailors(Array.isArray(sailorsData) ? sailorsData : sailorsData.users || [])
       } catch (error) {
-        console.error("Error fetching featured sailors:", error)
+        console.error("Home: Error fetching featured sailors:", error)
         setFeaturedSailors([])
       }
 
-      // Create trending content from a mix of existing content
-      const trending = [
-        ...(Array.isArray(videosData) ? videosData : videosData.videos || []).slice(0, 3).map((item: any) => ({
-          ...item,
-          type: "video",
-          views: Math.floor(Math.random() * 5000) + 1000,
-        })),
-        ...(Array.isArray(photosData) ? photosData : photosData.photos || []).slice(0, 2).map((item: any) => ({
-          ...item,
-          type: "photo",
-          views: Math.floor(Math.random() * 3000) + 800,
-        })),
-        ...podcastsWithEpisodes.slice(0, 1).map((item: any) => ({
-          ...item,
-          type: "podcast",
-          views: Math.floor(Math.random() * 2000) + 500,
-        })),
-      ]
+      // Create trending content
+      console.log("Home: Creating trending content")
+      const videos = latestVideos.slice(0, 3).map((item: any) => ({
+        ...item,
+        type: "video",
+        views: Math.floor(Math.random() * 5000) + 1000,
+        id: item._id || item.id,
+      }))
 
-      // Shuffle trending array and limit to 5 items
+      const photos = latestPhotos.slice(0, 2).map((item: any) => ({
+        ...item,
+        type: "photo",
+        views: Math.floor(Math.random() * 3000) + 800,
+        id: item._id || item.id,
+      }))
+
+      const podcasts = latestPodcasts.slice(0, 1).map((item: any) => ({
+        ...item,
+        type: "podcast",
+        views: Math.floor(Math.random() * 2000) + 500,
+        id: item._id || item.id,
+      }))
+
+      // Combine and shuffle
+      const trending = [...videos, ...photos, ...podcasts]
       const shuffled = trending.sort(() => 0.5 - Math.random()).slice(0, 5)
       setTrendingContent(shuffled)
     } catch (error) {
-      console.error("Error fetching latest content:", error)
+      console.error("Home: Error fetching latest content:", error)
+      setFetchError(error instanceof Error ? error.message : "Failed to load content")
     } finally {
       setIsLoading(false)
     }
@@ -241,67 +349,83 @@ export default function Home() {
             </Link>
           </div>
 
-          <div className="grid grid-cols-1 md:grid-cols-3 lg:grid-cols-5 gap-6">
-            {trendingContent.map((item, index) => (
-              <Card
-                key={item._id || item.id || index}
-                className="overflow-hidden border-none shadow-md hover:shadow-lg transition-all group"
-              >
-                <Link href={`/${item.type}s/${item._id || item.id}`}>
-                  <div className="relative aspect-video overflow-hidden bg-slate-200 dark:bg-slate-800">
-                    <img
-                      src={
-                        item.thumbnail_url ||
-                        item.coverImage ||
-                        item.url ||
-                        (item.type === "video"
-                          ? `https://res.cloudinary.com/${process.env.NEXT_PUBLIC_CLOUDINARY_CLOUD_NAME}/video/upload/so_0/${item.public_id}.jpg`
-                          : "/diverse-media-landscape.png")
-                      }
-                      alt={item.title || "Media thumbnail"}
-                      className="w-full h-full object-cover transition-transform group-hover:scale-105"
-                    />
+          {fetchError && (
+            <div className="p-4 bg-red-50 border border-red-200 rounded-md text-red-700 flex items-center gap-2 mb-6">
+              <AlertCircle className="h-5 w-5 flex-shrink-0" />
+              <div>
+                <p className="font-medium">Error loading content</p>
+                <p className="text-sm">{fetchError}</p>
+              </div>
+            </div>
+          )}
 
-                    <div className="absolute inset-0 bg-gradient-to-t from-black/70 to-transparent opacity-60"></div>
-
-                    <div className="absolute top-2 left-2">
-                      <Badge className="bg-black/50 text-white border-0 backdrop-blur-sm">
-                        {item.type === "video" && <Film className="h-3 w-3 mr-1" />}
-                        {item.type === "photo" && <ImageIcon className="h-3 w-3 mr-1" />}
-                        {item.type === "podcast" && <Mic className="h-3 w-3 mr-1" />}#{index + 1} Trending
-                      </Badge>
-                    </div>
-
-                    {item.type === "video" && (
-                      <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 transform">
-                        <div className="bg-white/20 backdrop-blur-sm rounded-full p-3 opacity-0 group-hover:opacity-100 transition-opacity">
-                          <Play className="h-6 w-6 text-white fill-white" />
-                        </div>
-                      </div>
-                    )}
-                  </div>
-                </Link>
-
-                <CardContent className="p-3">
+          {trendingContent.length === 0 ? (
+            <div className="text-center py-8 text-muted-foreground">
+              {isLoading ? "Loading trending content..." : "No trending content available"}
+            </div>
+          ) : (
+            <div className="grid grid-cols-1 md:grid-cols-3 lg:grid-cols-5 gap-6">
+              {trendingContent.map((item, index) => (
+                <Card
+                  key={item.id || index}
+                  className="overflow-hidden border-none shadow-md hover:shadow-lg transition-all group"
+                >
                   <Link href={`/${item.type}s/${item._id || item.id}`}>
-                    <h3 className="font-medium text-sm line-clamp-1 group-hover:text-cyan-700 dark:group-hover:text-cyan-400 transition-colors">
-                      {item.title || (item.type === "video" ? item.public_id?.split("/")?.pop() : "Untitled")}
-                    </h3>
+                    <div className="relative aspect-video overflow-hidden bg-slate-200 dark:bg-slate-800">
+                      <img
+                        src={
+                          item.thumbnail_url ||
+                          item.coverImage ||
+                          item.url ||
+                          (item.type === "video"
+                            ? `https://res.cloudinary.com/${process.env.NEXT_PUBLIC_CLOUDINARY_CLOUD_NAME}/video/upload/so_0/${item.public_id}.jpg`
+                            : "/diverse-media-landscape.png")
+                        }
+                        alt={item.title || "Media thumbnail"}
+                        className="w-full h-full object-cover transition-transform group-hover:scale-105"
+                      />
+
+                      <div className="absolute inset-0 bg-gradient-to-t from-black/70 to-transparent opacity-60"></div>
+
+                      <div className="absolute top-2 left-2">
+                        <Badge className="bg-black/50 text-white border-0 backdrop-blur-sm">
+                          {item.type === "video" && <Film className="h-3 w-3 mr-1" />}
+                          {item.type === "photo" && <ImageIcon className="h-3 w-3 mr-1" />}
+                          {item.type === "podcast" && <Mic className="h-3 w-3 mr-1" />}#{index + 1} Trending
+                        </Badge>
+                      </div>
+
+                      {item.type === "video" && (
+                        <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 transform">
+                          <div className="bg-white/20 backdrop-blur-sm rounded-full p-3 opacity-0 group-hover:opacity-100 transition-opacity">
+                            <Play className="h-6 w-6 text-white fill-white" />
+                          </div>
+                        </div>
+                      )}
+                    </div>
                   </Link>
 
-                  <div className="flex items-center justify-between mt-2 text-xs text-slate-500">
-                    <div className="flex items-center">
-                      <Lightning className="h-3 w-3 mr-1 text-red-500" />
-                      {item.views.toLocaleString()} views
+                  <CardContent className="p-3">
+                    <Link href={`/${item.type}s/${item._id || item.id}`}>
+                      <h3 className="font-medium text-sm line-clamp-1 group-hover:text-cyan-700 dark:group-hover:text-cyan-400 transition-colors">
+                        {item.title || (item.type === "video" ? item.public_id?.split("/")?.pop() : "Untitled")}
+                      </h3>
+                    </Link>
+
+                    <div className="flex items-center justify-between mt-2 text-xs text-slate-500">
+                      <div className="flex items-center">
+                        <Lightning className="h-3 w-3 mr-1 text-red-500" />
+                        {item.views.toLocaleString()} views
+                      </div>
+                      <Badge variant="outline" className="font-normal">
+                        {item.type}
+                      </Badge>
                     </div>
-                    <Badge variant="outline" className="font-normal">
-                      {item.type}
-                    </Badge>
-                  </div>
-                </CardContent>
-              </Card>
-            ))}
-          </div>
+                  </CardContent>
+                </Card>
+              ))}
+            </div>
+          )}
         </div>
       </section>
 
@@ -416,7 +540,8 @@ export default function Home() {
                               src={
                                 sailor.profileImage ||
                                 sailor.image ||
-                                "/placeholder.svg?height=200&width=200&query=sailor%20profile"
+                                "/placeholder.svg?height=200&width=200&query=sailor%20profile" ||
+                                "/placeholder.svg"
                               }
                               alt={sailor.name || "Sailor"}
                             />

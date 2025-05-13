@@ -54,14 +54,35 @@ export default function AudioUploader({ onUploadSuccess }: AudioUploaderProps) {
       setUploadedAudioId(null)
 
       // Get signature from our API
-      const signatureResponse = await fetch("/api/cloudinary/signature")
+      const signatureResponse = await fetch("/api/cloudinary/signature", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({
+          resourceType: "audio",
+        }),
+      })
 
       if (!signatureResponse.ok) {
-        const errorData = await signatureResponse.json()
-        throw new Error(`Failed to get upload signature: ${errorData.error || signatureResponse.statusText}`)
+        const errorText = await signatureResponse.text()
+        console.error("Signature response error:", errorText)
+        try {
+          const errorData = JSON.parse(errorText)
+          throw new Error(`Failed to get upload signature: ${errorData.error || signatureResponse.statusText}`)
+        } catch (e) {
+          throw new Error(`Failed to get upload signature: ${signatureResponse.statusText}`)
+        }
       }
 
-      const signatureData = await signatureResponse.json()
+      let signatureData
+      try {
+        signatureData = await signatureResponse.json()
+      } catch (e) {
+        console.error("Error parsing signature response:", e)
+        throw new Error("Invalid response from signature endpoint")
+      }
+
       const { signature, timestamp, cloudName, apiKey } = signatureData
 
       // Validate the signature response
@@ -99,29 +120,42 @@ export default function AudioUploader({ onUploadSuccess }: AudioUploaderProps) {
 
       xhr.onload = async () => {
         if (xhr.status >= 200 && xhr.status < 300) {
-          const response = JSON.parse(xhr.responseText)
+          let response
+          try {
+            response = JSON.parse(xhr.responseText)
+          } catch (e) {
+            console.error("Error parsing Cloudinary response:", e, "Response text:", xhr.responseText)
+            throw new Error("Invalid response from Cloudinary")
+          }
 
-          // Save audio metadata to our MongoDB database
-          const saveResponse = await fetch("/api/audio", {
-            method: "POST",
-            headers: {
-              "Content-Type": "application/json",
-            },
-            body: JSON.stringify({
-              publicId: response.public_id,
-              url: response.secure_url,
-              resourceType: response.resource_type,
-              format: response.format,
-              duration: response.duration || 0,
-              title: file.name.replace(/\.[^/.]+$/, ""), // Remove file extension
-            }),
-          })
+          try {
+            // Save audio metadata to our MongoDB database
+            const saveResponse = await fetch("/api/audio", {
+              method: "POST",
+              headers: {
+                "Content-Type": "application/json",
+              },
+              body: JSON.stringify({
+                publicId: response.public_id,
+                url: response.secure_url,
+                resourceType: response.resource_type,
+                format: response.format,
+                duration: response.duration || 0,
+                title: file.name.replace(/\.[^/.]+$/, ""), // Remove file extension
+              }),
+            })
 
-          if (!saveResponse.ok) {
-            console.warn("Audio uploaded to Cloudinary but metadata could not be saved to database")
-          } else {
+            if (!saveResponse.ok) {
+              const saveErrorText = await saveResponse.text()
+              console.warn("Audio uploaded to Cloudinary but metadata could not be saved to database:", saveErrorText)
+              throw new Error("Failed to save audio metadata")
+            }
+
             const saveData = await saveResponse.json()
             setUploadedAudioId(saveData.id)
+          } catch (e) {
+            console.error("Error saving audio metadata:", e)
+            throw new Error("Audio uploaded but metadata could not be saved")
           }
 
           setSuccess(true)
@@ -141,6 +175,7 @@ export default function AudioUploader({ onUploadSuccess }: AudioUploaderProps) {
             errorMessage = errorResponse.error?.message || "Upload failed"
           } catch (e) {
             // If we can't parse the error response, use the default message
+            console.error("Error parsing Cloudinary error response:", e, "Response text:", xhr.responseText)
           }
           throw new Error(errorMessage)
         }
@@ -148,6 +183,7 @@ export default function AudioUploader({ onUploadSuccess }: AudioUploaderProps) {
       }
 
       xhr.onerror = () => {
+        console.error("Network error during upload")
         setError("Network error during upload")
         setUploading(false)
       }
@@ -178,14 +214,35 @@ export default function AudioUploader({ onUploadSuccess }: AudioUploaderProps) {
       setThumbnailSuccess(false)
 
       // Get signature from our API
-      const signatureResponse = await fetch("/api/cloudinary/signature")
+      const signatureResponse = await fetch("/api/cloudinary/signature", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({
+          resourceType: "image",
+        }),
+      })
 
       if (!signatureResponse.ok) {
-        const errorData = await signatureResponse.json()
-        throw new Error(`Failed to get upload signature: ${errorData.error || signatureResponse.statusText}`)
+        const errorText = await signatureResponse.text()
+        console.error("Signature response error:", errorText)
+        try {
+          const errorData = JSON.parse(errorText)
+          throw new Error(`Failed to get upload signature: ${errorData.error || signatureResponse.statusText}`)
+        } catch (e) {
+          throw new Error(`Failed to get upload signature: ${signatureResponse.statusText}`)
+        }
       }
 
-      const signatureData = await signatureResponse.json()
+      let signatureData
+      try {
+        signatureData = await signatureResponse.json()
+      } catch (e) {
+        console.error("Error parsing signature response:", e)
+        throw new Error("Invalid response from signature endpoint")
+      }
+
       const { signature, timestamp, cloudName, apiKey } = signatureData
 
       // Create form data for Cloudinary upload
@@ -209,22 +266,37 @@ export default function AudioUploader({ onUploadSuccess }: AudioUploaderProps) {
 
       xhr.onload = async () => {
         if (xhr.status >= 200 && xhr.status < 300) {
-          const response = JSON.parse(xhr.responseText)
+          let response
+          try {
+            response = JSON.parse(xhr.responseText)
+          } catch (e) {
+            console.error("Error parsing Cloudinary response:", e, "Response text:", xhr.responseText)
+            throw new Error("Invalid response from Cloudinary")
+          }
 
-          // Update the audio record with the thumbnail URL
-          const updateResponse = await fetch("/api/audio", {
-            method: "PUT",
-            headers: {
-              "Content-Type": "application/json",
-            },
-            body: JSON.stringify({
-              id: uploadedAudioId,
-              thumbnailUrl: response.secure_url,
-            }),
-          })
+          try {
+            // Update the audio record with the thumbnail URL
+            const updateResponse = await fetch("/api/audio", {
+              method: "PUT",
+              headers: {
+                "Content-Type": "application/json",
+              },
+              body: JSON.stringify({
+                id: uploadedAudioId,
+                thumbnailUrl: response.secure_url,
+              }),
+            })
 
-          if (!updateResponse.ok) {
-            console.warn("Thumbnail uploaded to Cloudinary but audio record could not be updated")
+            if (!updateResponse.ok) {
+              const updateErrorText = await updateResponse.text()
+              console.warn("Thumbnail uploaded to Cloudinary but audio record could not be updated:", updateErrorText)
+              throw new Error("Failed to update audio with thumbnail")
+            }
+
+            await updateResponse.json() // Ensure we can parse the response
+          } catch (e) {
+            console.error("Error updating audio with thumbnail:", e)
+            throw new Error("Thumbnail uploaded but audio record could not be updated")
           }
 
           setThumbnailSuccess(true)
@@ -244,6 +316,7 @@ export default function AudioUploader({ onUploadSuccess }: AudioUploaderProps) {
             errorMessage = errorResponse.error?.message || "Upload failed"
           } catch (e) {
             // If we can't parse the error response, use the default message
+            console.error("Error parsing Cloudinary error response:", e, "Response text:", xhr.responseText)
           }
           throw new Error(errorMessage)
         }
@@ -251,6 +324,7 @@ export default function AudioUploader({ onUploadSuccess }: AudioUploaderProps) {
       }
 
       xhr.onerror = () => {
+        console.error("Network error during upload")
         setThumbnailError("Network error during upload")
         setThumbnailUploading(false)
       }

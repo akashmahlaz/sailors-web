@@ -1,11 +1,9 @@
 import { type NextRequest, NextResponse } from "next/server"
-import clientPromise from "@/lib/mongodb"
+import { getNewsCollection } from "@/lib/mongodb-server"
 
 // Helper function to get the news collection
-async function getNewsCollection() {
-  const client = await clientPromise
-  const db = client.db("cloudinary_media")
-  return db.collection("news")
+async function getNewsCollectionWrapper() {
+  return await getNewsCollection()
 }
 
 export async function POST(request: NextRequest) {
@@ -27,7 +25,7 @@ export async function POST(request: NextRequest) {
     }
 
     // Get news collection
-    const collection = await getNewsCollection()
+    const collection = await getNewsCollectionWrapper()
 
     // Store news article in MongoDB
     const result = await collection.insertOne({
@@ -65,7 +63,7 @@ export async function POST(request: NextRequest) {
 export async function GET(request: NextRequest) {
   try {
     // Get news collection
-    const collection = await getNewsCollection()
+    const collection = await getNewsCollectionWrapper()
     const url = new URL(request.url)
 
     // Get query parameters

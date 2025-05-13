@@ -65,12 +65,30 @@ export default function CloudinaryUploader({
       })
 
       if (!signatureResponse.ok) {
-        const errorData = await signatureResponse.json()
-        throw new Error(`Failed to get upload signature: ${errorData.error || signatureResponse.statusText}`)
+        const errorText = await signatureResponse.text()
+        console.error("Signature response error:", errorText)
+        try {
+          const errorData = JSON.parse(errorText)
+          throw new Error(`Failed to get upload signature: ${errorData.error || signatureResponse.statusText}`)
+        } catch (e) {
+          throw new Error(`Failed to get upload signature: ${signatureResponse.statusText}`)
+        }
       }
 
-      const signatureData = await signatureResponse.json()
+      let signatureData
+      try {
+        signatureData = await signatureResponse.json()
+      } catch (e) {
+        console.error("Error parsing signature response:", e)
+        throw new Error("Invalid response from signature endpoint")
+      }
+
       const { signature, timestamp, cloudName, apiKey } = signatureData
+
+      if (!signature || !timestamp || !cloudName || !apiKey) {
+        console.error("Missing required signature data:", signatureData)
+        throw new Error("Incomplete signature data received")
+      }
 
       // Create form data for Cloudinary upload
       const formData = new FormData()
@@ -118,7 +136,7 @@ export default function CloudinaryUploader({
             const fileInput = document.getElementById("file-upload") as HTMLInputElement
             if (fileInput) fileInput.value = ""
           } catch (e) {
-            console.error("Error parsing response:", e)
+            console.error("Error parsing response:", e, "Response text:", xhr.responseText)
             throw new Error("Invalid response from Cloudinary")
           }
         } else {
@@ -128,6 +146,7 @@ export default function CloudinaryUploader({
             errorMessage = errorResponse.error?.message || "Upload failed"
           } catch (e) {
             // If we can't parse the error response, use the default message
+            console.error("Error parsing error response:", e, "Response text:", xhr.responseText)
           }
           throw new Error(errorMessage)
         }
@@ -135,6 +154,7 @@ export default function CloudinaryUploader({
       }
 
       xhr.onerror = () => {
+        console.error("Network error during upload")
         setError("Network error during upload")
         setUploading(false)
       }

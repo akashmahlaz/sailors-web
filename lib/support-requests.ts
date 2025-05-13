@@ -1,32 +1,25 @@
-import clientPromise from "@/lib/mongodb"
-
-// Helper function to get the support requests collection
-export async function getSupportRequestsCollection() {
-  const client = await clientPromise
-  const db = client.db("cloudinary_media")
-  return db.collection("support_requests")
-}
+import clientPromise from "@/lib/mongodb-server"
 
 export interface SupportRequest {
-  id?: string
+  id: string
   title: string
   description: string
   category: string
   isAnonymous: boolean
-  submitterId?: string
-  submitterName?: string
-  submitterEmail?: string
+  submitterId?: string | null
+  submitterName?: string | null
+  submitterEmail?: string | null
   status: "pending" | "in-review" | "resolved" | "dismissed"
-  proofs: Array<{
-    url: string
-    publicId: string
-    resourceType: string
-    format: string
-    name?: string
-  }>
-  createdAt: Date
-  updatedAt: Date
+  proofs: any[]
+  createdAt: string
+  updatedAt?: string
   adminNotes?: string
   adminId?: string
   resolution?: string
+}
+
+export async function getSupportRequestsCollection() {
+  const client = await clientPromise
+  const db = client.db("sailor_platform")
+  return db.collection("support_requests")
 }
