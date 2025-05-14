@@ -15,6 +15,9 @@ import {
   MessageSquare,
   Share2,
   Eye,
+  User,
+  Calendar,
+  Clock,
 } from "lucide-react"
 import { Button } from "@/components/ui/button"
 import { Dialog, DialogContent } from "@/components/ui/dialog"
@@ -24,6 +27,7 @@ import { Textarea } from "@/components/ui/textarea"
 import { useSession } from "next-auth/react"
 import { formatDistanceToNow } from "date-fns"
 import { toast } from "@/components/ui/use-toast"
+import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs"
 
 interface Photo {
   id: string
@@ -61,12 +65,13 @@ const PhotoGallery = forwardRef<PhotoGalleryRef>((props, ref) => {
   const [loading, setLoading] = useState(true)
   const [error, setError] = useState<string | null>(null)
   const [selectedPhoto, setSelectedPhoto] = useState<Photo | null>(null)
-  const [showInfo, setShowInfo] = useState(false)
+  const [showInfo, setShowInfo] = useState(true)
   const [likedPhotos, setLikedPhotos] = useState<Record<string, boolean>>({})
   const [commentText, setCommentText] = useState("")
   const [showComments, setShowComments] = useState(false)
   const [comments, setComments] = useState<Comment[]>([])
   const [loadingComments, setLoadingComments] = useState(false)
+  const [activeTab, setActiveTab] = useState<string>("info")
 
   const fetchPhotos = async () => {
     try {
@@ -121,6 +126,16 @@ const PhotoGallery = forwardRef<PhotoGalleryRef>((props, ref) => {
       await fetch(`/api/photos/${photoId}/view`, {
         method: "POST",
       })
+
+      // Update local view count
+      setPhotos(photos.map((photo) => (photo.id === photoId ? { ...photo, views: photo.views + 1 } : photo)))
+
+      if (selectedPhoto && selectedPhoto.id === photoId) {
+        setSelectedPhoto({
+          ...selectedPhoto,
+          views: selectedPhoto.views + 1,
+        })
+      }
     } catch (error) {
       console.error("Error recording view:", error)
     }
@@ -130,8 +145,27 @@ const PhotoGallery = forwardRef<PhotoGalleryRef>((props, ref) => {
     setSelectedPhoto(photo)
     setShowInfo(true)
     setShowComments(false)
+    setActiveTab("info")
     await recordView(photo.id)
     await fetchComments(photo.id)
+
+    // Check if this photo is liked by the current user
+    if (session?.user?.id) {
+      try {
+        const response = await fetch(`/api/photos/${photo.id}/like/check`, {
+          method: "GET",
+        })
+        if (response.ok) {
+          const { liked } = await response.json()
+          setLikedPhotos((prev) => ({
+            ...prev,
+            [photo.id]: liked,
+          }))
+        }
+      } catch (error) {
+        console.error("Error checking like status:", error)
+      }
+    }
   }
 
   const downloadPhoto = (photo: Photo) => {
@@ -299,6 +333,29 @@ const PhotoGallery = forwardRef<PhotoGalleryRef>((props, ref) => {
     }
   }
 
+  const sharePhoto = () => {
+    if (!selectedPhoto) return
+
+    if (navigator.share) {
+      navigator
+        .share({
+          title: selectedPhoto.title || "Shared Photo",
+          text: selectedPhoto.description || "Check out this photo!",
+          url: window.location.href,
+        })
+        .catch((err) => {
+          console.error("Error sharing:", err)
+        })
+    } else {
+      // Fallback for browsers that don't support navigator.share
+      navigator.clipboard.writeText(window.location.href)
+      toast({
+        title: "Link copied",
+        description: "Photo link copied to clipboard",
+      })
+    }
+  }
+
   if (loading) {
     return (
       <Card>
@@ -318,17 +375,17 @@ const PhotoGallery = forwardRef<PhotoGalleryRef>((props, ref) => {
   }
 
   return (
-    <Card className="border-cyan-200 shadow-lg">
-      <CardHeader className="flex flex-row items-center justify-between border-b border-cyan-100">
+    <Card className="border-gray-200 shadow-lg">
+      <CardHeader className="flex flex-row items-center justify-between border-b border-gray-100">
         <div>
-          <CardTitle className="text-cyan-900">Maritime Moments</CardTitle>
+          <CardTitle className="text-gray-900">Maritime Moments</CardTitle>
           <CardDescription>
             {photos.length > 0 ? `${photos.length} moments in your gallery` : "No maritime moments yet"}
           </CardDescription>
         </div>
-        <Button variant="outline" size="sm" onClick={fetchPhotos} disabled={loading} className="border-cyan-200">
+        <Button variant="outline" size="sm" onClick={fetchPhotos} disabled={loading} className="border-gray-200">
           <RefreshCw className="h-4 w-4 mr-2" />
-          Scan Horizon
+          Refresh Gallery
         </Button>
       </CardHeader>
       <CardContent className="p-4">
@@ -347,11 +404,11 @@ const PhotoGallery = forwardRef<PhotoGalleryRef>((props, ref) => {
             Capture your first maritime moment to see it here
           </div>
         ) : (
-          <div className="grid grid-cols-2 md:grid-cols-3 gap-4">
+          <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4">
             {photos.map((photo) => (
               <div
                 key={photo.id}
-                className="relative group aspect-square rounded-md overflow-hidden cursor-pointer bg-gradient-to-b from-white to-cyan-50 shadow-sm"
+                className="relative group aspect-square rounded-md overflow-hidden cursor-pointer bg-gradient-to-b from-white to-gray-50 shadow-sm hover:shadow-md transition-all"
               >
                 <img
                   src={photo.url || "/placeholder.svg"}
@@ -381,7 +438,7 @@ const PhotoGallery = forwardRef<PhotoGalleryRef>((props, ref) => {
                         onClick={(e) => {
                           e.stopPropagation()
                           handlePhotoSelect(photo)
-                          setShowComments(true)
+                          setActiveTab("comments")
                         }}
                       >
                         <MessageSquare className="h-4 w-4" />
@@ -404,6 +461,12 @@ const PhotoGallery = forwardRef<PhotoGalleryRef>((props, ref) => {
                   <Eye className="h-3 w-3 mr-1" />
                   {photo.views}
                 </div>
+                {photo.user_name && (
+                  <div className="absolute top-2 left-2 bg-black/70 text-white text-xs px-2 py-1 rounded flex items-center">
+                    <User className="h-3 w-3 mr-1" />
+                    {photo.user_name}
+                  </div>
+                )}
               </div>
             ))}
           </div>
@@ -411,7 +474,7 @@ const PhotoGallery = forwardRef<PhotoGalleryRef>((props, ref) => {
 
         {/* Photo Lightbox */}
         <Dialog open={!!selectedPhoto} onOpenChange={(open) => !open && setSelectedPhoto(null)}>
-          <DialogContent className="max-w-4xl w-full p-0 h-[80vh] flex flex-col">
+          <DialogContent className="max-w-5xl w-full p-0 h-[90vh] flex flex-col md:flex-row">
             <div className="relative flex-1 flex items-center justify-center bg-black">
               {selectedPhoto && (
                 <img
@@ -428,15 +491,6 @@ const PhotoGallery = forwardRef<PhotoGalleryRef>((props, ref) => {
                 onClick={() => setSelectedPhoto(null)}
               >
                 <X className="h-6 w-6" />
-              </Button>
-
-              <Button
-                variant="ghost"
-                size="icon"
-                className="absolute top-2 left-2 text-white hover:bg-black/20"
-                onClick={() => setShowInfo(!showInfo)}
-              >
-                <Info className="h-6 w-6" />
               </Button>
 
               <Button
@@ -466,17 +520,25 @@ const PhotoGallery = forwardRef<PhotoGalleryRef>((props, ref) => {
                   onClick={() => selectedPhoto && toggleLike(selectedPhoto.id)}
                 >
                   <Heart className="h-6 w-6" fill={selectedPhoto && likedPhotos[selectedPhoto.id] ? "white" : "none"} />
+                  <span className="sr-only">Like</span>
                 </Button>
                 <Button
                   variant="ghost"
                   size="icon"
                   className="text-white hover:bg-white/20 rounded-full"
-                  onClick={() => setShowComments(!showComments)}
+                  onClick={() => setActiveTab("comments")}
                 >
                   <MessageSquare className="h-6 w-6" />
+                  <span className="sr-only">Comments</span>
                 </Button>
-                <Button variant="ghost" size="icon" className="text-white hover:bg-white/20 rounded-full">
+                <Button
+                  variant="ghost"
+                  size="icon"
+                  className="text-white hover:bg-white/20 rounded-full"
+                  onClick={sharePhoto}
+                >
                   <Share2 className="h-6 w-6" />
+                  <span className="sr-only">Share</span>
                 </Button>
                 <Button
                   variant="ghost"
@@ -485,110 +547,159 @@ const PhotoGallery = forwardRef<PhotoGalleryRef>((props, ref) => {
                   onClick={() => selectedPhoto && downloadPhoto(selectedPhoto)}
                 >
                   <Download className="h-6 w-6" />
+                  <span className="sr-only">Download</span>
                 </Button>
               </div>
             </div>
 
-            {showInfo && selectedPhoto && (
-              <div className="p-4 bg-white border-t">
-                <h2 className="text-xl font-bold text-cyan-900">{selectedPhoto.title}</h2>
-                {selectedPhoto.description && <p className="mt-2 text-muted-foreground">{selectedPhoto.description}</p>}
+            {selectedPhoto && (
+              <div className="w-full md:w-96 bg-white border-t md:border-t-0 md:border-l border-gray-200 flex flex-col">
+                <Tabs value={activeTab} onValueChange={setActiveTab} className="flex-1 flex flex-col">
+                  <TabsList className="grid w-full grid-cols-2 p-0 h-12">
+                    <TabsTrigger value="info" className="rounded-none data-[state=active]:bg-gray-100">
+                      <Info className="h-4 w-4 mr-2" />
+                      Details
+                    </TabsTrigger>
+                    <TabsTrigger value="comments" className="rounded-none data-[state=active]:bg-gray-100">
+                      <MessageSquare className="h-4 w-4 mr-2" />
+                      Comments
+                    </TabsTrigger>
+                  </TabsList>
 
-                {selectedPhoto.tags && selectedPhoto.tags.length > 0 && (
-                  <div className="mt-2 flex flex-wrap gap-1">
-                    {selectedPhoto.tags.map((tag) => (
-                      <Badge key={tag} variant="secondary" className="bg-cyan-100 text-cyan-800 border-cyan-200">
-                        {tag}
-                      </Badge>
-                    ))}
-                  </div>
-                )}
+                  <TabsContent value="info" className="flex-1 p-4 overflow-y-auto">
+                    <div className="space-y-4">
+                      <div>
+                        <h2 className="text-xl font-bold text-gray-900">{selectedPhoto.title}</h2>
+                        {selectedPhoto.description && <p className="mt-2 text-gray-600">{selectedPhoto.description}</p>}
+                      </div>
 
-                <div className="mt-4 flex justify-between items-center">
-                  <div className="flex items-center gap-2">
-                    <Avatar className="h-6 w-6">
-                      <AvatarImage src={selectedPhoto.user_image || "/placeholder.svg"} />
-                      <AvatarFallback>{selectedPhoto.user_name?.[0] || "U"}</AvatarFallback>
-                    </Avatar>
-                    <span className="text-sm">{selectedPhoto.user_name || "Anonymous"}</span>
-                  </div>
-                  <span className="text-sm text-muted-foreground">
-                    {formatDistanceToNow(new Date(selectedPhoto.created_at), { addSuffix: true })}
-                  </span>
-                </div>
-              </div>
-            )}
-
-            {showComments && selectedPhoto && (
-              <div className="p-4 bg-white border-t h-[40vh] overflow-y-auto">
-                <h3 className="text-lg font-semibold text-cyan-900 mb-4">Comments</h3>
-
-                <div className="flex items-start gap-3 mb-6">
-                  <Avatar className="h-8 w-8">
-                    <AvatarImage src={session?.user?.image || "/placeholder.svg?height=40&width=40&query=avatar"} />
-                    <AvatarFallback>{session?.user?.name?.[0] || "S"}</AvatarFallback>
-                  </Avatar>
-                  <div className="flex-1">
-                    <Textarea
-                      placeholder="Add a comment..."
-                      value={commentText}
-                      onChange={(e) => setCommentText(e.target.value)}
-                      className="min-h-[80px] border-cyan-200 focus-visible:ring-cyan-500"
-                    />
-                    <Button
-                      onClick={handleComment}
-                      className="mt-2 bg-cyan-600 hover:bg-cyan-700"
-                      disabled={!commentText.trim() || !session}
-                    >
-                      Post Comment
-                    </Button>
-                  </div>
-                </div>
-
-                {loadingComments ? (
-                  <div className="space-y-4">
-                    {[1, 2, 3].map((i) => (
-                      <div key={i} className="flex items-start gap-3">
-                        <Skeleton className="h-8 w-8 rounded-full" />
-                        <div className="flex-1">
-                          <Skeleton className="h-4 w-1/4 mb-2" />
-                          <Skeleton className="h-3 w-full" />
-                          <Skeleton className="h-3 w-3/4 mt-1" />
+                      <div className="flex items-center gap-3 py-3 border-t border-b border-gray-100">
+                        <Avatar className="h-10 w-10">
+                          <AvatarImage src={selectedPhoto.user_image || "/placeholder.svg"} />
+                          <AvatarFallback>{selectedPhoto.user_name?.[0] || "U"}</AvatarFallback>
+                        </Avatar>
+                        <div>
+                          <p className="font-medium">{selectedPhoto.user_name || "Anonymous"}</p>
+                          <p className="text-xs text-gray-500">
+                            {formatDistanceToNow(new Date(selectedPhoto.created_at), { addSuffix: true })}
+                          </p>
                         </div>
                       </div>
-                    ))}
-                  </div>
-                ) : comments.length > 0 ? (
-                  <div className="space-y-4">
-                    {comments.map((comment) => (
-                      <div key={comment.id} className="flex items-start gap-3">
+
+                      <div className="grid grid-cols-2 gap-2 text-sm">
+                        <div className="flex items-center gap-2 p-2 bg-gray-50 rounded">
+                          <Eye className="h-4 w-4 text-gray-500" />
+                          <span>{selectedPhoto.views} views</span>
+                        </div>
+                        <div className="flex items-center gap-2 p-2 bg-gray-50 rounded">
+                          <Heart className="h-4 w-4 text-gray-500" />
+                          <span>{selectedPhoto.likes} likes</span>
+                        </div>
+                        <div className="flex items-center gap-2 p-2 bg-gray-50 rounded">
+                          <Calendar className="h-4 w-4 text-gray-500" />
+                          <span>{new Date(selectedPhoto.created_at).toLocaleDateString()}</span>
+                        </div>
+                        <div className="flex items-center gap-2 p-2 bg-gray-50 rounded">
+                          <Clock className="h-4 w-4 text-gray-500" />
+                          <span>{new Date(selectedPhoto.created_at).toLocaleTimeString()}</span>
+                        </div>
+                      </div>
+
+                      {selectedPhoto.tags && selectedPhoto.tags.length > 0 && (
+                        <div>
+                          <h3 className="font-medium mb-2">Tags</h3>
+                          <div className="flex flex-wrap gap-1">
+                            {selectedPhoto.tags.map((tag) => (
+                              <Badge
+                                key={tag}
+                                variant="secondary"
+                                className="bg-gray-100 text-gray-800 border-gray-200"
+                              >
+                                {tag}
+                              </Badge>
+                            ))}
+                          </div>
+                        </div>
+                      )}
+                    </div>
+                  </TabsContent>
+
+                  <TabsContent value="comments" className="flex-1 flex flex-col p-0 m-0 data-[state=active]:flex">
+                    <div className="p-4 border-b border-gray-100">
+                      <div className="flex items-start gap-3">
                         <Avatar className="h-8 w-8">
-                          <AvatarImage src={comment.user_image || "/placeholder.svg"} />
-                          <AvatarFallback>{comment.user_name[0]}</AvatarFallback>
+                          <AvatarImage
+                            src={session?.user?.image || "/placeholder.svg?height=40&width=40&query=avatar"}
+                          />
+                          <AvatarFallback>{session?.user?.name?.[0] || "S"}</AvatarFallback>
                         </Avatar>
                         <div className="flex-1">
-                          <div className="flex items-center gap-2">
-                            <span className="font-medium">{comment.user_name}</span>
-                            <span className="text-xs text-muted-foreground">
-                              {formatDistanceToNow(new Date(comment.created_at), { addSuffix: true })}
-                            </span>
-                          </div>
-                          <p className="mt-1">{comment.content}</p>
+                          <Textarea
+                            placeholder={session ? "Add a comment..." : "Sign in to comment"}
+                            value={commentText}
+                            onChange={(e) => setCommentText(e.target.value)}
+                            className="min-h-[80px] border-gray-200 focus-visible:ring-gray-500"
+                            disabled={!session}
+                          />
                           <Button
-                            variant="ghost"
-                            size="sm"
-                            className="h-auto p-0 text-xs text-muted-foreground mt-1"
-                            onClick={() => likeComment(comment.id)}
+                            onClick={handleComment}
+                            className="mt-2 bg-gray-800 hover:bg-gray-900"
+                            disabled={!commentText.trim() || !session}
                           >
-                            <Heart className="h-3 w-3 mr-1" /> {comment.likes}
+                            Post Comment
                           </Button>
                         </div>
                       </div>
-                    ))}
-                  </div>
-                ) : (
-                  <p className="text-center text-muted-foreground">No comments yet. Be the first to comment!</p>
-                )}
+                    </div>
+
+                    <div className="flex-1 overflow-y-auto p-4">
+                      {loadingComments ? (
+                        <div className="space-y-4">
+                          {[1, 2, 3].map((i) => (
+                            <div key={i} className="flex items-start gap-3">
+                              <Skeleton className="h-8 w-8 rounded-full" />
+                              <div className="flex-1">
+                                <Skeleton className="h-4 w-1/4 mb-2" />
+                                <Skeleton className="h-3 w-full" />
+                                <Skeleton className="h-3 w-3/4 mt-1" />
+                              </div>
+                            </div>
+                          ))}
+                        </div>
+                      ) : comments.length > 0 ? (
+                        <div className="space-y-4">
+                          {comments.map((comment) => (
+                            <div key={comment.id} className="flex items-start gap-3">
+                              <Avatar className="h-8 w-8">
+                                <AvatarImage src={comment.user_image || "/placeholder.svg"} />
+                                <AvatarFallback>{comment.user_name[0]}</AvatarFallback>
+                              </Avatar>
+                              <div className="flex-1">
+                                <div className="flex items-center gap-2">
+                                  <span className="font-medium">{comment.user_name}</span>
+                                  <span className="text-xs text-muted-foreground">
+                                    {formatDistanceToNow(new Date(comment.created_at), { addSuffix: true })}
+                                  </span>
+                                </div>
+                                <p className="mt-1">{comment.content}</p>
+                                <Button
+                                  variant="ghost"
+                                  size="sm"
+                                  className="h-auto p-0 text-xs text-muted-foreground mt-1"
+                                  onClick={() => likeComment(comment.id)}
+                                >
+                                  <Heart className="h-3 w-3 mr-1" /> {comment.likes}
+                                </Button>
+                              </div>
+                            </div>
+                          ))}
+                        </div>
+                      ) : (
+                        <p className="text-center text-muted-foreground">No comments yet. Be the first to comment!</p>
+                      )}
+                    </div>
+                  </TabsContent>
+                </Tabs>
               </div>
             )}
           </DialogContent>
