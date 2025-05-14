@@ -382,7 +382,7 @@ export default function ProfilePage({ params }: { params: { id: string } }) {
                         role="button"
                       >
                         <Avatar className="h-10 w-10">
-                          <AvatarImage
+                          <AvatarImage 
                             src={
                               followedUser.profileImage ||
                               followedUser.image ||

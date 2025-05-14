@@ -11,7 +11,7 @@ async function getPodcastsCollection() {
 
 export async function GET(request: NextRequest, { params }: { params: { id: string } }) {
   try {
-    const id = await params.id
+    const id = params.id
 
     // Get podcasts collection
     const collection = await getPodcastsCollection()

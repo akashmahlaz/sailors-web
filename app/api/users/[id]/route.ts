@@ -1,9 +1,15 @@
 import { type NextRequest, NextResponse } from "next/server"
 import { getUserProfileByUserId } from "@/lib/user-profiles"
 
-export async function GET(request: NextRequest, { params }: { params: { id: string } }) {
+export async function GET(request: NextRequest, context: { params: { id: string } } | { params: Promise<{ id: string }> }) {
   try {
-    const userId = params.id
+    let params: { id: string };
+    if (context.params instanceof Promise) {
+      params = await context.params;
+    } else {
+      params = context.params;
+    }
+    const userId = params.id;
 
     const profile = await getUserProfileByUserId(userId)
 

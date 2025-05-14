@@ -57,6 +57,11 @@ export default function Home() {
     fetchLatestContent()
   }, [])
 
+  // Fetch trending content for homepage trending section
+  useEffect(() => {
+    fetchTrendingContent()
+  }, [latestVideos, latestPhotos, latestPodcasts])
+
   const fetchLatestContent = async () => {
     setIsLoading(true)
     setFetchError(null)
@@ -206,40 +211,39 @@ export default function Home() {
         console.error("Home: Error fetching featured sailors:", error)
         setFeaturedSailors([])
       }
-
-      // Create trending content
-      console.log("Home: Creating trending content")
-      const videos = latestVideos.slice(0, 3).map((item: any) => ({
-        ...item,
-        type: "video",
-        views: Math.floor(Math.random() * 5000) + 1000,
-        id: item._id || item.id,
-      }))
-
-      const photos = latestPhotos.slice(0, 2).map((item: any) => ({
-        ...item,
-        type: "photo",
-        views: Math.floor(Math.random() * 3000) + 800,
-        id: item._id || item.id,
-      }))
-
-      const podcasts = latestPodcasts.slice(0, 1).map((item: any) => ({
-        ...item,
-        type: "podcast",
-        views: Math.floor(Math.random() * 2000) + 500,
-        id: item._id || item.id,
-      }))
-
-      // Combine and shuffle
-      const trending = [...videos, ...photos, ...podcasts]
-      const shuffled = trending.sort(() => 0.5 - Math.random()).slice(0, 5)
-      setTrendingContent(shuffled)
     } catch (error) {
       console.error("Home: Error fetching latest content:", error)
       setFetchError(error instanceof Error ? error.message : "Failed to load content")
     } finally {
       setIsLoading(false)
     }
+  }
+
+  // Create trending content for homepage
+  const fetchTrendingContent = () => {
+    // Use the latest fetched videos, photos, podcasts
+    const videos = latestVideos.slice(0, 3).map((item: any) => ({
+      ...item,
+      type: "video",
+      views: Math.floor(Math.random() * 5000) + 1000,
+      id: item._id || item.id,
+    }))
+    const photos = latestPhotos.slice(0, 2).map((item: any) => ({
+      ...item,
+      type: "photo",
+      views: Math.floor(Math.random() * 3000) + 800,
+      id: item._id || item.id,
+    }))
+    const podcasts = latestPodcasts.slice(0, 1).map((item: any) => ({
+      ...item,
+      type: "podcast",
+      views: Math.floor(Math.random() * 2000) + 500,
+      id: item._id || item.id,
+    }))
+    // Combine and shuffle
+    const trending = [...videos, ...photos, ...podcasts]
+    const shuffled = trending.sort(() => 0.5 - Math.random()).slice(0, 5)
+    setTrendingContent(shuffled)
   }
 
   const getInitials = (name: string) => {
@@ -345,7 +349,7 @@ export default function Home() {
                 {/* Main image container */}
                 <div className="relative z-10 bg-white rounded-xl overflow-hidden shadow-lg border border-gray-200">
                   <img
-                    src="/placeholder.svg?key=nf3pd"
+                    src="/d3.jpg"
                     alt="Sailor's Community"
                     className="w-full h-full object-cover"
                   />
@@ -512,35 +516,35 @@ export default function Home() {
               title="Videos"
               icon={<Film className="h-6 w-6" />}
               href="/videos"
-              bgClass="from-gray-700 to-gray-800"
+              bgClass="from-red-400 to-pink-600"
               count={latestVideos.length}
             />
             <CategoryCard
               title="Photos"
               icon={<ImageIcon className="h-6 w-6" />}
               href="/photos"
-              bgClass="from-gray-600 to-gray-700"
+              bgClass="from-green-500 to-emerald-600"
               count={latestPhotos.length}
             />
             <CategoryCard
               title="Podcasts"
               icon={<Radio className="h-6 w-6" />}
               href="/podcasts"
-              bgClass="from-gray-500 to-gray-600"
+              bgClass="from-cyan-500 to-blue-600"
               count={latestPodcasts.length}
             />
             <CategoryCard
               title="News"
               icon={<Newspaper className="h-6 w-6" />}
               href="/news"
-              bgClass="from-gray-600 to-gray-700"
+              bgClass="from-yellow-400 to-orange-500"
               count={12}
             />
             <CategoryCard
               title="Blogs"
               icon={<BookOpen className="h-6 w-6" />}
               href="/blogs"
-              bgClass="from-gray-700 to-gray-800"
+              bgClass="from-purple-500 to-fuchsia-600"
               count={8}
             />
             <CategoryCard
@@ -606,14 +610,16 @@ export default function Home() {
                       <div className="relative w-20 h-20 sm:w-24 sm:h-24 mb-3">
                         <div className="absolute inset-0 rounded-full bg-gradient-to-br from-gray-300 to-gray-400 animate-pulse opacity-70 group-hover:opacity-100 transition-opacity"></div>
                         <div className="absolute inset-1 rounded-full overflow-hidden bg-white dark:bg-slate-800">
-                          <Avatar className="h-full w-full">
+                          <Avatar
+                            className="h-full w-full border-4 border-pink-500"
+                            style={{ boxShadow: "0 0 0 4px #22c55e, 0 0 0 8px #ec4899" }}
+                          >
                             <AvatarImage
+                              className="object-cover w-full h-full rounded-full"
                               src={
                                 sailor.profileImage ||
                                 sailor.image ||
-                                "/placeholder.svg?height=200&width=200&query=sailor%20profile" ||
-                                "/placeholder.svg" ||
-                                "/placeholder.svg"
+                                "/placeholder.svg?height=200&width=200&query=sailor%20profile"
                               }
                               alt={sailor.name || "Sailor"}
                             />
