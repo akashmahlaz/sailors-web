@@ -31,6 +31,8 @@ import {
   AlertCircle,
   Sparkles,
   Sailboat,
+  Group,
+  UserCircle2,
 } from "lucide-react"
 import { useTypewriter, Cursor } from "react-simple-typewriter"
 
@@ -302,7 +304,7 @@ export default function Home() {
               }}
             >
               <motion.div variants={fadeIn} className="mb-6">
-                <Badge className="px-3 py-1 text-sm bg-gray-700 text-white border-none">
+                <Badge className="px-3 py-1 text-sm bg-green-500 text-white border-none">
                   <Sparkles className="w-4 h-4 mr-1" /> Maritime Community
                 </Badge>
               </motion.div>
@@ -327,20 +329,20 @@ export default function Home() {
 
               <motion.div className="flex flex-wrap gap-4" variants={fadeIn}>
                 <Link href="/videos">
-                  <Button size="lg" className="bg-gray-800 hover:bg-gray-700 text-white">
+                  <Button size="lg" className="bg-white hover:bg-green-600 text-green-600 border-green-600 border-2 hover:text-white transition-colors">
                     Explore Content <Compass className="ml-2 h-5 w-5" />
                   </Button>
                 </Link>
                 {!isAuthenticated ? (
                   <Link href="/signup">
-                    <Button size="lg" variant="outline" className=" rounded-xl border-gray-400 bg-white text-black hover:bg-black hover:text-white hover:border-white border-2">
+                    <Button size="lg" variant="outline" className="rounded-xl border-green-400 bg-white text-green-700 hover:bg-green-700 hover:text-white hover:border-green-700 border-2 transition-colors">
                       Join the Crew <Anchor className="ml-2 h-5 w-5" />
                     </Button>
                   </Link>
                 ) : (
                   <Link href="/community">
-                    <Button size="lg" variant="outline" className="border-gray-400 text-gray-700 hover:bg-gray-100">
-                      Upload Content <Upload className="ml-2 h-5 w-5" />
+                    <Button size="lg" variant="outline" className=" text-white  hover:bg-blue-600 hover:text-white transition-colors">
+                      Community <UserCircle2 className="ml-2 h-5 w-5" />
                     </Button>
                   </Link>
                 )}
@@ -777,24 +779,24 @@ export default function Home() {
               <>
                 <Link href="/signup">
                   <Button size="lg" className="bg-white text-gray-800 hover:bg-gray-100">
-                    Create Account <Users className="ml-2 h-5 w-5" />
+                    Signup <Users className="ml-2 h-5 w-5" />
                   </Button>
                 </Link>
                 <Link href="/signin">
-                  <Button size="lg" variant="outline" className="border-white text-white hover:bg-white/10">
+                  <Button size="lg" variant="outline" className="border-white text-green-500 hover:bg-white/10">
                     Sign In <Anchor className="ml-2 h-5 w-5" />
                   </Button>
                 </Link>
               </>
             ) : (
               <>
-                <Link href="/upload">
+                <Link href="/photos">
                   <Button size="lg" className="bg-white text-gray-800 hover:bg-gray-100">
-                    Upload Content <Upload className="ml-2 h-5 w-5" />
+                    Share Moments of Sea <Upload className="ml-2 h-5 w-5" />
                   </Button>
                 </Link>
                 <Link href="/profile/me">
-                  <Button size="lg" variant="outline" className="border-white text-white hover:bg-white/10">
+                  <Button size="lg" variant="outline" className="border-white text-green-500 hover:bg-green-500 hover:text-white">
                     My Profile <Ship className="ml-2 h-5 w-5" />
                   </Button>
                 </Link>

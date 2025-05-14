@@ -42,9 +42,9 @@ export default function NavBar() {
       label: "Sailor Chronicles",
       icon: Anchor,
       subLinks: [
-        { href: "/videos", label: "Sea Shorts", icon: Film },
-        { href: "/audio", label: "Sea Sounds", icon: Music },
-        { href: "/photos", label: "Sea Snaps", icon: ImageIcon },
+        { href: "/videos", label: "Shorts", icon: Film },
+        { href: "/audio", label: "Sailor's Voice", icon: Music },
+        { href: "/photos", label: "Moments", icon: ImageIcon },
       ],
     },
     {
@@ -52,7 +52,7 @@ export default function NavBar() {
       icon: Waves,
       subLinks: [
         { href: "/news", label: "Maritime News", icon: Newspaper },
-        { href: "/blog", label: "Sea Blog", icon: FileText },
+        { href: "/blog", label: "Blogs", icon: FileText },
         { href: "/podcasts", label: "Sailor's Podcast", icon: Mic },
       ],
     },
@@ -79,8 +79,9 @@ export default function NavBar() {
 
         {/* Mobile menu button */}
         <button
-          className="sm:hidden ml-auto text-gray-700 p-2 rounded-full hover:bg-gray-100 transition-colors dark:text-gray-300 dark:hover:bg-gray-700"
+          className="sm:hidden ml-auto text-gray-700 p-2 rounded-full hover:bg-gray-100 focus-visible:ring-2 focus-visible:ring-offset-2 focus-visible:ring-gray-400 transition-colors dark:text-gray-300 dark:hover:bg-gray-700 dark:focus-visible:ring-gray-500"
           onClick={() => setMobileMenuOpen(!mobileMenuOpen)}
+          aria-label="Open main menu"
         >
           <Menu className="h-6 w-6" />
         </button>
@@ -89,7 +90,7 @@ export default function NavBar() {
         <nav className="hidden sm:flex items-center space-x-4 ml-6">
           {mainDropdowns.map((dropdown) => (
             <div key={dropdown.label} className="group relative inline-block">
-              <button className="flex items-center text-sm font-medium text-gray-700 hover:text-gray-900 transition-all duration-300 hover:bg-gray-100 px-3 py-1.5 rounded-lg dark:text-gray-300 dark:hover:text-white dark:hover:bg-gray-700">
+              <button className="flex items-center text-sm font-medium text-gray-700 hover:text-gray-900 transition-all duration-300 hover:bg-gray-100 px-3 py-1.5 rounded-lg focus-visible:ring-2 focus-visible:ring-offset-2 focus-visible:ring-gray-400 dark:text-gray-300 dark:hover:text-white dark:hover:bg-gray-700 dark:focus-visible:ring-gray-500">
                 <dropdown.icon className="mr-2 h-5 w-5 text-gray-500 transition-transform group-hover:rotate-12 duration-300 dark:text-gray-400" />
                 {dropdown.label}
                 <ChevronDown className="ml-1 h-4 w-4 text-gray-500 transform group-hover:rotate-180 transition-transform duration-300 dark:text-gray-400" />
@@ -133,7 +134,7 @@ export default function NavBar() {
 
         {/* Mobile menu */}
         {mobileMenuOpen && (
-          <div className="absolute top-16 left-0 right-0 bg-white sm:hidden p-4 shadow-lg z-50 dark:bg-gray-800">
+          <div className="absolute top-16 left-0 right-0 bg-white sm:hidden p-4 shadow-lg z-50 dark:bg-gray-800 bg-opacity-95 dark:bg-opacity-95 backdrop-blur-md">
             <div className="space-y-4">
               {mainDropdowns.map((dropdown) => (
                 <div key={dropdown.label} className="space-y-2">
@@ -177,17 +178,23 @@ export default function NavBar() {
           <Button
             variant="ghost"
             size="icon"
-            className="text-gray-700 hover:bg-gray-100 hover:text-gray-900 dark:text-gray-300 dark:hover:bg-gray-700 dark:hover:text-white"
+            className="text-gray-700 hover:bg-gray-100 hover:text-gray-900 focus-visible:ring-2 focus-visible:ring-offset-2 focus-visible:ring-gray-400 dark:text-gray-300 dark:hover:bg-gray-700 dark:hover:text-white dark:focus-visible:ring-gray-500"
           >
             <Search className="h-5 w-5" />
           </Button>
 
-          {isAuthenticated && (
+          {/* Theme toggle always visible and with clear icon color using a wrapper */}
+          <span className="inline-flex items-center text-gray-700 dark:text-gray-500">
+            <ThemeToggle  />
+          </span>
+
+          {/* {isAuthenticated && (
             <Button
               variant="ghost"
               size="icon"
-              className="relative text-gray-700 hover:bg-gray-100 hover:text-gray-900 dark:text-gray-300 dark:hover:bg-gray-700 dark:hover:text-white"
+              className="relative text-gray-700 hover:bg-gray-100 hover:text-gray-900 focus-visible:ring-2 focus-visible:ring-offset-2 focus-visible:ring-gray-400 dark:text-gray-300 dark:hover:bg-gray-700 dark:hover:text-white dark:focus-visible:ring-gray-500"
               onClick={toggleNotificationPanel}
+              aria-label="Open notifications"
             >
               <Bell className="h-5 w-5" />
               {unreadCount > 0 && (
@@ -196,13 +203,11 @@ export default function NavBar() {
                 </span>
               )}
             </Button>
-          )}
-
-          <ThemeToggle />
+          )} */}
 
           {isAuthenticated ? (
             <div className="group relative inline-block">
-              <button className="flex items-center space-x-2 text-gray-700 bg-gray-100 px-3 py-1.5 rounded-lg transition-all duration-300 hover:bg-gray-200 hover:text-gray-900 dark:text-gray-300 dark:bg-gray-700 dark:hover:bg-gray-600 dark:hover:text-white">
+              <button className="flex items-center space-x-2 text-gray-700 bg-gray-100 px-3 py-1.5 rounded-lg transition-all duration-300 hover:bg-gray-200 hover:text-gray-900 focus-visible:ring-2 focus-visible:ring-offset-2 focus-visible:ring-gray-400 dark:text-gray-300 dark:bg-gray-700 dark:hover:bg-gray-600 dark:hover:text-white dark:focus-visible:ring-gray-500">
                 <div className="flex items-center space-x-2">
                   <User className="h-6 w-6 text-gray-500 transition-transform group-hover:rotate-12 duration-300 dark:text-gray-400" />
                   <span className="text-sm font-medium">
@@ -267,7 +272,7 @@ export default function NavBar() {
               <Link href="/signin">
                 <Button
                   variant="ghost"
-                  className="text-gray-700 hover:bg-gray-100 hover:text-gray-900 dark:text-gray-300 dark:hover:bg-gray-700 dark:hover:text-white"
+                  className="text-gray-700 hover:bg-gray-100 hover:text-gray-900 focus-visible:ring-2 focus-visible:ring-offset-2 focus-visible:ring-gray-400 dark:text-gray-300 dark:hover:bg-gray-700 dark:hover:text-white dark:focus-visible:ring-gray-500"
                 >
                   Sign in
                 </Button>
@@ -275,7 +280,7 @@ export default function NavBar() {
               <Link href="/signup">
                 <Button
                   className="bg-gray-800 hover:bg-gray-700 text-white shadow-sm
-                    transition-all duration-300 hover:scale-105 dark:bg-gray-700 dark:hover:bg-gray-600"
+                    transition-all duration-300 hover:scale-105 focus-visible:ring-2 focus-visible:ring-offset-2 focus-visible:ring-gray-400 dark:bg-gray-700 dark:hover:bg-gray-600 dark:focus-visible:ring-gray-500"
                 >
                   Sign up
                 </Button>

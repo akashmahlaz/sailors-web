@@ -71,10 +71,10 @@ export default function SignUp() {
   }
 
   return (
-    <div className="flex min-h-screen items-center justify-center bg-gray-50 px-4 py-12 sm:px-6 lg:px-8">
-      <Card className="w-full max-w-md">
-        <CardHeader className="space-y-1">
-          <CardTitle className="text-2xl font-bold text-center text-cyan-900">Hoist Your Colors</CardTitle>
+    <div className="flex min-h-screen items-center justify-center bg-gradient-to-b from-slate-50 to-white dark:from-slate-900 dark:to-slate-950 px-4 py-12 sm:px-6 lg:px-8">
+      <Card className="w-full max-w-md border-emerald-200 shadow-lg dark:border-emerald-900 dark:shadow-none">
+        <CardHeader className="space-y-1 border-b border-emerald-100 dark:border-emerald-900">
+          <CardTitle className="text-2xl font-bold text-center text-emerald-900 dark:text-emerald-200">Hoist Your Colors</CardTitle>
           <CardDescription className="text-center">
             Enter your information to join our maritime crew or use a social provider
           </CardDescription>
@@ -83,7 +83,7 @@ export default function SignUp() {
           <div className="grid grid-cols-2 gap-4 mb-4">
             <Button
               variant="outline"
-              className="w-full"
+              className="w-full border-emerald-200 text-emerald-700 hover:bg-emerald-50 dark:border-emerald-700 dark:text-emerald-300 dark:hover:bg-emerald-900"
               onClick={() => handleOAuthSignIn("google")}
               disabled={isLoading}
             >
@@ -110,7 +110,7 @@ export default function SignUp() {
             </Button>
             <Button
               variant="outline"
-              className="w-full"
+              className="w-full border-emerald-200 text-emerald-700 hover:bg-emerald-50 dark:border-emerald-700 dark:text-emerald-300 dark:hover:bg-emerald-900"
               onClick={() => handleOAuthSignIn("github")}
               disabled={isLoading}
             >
@@ -121,10 +121,10 @@ export default function SignUp() {
 
           <div className="relative mb-4">
             <div className="absolute inset-0 flex items-center">
-              <span className="w-full border-t" />
+              <span className="w-full border-t border-slate-200 dark:border-slate-700" />
             </div>
             <div className="relative flex justify-center text-xs uppercase">
-              <span className="bg-white px-2 text-gray-500">Or continue with email</span>
+              <span className="bg-white dark:bg-slate-950 px-2 text-slate-500 dark:text-slate-400">Or continue with email</span>
             </div>
           </div>
 
@@ -170,15 +170,15 @@ export default function SignUp() {
                 required
               />
             </div>
-            <Button type="submit" className="w-full bg-cyan-600 hover:bg-cyan-700" disabled={isLoading}>
+            <Button type="submit" className="w-full bg-emerald-600 hover:bg-emerald-700 text-white" disabled={isLoading}>
               {isLoading ? "Hoisting Colors..." : "Join the Crew with Email"}
             </Button>
           </form>
         </CardContent>
         <CardFooter className="flex justify-center">
-          <p className="text-sm text-gray-600">
+          <p className="text-sm text-slate-600 dark:text-slate-400">
             Already have a ship?{" "}
-            <Link href="/signin" className="text-cyan-600 hover:text-cyan-500">
+            <Link href="/signin" className="text-emerald-600 hover:text-emerald-500 dark:text-emerald-400 dark:hover:text-emerald-300">
               Board Ship
             </Link>
           </p>

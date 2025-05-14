@@ -251,7 +251,12 @@ export default function PodcastList() {
                     </div>
 
                     <div className="flex gap-2">
-                      <Button variant="outline" size="sm" className="border-cyan-200">
+                      <Button
+                        variant="outline"
+                        size="sm"
+                        className="border-cyan-200"
+                        onClick={() => window.open(`/podcasts/${podcast.id}`, '_blank')}
+                      >
                         <Play className="h-4 w-4 mr-2" />
                         Preview
                       </Button>

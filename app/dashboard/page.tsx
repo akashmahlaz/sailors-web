@@ -26,36 +26,36 @@ export default function Dashboard() {
   }
 
   return (
-    <div className="container mx-auto py-10 bg-gradient-to-b from-slate-50 to-cyan-50">
-      <Card className="border-cyan-200 shadow-lg shadow-cyan-100">
-        <CardHeader className="border-b border-cyan-100">
-          <CardTitle className="text-cyan-900">Ship's Deck</CardTitle>
+    <div className="container mx-auto py-10 px-4 bg-gradient-to-b from-slate-50 to-white dark:from-slate-900 dark:to-slate-950 min-h-screen">
+      <Card className="border-emerald-200 shadow-lg dark:border-emerald-900 dark:shadow-none">
+        <CardHeader className="border-b border-emerald-100 dark:border-emerald-900">
+          <CardTitle className="text-emerald-900 dark:text-emerald-200">Ship's Deck</CardTitle>
           <CardDescription>Navigate your maritime media journey</CardDescription>
         </CardHeader>
         <CardContent className="pt-6">
           <div className="space-y-6">
             <div>
-              <h2 className="text-xl font-bold text-cyan-800">Ahoy, {session?.user?.name}!</h2>
-              <p className="text-cyan-600">Message in a bottle: {session?.user?.email}</p>
+              <h2 className="text-xl font-bold text-emerald-800 dark:text-emerald-200">Ahoy, {session?.user?.name}!</h2>
+              <p className="text-emerald-600 dark:text-emerald-400">Message in a bottle: {session?.user?.email}</p>
             </div>
-            <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-4">
-              <Button onClick={() => router.push("/podcasts")} className="bg-cyan-600 hover:bg-cyan-700">
+            <div className="grid gap-4 grid-cols-1 sm:grid-cols-2 lg:grid-cols-4">
+              <Button onClick={() => router.push("/podcasts")} className="bg-emerald-600 hover:bg-emerald-700 text-white">
                 Sea Waves
               </Button>
-              <Button onClick={() => router.push("/news")} className="bg-cyan-600 hover:bg-cyan-700">
+              <Button onClick={() => router.push("/news")} className="bg-emerald-600 hover:bg-emerald-700 text-white">
                 Maritime Reports
               </Button>
-              <Button onClick={() => router.push("/videos")} className="bg-cyan-600 hover:bg-cyan-700">
+              <Button onClick={() => router.push("/videos")} className="bg-emerald-600 hover:bg-emerald-700 text-white">
                 Sea Shorts
               </Button>
-              <Button onClick={() => router.push("/photos")} className="bg-cyan-600 hover:bg-cyan-700">
+              <Button onClick={() => router.push("/photos")} className="bg-emerald-600 hover:bg-emerald-700 text-white">
                 Sea Snaps
               </Button>
             </div>
             <Button
               variant="outline"
               onClick={() => signOut({ callbackUrl: "/signin" })}
-              className="text-cyan-700 border-cyan-300 hover:bg-cyan-50"
+              className="text-emerald-700 border-emerald-300 hover:bg-emerald-50 dark:text-emerald-300 dark:border-emerald-700 dark:hover:bg-emerald-900"
             >
               Abandon Ship
             </Button>

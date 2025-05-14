@@ -308,15 +308,15 @@ const AudioGallery = forwardRef<AudioGalleryRef>((props, ref) => {
 
   return (
     <div className="space-y-6">
-      <Card className="w-full border-cyan-200 shadow-lg">
-        <CardHeader className="flex flex-row items-center justify-between border-b border-cyan-100">
+      <Card className="w-full  border-green-200 shadow-lg bg-gradient-to-b from-gray-50 to-green-50 dark:from-gray-900 dark:to-green-950">
+        <CardHeader className="flex flex-row items-center justify-between border-b border-green-100 bg-gradient-to-r from-green-50 to-white dark:from-gray-900 dark:to-green-950">
           <div>
-            <CardTitle className="text-cyan-900">Sea Shanties</CardTitle>
+            <CardTitle className="text-green-900 dark:text-green-100">Sea Shanties</CardTitle>
             <CardDescription>
               {currentAudio ? `Now playing: ${currentAudio.title}` : "Select a sea shanty to play"}
             </CardDescription>
           </div>
-          <Button variant="outline" size="sm" onClick={fetchAudios} disabled={loading} className="border-cyan-200">
+          <Button variant="outline" size="sm" onClick={fetchAudios} disabled={loading} className="border-green-200 text-green-700 hover:bg-green-50 dark:border-green-700 dark:text-green-300 dark:hover:bg-green-900">
             <RefreshCw className="h-4 w-4 mr-2" />
             Refresh Tunes
           </Button>
@@ -334,7 +334,7 @@ const AudioGallery = forwardRef<AudioGalleryRef>((props, ref) => {
 
           {/* Audio Player */}
           {currentAudio && (
-            <div className="mb-6 p-4 bg-gradient-to-b from-white to-cyan-50 rounded-lg shadow-sm">
+            <div className="mb-6 p-4 bg-gradient-to-b from-white to-green-50 dark:from-gray-900 dark:to-green-950 rounded-lg shadow-sm">
               <audio
                 ref={audioRef}
                 src={currentAudio.url}
@@ -354,13 +354,13 @@ const AudioGallery = forwardRef<AudioGalleryRef>((props, ref) => {
                     className="h-16 w-16 object-cover rounded-md shadow-md"
                   />
                 ) : (
-                  <div className="h-16 w-16 bg-cyan-100 rounded-md flex items-center justify-center shadow-md">
-                    <Music className="h-8 w-8 text-cyan-600" />
+                  <div className="h-16 w-16 bg-green-100 rounded-md flex items-center justify-center shadow-md">
+                    <Music className="h-8 w-8 text-green-600" />
                   </div>
                 )}
                 <div className="flex-1">
-                  <div className="font-medium text-cyan-900">{currentAudio.title}</div>
-                  <div className="text-xs text-cyan-700">
+                  <div className="font-medium text-green-900 dark:text-green-100">{currentAudio.title}</div>
+                  <div className="text-xs text-green-700 dark:text-green-300">
                     {formatTime(currentTime)} / {formatTime(currentAudio.duration || 0)}
                   </div>
                   <Slider
@@ -375,7 +375,7 @@ const AudioGallery = forwardRef<AudioGalleryRef>((props, ref) => {
                 <Button
                   variant="ghost"
                   size="icon"
-                  className="text-cyan-700"
+                  className="text-green-700 dark:text-green-300"
                   onClick={() => downloadAudio(currentAudio)}
                 >
                   <Download className="h-4 w-4" />
@@ -388,7 +388,7 @@ const AudioGallery = forwardRef<AudioGalleryRef>((props, ref) => {
                     variant="outline"
                     size="icon"
                     onClick={playPrevious}
-                    className="border-cyan-200 text-cyan-700"
+                    className="border-green-200 text-green-700 hover:bg-green-50 dark:border-green-700 dark:text-green-300 dark:hover:bg-green-900"
                   >
                     <SkipBack className="h-4 w-4" />
                   </Button>
@@ -396,17 +396,17 @@ const AudioGallery = forwardRef<AudioGalleryRef>((props, ref) => {
                     variant="default"
                     size="icon"
                     onClick={togglePlay}
-                    className="bg-cyan-600 hover:bg-cyan-700 h-10 w-10 rounded-full"
+                    className="bg-green-600 hover:bg-green-700 h-10 w-10 rounded-full"
                   >
                     {isPlaying ? <Pause className="h-4 w-4" /> : <Play className="h-4 w-4" />}
                   </Button>
-                  <Button variant="outline" size="icon" onClick={playNext} className="border-cyan-200 text-cyan-700">
+                  <Button variant="outline" size="icon" onClick={playNext} className="border-green-200 text-green-700 hover:bg-green-50 dark:border-green-700 dark:text-green-300 dark:hover:bg-green-900">
                     <SkipForward className="h-4 w-4" />
                   </Button>
                 </div>
 
                 <div className="flex items-center gap-2">
-                  <Volume2 className="h-4 w-4 text-cyan-700" />
+                  <Volume2 className="h-4 w-4 text-green-700 dark:text-green-300" />
                   <Slider
                     value={[volume]}
                     min={0}
@@ -437,11 +437,11 @@ const AudioGallery = forwardRef<AudioGalleryRef>((props, ref) => {
           )}
 
           <Tabs value={activeTab} onValueChange={setActiveTab} className="mt-6">
-            <TabsList className="grid w-full grid-cols-2 bg-cyan-50">
-              <TabsTrigger value="library" className="data-[state=active]:bg-cyan-600 data-[state=active]:text-white">
+            <TabsList className="grid w-full grid-cols-2 bg-green-50 dark:bg-gray-900">
+              <TabsTrigger value="library" className="data-[state=active]:bg-green-600 data-[state=active]:text-white">
                 Library
               </TabsTrigger>
-              <TabsTrigger value="playlist" className="data-[state=active]:bg-cyan-600 data-[state=active]:text-white">
+              <TabsTrigger value="playlist" className="data-[state=active]:bg-green-600 data-[state=active]:text-black">
                 Playlists
               </TabsTrigger>
             </TabsList>
@@ -456,13 +456,13 @@ const AudioGallery = forwardRef<AudioGalleryRef>((props, ref) => {
                   {audios.map((audio) => (
                     <div
                       key={audio.id}
-                      className={`p-4 rounded-md flex flex-col gap-3 cursor-pointer hover:bg-cyan-50 transition-colors ${
+                      className={`p-4 rounded-md flex flex-col gap-3 cursor-pointer transition-colors hover:bg-green-50 dark:hover:bg-green-900 ${
                         currentAudio?.id === audio.id
-                          ? "bg-cyan-50 border border-cyan-200"
-                          : "bg-white border border-transparent"
+                          ? "bg-green-50 text-black border border-green-200 dark:bg-green-900 dark:text-green-100 dark:border-green-700"
+                          : "bg-white border border-transparent dark:bg-gray-800 dark:text-green-50"
                       }`}
                     >
-                      <div className="flex items-center gap-3">
+                      <div className="flex items-center text-black gap-3">
                         {audio.thumbnail_url ? (
                           <img
                             src={audio.thumbnail_url || "/placeholder.svg"}
@@ -470,17 +470,17 @@ const AudioGallery = forwardRef<AudioGalleryRef>((props, ref) => {
                             className="h-12 w-12 object-cover rounded-md flex-shrink-0 shadow-sm"
                           />
                         ) : (
-                          <div className="h-12 w-12 bg-cyan-100 rounded-md flex items-center justify-center flex-shrink-0 shadow-sm">
-                            <Music className="h-6 w-6 text-cyan-600" />
+                          <div className="h-12 w-12 bg-green-100 rounded-md flex items-center justify-center flex-shrink-0 shadow-sm">
+                            <Music className="h-6 w-6 text-green-600" />
                           </div>
                         )}
                         <div className="flex-1 min-w-0">
-                          <p className="font-medium truncate text-cyan-900">{audio.title}</p>
+                          <p className="font-medium truncate text-green-900 dark:text-green-100">{audio.title}</p>
                           <div className="flex items-center gap-2">
-                            <Badge variant="outline" className="text-xs border-cyan-200 text-cyan-700">
+                            <Badge variant="outline" className="text-xs border-green-200 text-green-700 dark:border-green-700 dark:text-green-300">
                               {formatTime(audio.duration || 0)}
                             </Badge>
-                            <Badge variant="outline" className="text-xs border-cyan-200 text-cyan-700">
+                            <Badge variant="outline" className="text-xs border-green-200 text-green-700 dark:border-green-700 dark:text-green-300">
                               {audio.format.toUpperCase()}
                             </Badge>
                             <span className="text-xs text-muted-foreground">
@@ -496,7 +496,7 @@ const AudioGallery = forwardRef<AudioGalleryRef>((props, ref) => {
                               e.stopPropagation()
                               downloadAudio(audio)
                             }}
-                            className="text-cyan-700"
+                            className="text-green-700 dark:text-green-300"
                           >
                             <Download className="h-4 w-4" />
                           </Button>
@@ -507,14 +507,14 @@ const AudioGallery = forwardRef<AudioGalleryRef>((props, ref) => {
                               e.stopPropagation()
                               playAudio(audio)
                             }}
-                            className="text-cyan-700"
+                            className="text-green-700 dark:text-green-300"
                           >
                             <Play className="h-4 w-4" />
                           </Button>
                         </div>
                       </div>
 
-                      <div className="flex justify-between items-center pt-2 border-t border-cyan-100">
+                      <div className="flex justify-between items-center pt-2 border-t border-green-100 dark:border-green-700">
                         <div className="flex space-x-4">
                           <Button
                             variant="ghost"
@@ -542,13 +542,13 @@ const AudioGallery = forwardRef<AudioGalleryRef>((props, ref) => {
                           </Button>
                         </div>
 
-                        <Button size="sm" className="bg-cyan-600 hover:bg-cyan-700" onClick={() => playAudio(audio)}>
+                        <Button size="sm" className="bg-green-600 hover:bg-green-700" onClick={() => playAudio(audio)}>
                           <Play className="h-4 w-4 mr-2" /> Play
                         </Button>
                       </div>
 
                       {expandedAudio === audio.id && (
-                        <div className="mt-2 space-y-4 pt-2 border-t border-cyan-100">
+                        <div className="mt-2 space-y-4 pt-2 border-t border-green-100 dark:border-green-700">
                           <div className="flex items-start gap-3">
                             <Avatar className="h-8 w-8">
                               <AvatarImage
@@ -561,11 +561,11 @@ const AudioGallery = forwardRef<AudioGalleryRef>((props, ref) => {
                                 placeholder="Add a comment..."
                                 value={commentText}
                                 onChange={(e) => setCommentText(e.target.value)}
-                                className="min-h-[80px] border-cyan-200 focus-visible:ring-cyan-500"
+                                className="min-h-[80px] border-green-200 focus-visible:ring-green-500 dark:border-green-700 dark:focus-visible:ring-green-300"
                               />
                               <Button
                                 onClick={() => handleComment(audio.id)}
-                                className="mt-2 bg-cyan-600 hover:bg-cyan-700"
+                                className="mt-2 bg-green-600 hover:bg-green-700"
                                 disabled={!commentText.trim()}
                               >
                                 Post Comment
@@ -608,16 +608,16 @@ const AudioGallery = forwardRef<AudioGalleryRef>((props, ref) => {
             <TabsContent value="playlist" className="space-y-4 mt-4">
               {currentPlaylist ? (
                 <>
-                  <div className="flex items-center justify-between bg-gradient-to-r from-cyan-50 to-white p-4 rounded-lg shadow-sm">
+                  <div className="flex items-center justify-between bg-gradient-to-r from-green-50 to-white dark:from-gray-900 dark:to-green-950 p-4 rounded-lg shadow-sm">
                     <div>
-                      <h3 className="text-lg font-medium text-cyan-900">{currentPlaylist.name}</h3>
-                      <p className="text-sm text-cyan-700">{currentPlaylist.description}</p>
+                      <h3 className="text-lg font-medium text-green-900 dark:text-green-100">{currentPlaylist.name}</h3>
+                      <p className="text-sm text-green-700 dark:text-green-300">{currentPlaylist.description}</p>
                     </div>
                     <Button
                       variant="outline"
                       size="sm"
                       onClick={() => setCurrentPlaylist(null)}
-                      className="border-cyan-200"
+                      className="border-green-200 text-green-700 hover:bg-green-50 dark:border-green-700 dark:text-green-300 dark:hover:bg-green-900"
                     >
                       Back to Playlists
                     </Button>
@@ -631,9 +631,9 @@ const AudioGallery = forwardRef<AudioGalleryRef>((props, ref) => {
                       {playlistAudios.map((audio) => (
                         <div
                           key={audio.id}
-                          className={`p-4 rounded-md flex items-center gap-3 cursor-pointer hover:bg-cyan-50 transition-colors ${
+                          className={`p-4 rounded-md flex items-center gap-3 cursor-pointer hover:bg-green-50 transition-colors ${
                             currentAudio?.id === audio.id
-                              ? "bg-cyan-50 border border-cyan-200"
+                              ? "bg-green-50 border border-green-200"
                               : "bg-white border border-transparent"
                           }`}
                           onClick={() => playAudio(audio)}
@@ -645,17 +645,17 @@ const AudioGallery = forwardRef<AudioGalleryRef>((props, ref) => {
                               className="h-12 w-12 object-cover rounded-md flex-shrink-0 shadow-sm"
                             />
                           ) : (
-                            <div className="h-12 w-12 bg-cyan-100 rounded-md flex items-center justify-center flex-shrink-0 shadow-sm">
-                              <Music className="h-6 w-6 text-cyan-600" />
+                            <div className="h-12 w-12 bg-green-100 rounded-md flex items-center justify-center flex-shrink-0 shadow-sm">
+                              <Music className="h-6 w-6 text-green-600" />
                             </div>
                           )}
                           <div className="flex-1 min-w-0">
-                            <p className="font-medium truncate text-cyan-900">{audio.title}</p>
+                            <p className="font-medium truncate text-green-900 dark:text-green-100">{audio.title}</p>
                             <div className="flex items-center gap-2">
-                              <Badge variant="outline" className="text-xs border-cyan-200 text-cyan-700">
+                              <Badge variant="outline" className="text-xs border-green-200 text-green-700 dark:border-green-700 dark:text-green-300">
                                 {formatTime(audio.duration || 0)}
                               </Badge>
-                              <Badge variant="outline" className="text-xs border-cyan-200 text-cyan-700">
+                              <Badge variant="outline" className="text-xs border-green-200 text-green-700 dark:border-green-700 dark:text-green-300">
                                 {audio.format.toUpperCase()}
                               </Badge>
                               <span className="text-xs text-muted-foreground">
@@ -671,7 +671,7 @@ const AudioGallery = forwardRef<AudioGalleryRef>((props, ref) => {
                                 e.stopPropagation()
                                 downloadAudio(audio)
                               }}
-                              className="text-cyan-700"
+                              className="text-green-700 dark:text-green-300"
                             >
                               <Download className="h-4 w-4" />
                             </Button>
@@ -682,7 +682,7 @@ const AudioGallery = forwardRef<AudioGalleryRef>((props, ref) => {
                                 e.stopPropagation()
                                 playAudio(audio)
                               }}
-                              className="text-cyan-700"
+                              className="text-green-700 dark:text-green-300"
                             >
                               <Play className="h-4 w-4" />
                             </Button>

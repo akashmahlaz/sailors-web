@@ -66,6 +66,8 @@ export default function NewsList() {
   const [expandedArticle, setExpandedArticle] = useState<string | null>(null)
   const [likedArticles, setLikedArticles] = useState<Record<string, boolean>>({})
   const [commentText, setCommentText] = useState("")
+  const [currentPage, setCurrentPage] = useState(1)
+  const ARTICLES_PER_PAGE = 8
 
   // Mock comments for demonstration
   const [articleComments, setArticleComments] = useState<Record<string, Comment[]>>({})
@@ -166,6 +168,9 @@ export default function NewsList() {
     })
   }
 
+  const totalPages = Math.ceil(news.length / ARTICLES_PER_PAGE)
+  const paginatedNews = news.slice((currentPage - 1) * ARTICLES_PER_PAGE, currentPage * ARTICLES_PER_PAGE)
+
   if (loading) {
     return (
       <Card>
@@ -263,7 +268,7 @@ export default function NewsList() {
           </div>
         ) : (
           <div className="space-y-6">
-            {news.map((article) => (
+            {paginatedNews.map((article) => (
               <div
                 key={article.id}
                 className="bg-gradient-to-b from-white to-cyan-50 rounded-xl overflow-hidden shadow-sm"
@@ -290,7 +295,7 @@ export default function NewsList() {
                         {article.title}
                       </h3>
                     </Link>
-                    <p className="text-muted-foreground mb-2">{article.summary}</p>
+                    <p className="text-muted-foreground mb-2 line-clamp-3">{article.summary}</p>
                     <div className="flex flex-wrap items-center gap-x-4 gap-y-1 text-sm text-muted-foreground">
                       <span>By {article.author}</span>
                       <span>
@@ -409,6 +414,20 @@ export default function NewsList() {
                 </div>
               </div>
             ))}
+            {/* Pagination Controls */}
+            {totalPages > 1 && (
+              <div className="flex justify-center gap-2 mt-8">
+                <Button size="sm" variant="outline" onClick={() => setCurrentPage((p) => Math.max(1, p - 1))} disabled={currentPage === 1}>
+                  Previous
+                </Button>
+                <span className="px-3 py-2 text-sm font-medium text-gray-700 bg-gray-100 rounded">
+                  Page {currentPage} of {totalPages}
+                </span>
+                <Button size="sm" variant="outline" onClick={() => setCurrentPage((p) => Math.min(totalPages, p + 1))} disabled={currentPage === totalPages}>
+                  Next
+                </Button>
+              </div>
+            )}
           </div>
         )}
       </CardContent>
