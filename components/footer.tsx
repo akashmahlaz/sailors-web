@@ -11,8 +11,8 @@ export default function Footer() {
           {/* Logo and About */}
           <div>
             <Link href="/" className="flex items-center mb-5">
-              <Sailboat className="h-9 w-9 text-green-400 mr-2 drop-shadow-lg" />
-              <span className="text-2xl font-extrabold tracking-tight text-green-300">Sailor's Voyage</span>
+              <Sailboat className="h-9 w-9 text-black-400 mr-2 drop-shadow-lg" />
+              <span className="text-2xl font-extrabold tracking-tight text-black-300">Sailor's Voyage</span>
             </Link>
             <p className="text-slate-400 mb-5 text-sm leading-relaxed">
               Navigate the digital seas with your fellow sailors. Share stories, discover content, and connect with your maritime community.
@@ -38,36 +38,36 @@ export default function Footer() {
 
           {/* Quick Links */}
           <div>
-            <h3 className="text-lg font-semibold mb-4 text-green-300 tracking-wide">Quick Links</h3>
+            <h3 className="text-lg font-semibold mb-4 text-black-300 tracking-wide">Quick Links</h3>
             <ul className="space-y-2">
               <li>
                 <Link href="/videos" className="text-slate-300 hover:text-red-400 transition-colors flex items-center font-medium">
-                  <Anchor className="h-4 w-4 mr-2 text-green-400" /> Videos
+                  <Anchor className="h-4 w-4 mr-2 text-black-400" /> Videos
                 </Link>
               </li>
               <li>
                 <Link href="/photos" className="text-slate-300 hover:text-red-400 transition-colors flex items-center font-medium">
-                  <Anchor className="h-4 w-4 mr-2 text-green-400" /> Photos
+                  <Anchor className="h-4 w-4 mr-2 text-black-400" /> Photos
                 </Link>
               </li>
               <li>
                 <Link href="/audio" className="text-slate-300 hover:text-cyan-300 transition-colors flex items-center font-medium">
-                  <Anchor className="h-4 w-4 mr-2 text-green-400" /> Audio
+                  <Anchor className="h-4 w-4 mr-2 text-black-400" /> Audio
                 </Link>
               </li>
               <li>
                 <Link href="/podcasts" className="text-slate-300 hover:text-cyan-300 transition-colors flex items-center font-medium">
-                  <Anchor className="h-4 w-4 mr-2 text-green-400" /> Podcasts
+                  <Anchor className="h-4 w-4 mr-2 text-black-400" /> Podcasts
                 </Link>
               </li>
               <li>
                 <Link href="/blog" className="text-slate-300 hover:text-cyan-300 transition-colors flex items-center font-medium">
-                  <Anchor className="h-4 w-4 mr-2 text-green-400" /> Blog
+                  <Anchor className="h-4 w-4 mr-2 text-black-400" /> Blog
                 </Link>
               </li>
               <li>
                 <Link href="/news" className="text-slate-300 hover:text-cyan-300 transition-colors flex items-center font-medium">
-                  <Anchor className="h-4 w-4 mr-2 text-green-400" /> News
+                  <Anchor className="h-4 w-4 mr-2 text-black-400" /> News
                 </Link>
               </li>
             </ul>
@@ -75,21 +75,21 @@ export default function Footer() {
 
           {/* Support */}
           <div>
-            <h3 className="text-lg font-semibold mb-4 text-green-300 tracking-wide">Support</h3>
+            <h3 className="text-lg font-semibold mb-4 text-black-300 tracking-wide">Support</h3>
             <ul className="space-y-2">
               <li>
-                <Link href="/support" className="text-slate-300 hover:text-green-300 transition-colors flex items-center font-medium">
-                  <LifeBuoy className="h-4 w-4 mr-2 text-green-400" /> Help Center
+                <Link href="/support" className="text-slate-300 hover:text-black-300 transition-colors flex items-center font-medium">
+                  <LifeBuoy className="h-4 w-4 mr-2 text-black-400" /> Help Center
                 </Link>
               </li>
               <li>
-                <Link href="/support/knowledge-base" className="text-slate-300 hover:text-green-300 transition-colors flex items-center font-medium">
-                  <Compass className="h-4 w-4 mr-2 text-green-400" /> Knowledge Base
+                <Link href="/support/knowledge-base" className="text-slate-300 hover:text-black-300 transition-colors flex items-center font-medium">
+                  <Compass className="h-4 w-4 mr-2 text-black-400" /> Knowledge Base
                 </Link>
               </li>
               <li>
-                <Link href="/support" className="text-slate-300 hover:text-green-300 transition-colors flex items-center font-medium">
-                  <Mail className="h-4 w-4 mr-2 text-green-400" /> Contact Us
+                <Link href="/support" className="text-slate-300 hover:text-black-300 transition-colors flex items-center font-medium">
+                  <Mail className="h-4 w-4 mr-2 text-black-400" /> Contact Us
                 </Link>
               </li>
             </ul>
@@ -97,13 +97,13 @@ export default function Footer() {
 
           {/* Newsletter */}
           <div>
-            <h3 className="text-lg font-semibold mb-4 text-green-300 tracking-wide">Stay Updated</h3>
+            <h3 className="text-lg font-semibold mb-4 text-black-300 tracking-wide">Stay Updated</h3>
             <p className="text-slate-400 mb-4 text-sm">Subscribe to our newsletter for the latest updates and features.</p>
             <form className="flex">
               <input
                 type="email"
                 placeholder="Your email address"
-                className="bg-slate-800 border border-slate-700 rounded-l-md px-4 py-2 w-full focus:outline-none focus:ring-2 focus:ring-green-500 text-slate-100 placeholder:text-slate-400"
+                className="bg-slate-800 border border-slate-700 rounded-l-md px-4 py-2 w-full focus:outline-none focus:ring-2 focus:ring-black-500 text-slate-100 placeholder:text-slate-400"
               />
               <button
                 type="submit"

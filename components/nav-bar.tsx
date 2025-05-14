@@ -59,7 +59,7 @@ export default function NavBar() {
   ]
 
   return (
-    <div className="bg-gray-200 border-b border-gray-200 sticky top-0 z-50 shadow-sm dark:bg-gray-800 dark:border-gray-700">
+    <div className="bg-gray-200 border-b border-gray-500 sticky top-0 z-50 shadow-sm dark:bg-gray-800 dark:border-gray-700">
       <div className="container mx-auto flex h-16 items-center px-4 sm:px-6 lg:px-8">
         <div className="mr-4 flex flex-shrink-0 items-center">
           <Link
@@ -68,7 +68,7 @@ export default function NavBar() {
           >
             {/* Logo image placeholder, replace src when image is provided */}
             <img
-              src="/d0.jpg"
+              src="/d4.jpg"
               alt="Logo"
               className="mr-2 h-12 w-12 object-contain rounded-full bg-gray-100 dark:bg-gray-700 border border-gray-200 dark:border-gray-600 shadow-sm"
               style={{ minWidth: 32, minHeight: 32 }}

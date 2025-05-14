@@ -271,7 +271,7 @@ export default function Home() {
   return (
     <div className="flex flex-col min-h-screen">
       {/* Light Gray Hero Section */}
-      <section className="relative bg-gradient-to-b from-gray-400 to-gray-200 overflow-hidden">
+      <section className="relative bg-gradient-to-b from-gray-600 to-gray-200 overflow-hidden">
         {/* Subtle Pattern Overlay */}
         <div className="absolute inset-0 opacity-5">
           <svg width="100%" height="100%" xmlns="http://www.w3.org/2000/svg">
@@ -418,118 +418,118 @@ export default function Home() {
       </section>
 
       {/* Trending Now Section */}
-      <section className="py-12 bg-white dark:bg-slate-900">
+      <section className="py-12 bg-gray-100 dark:bg-slate-900">
         <div className="container mx-auto px-4">
           <div className="flex items-center justify-between mb-8">
-            <div className="flex items-center gap-3">
-              <div className="bg-gray-800 p-2 rounded-md text-white">
-                <TrendingUp className="h-5 w-5" />
-              </div>
-              <h2 className="text-2xl font-bold text-slate-900 dark:text-white">Trending Now</h2>
-            </div>
-            <Link href="/trending">
-              <Button
-                variant="ghost"
-                className="text-slate-500 hover:text-slate-900 dark:text-slate-400 dark:hover:text-white"
-              >
-                See All <ArrowRight className="ml-2 h-4 w-4" />
-              </Button>
-            </Link>
+        <div className="flex items-center gap-3">
+          <div className="bg-gray-800 p-2 rounded-md text-white">
+            <TrendingUp className="h-5 w-5" />
+          </div>
+          <h2 className="text-2xl font-bold text-slate-900 dark:text-white">Trending Now</h2>
+        </div>
+        <Link href="/trending">
+          <Button
+            variant="ghost"
+            className="text-slate-500 hover:text-slate-900 dark:text-slate-400 dark:hover:text-white"
+          >
+            See All <ArrowRight className="ml-2 h-4 w-4" />
+          </Button>
+        </Link>
           </div>
 
           {fetchError && (
-            <div className="p-4 bg-red-50 border border-red-200 rounded-md text-red-700 flex items-center gap-2 mb-6">
-              <AlertCircle className="h-5 w-5 flex-shrink-0" />
-              <div>
-                <p className="font-medium">Error loading content</p>
-                <p className="text-sm">{fetchError}</p>
-              </div>
-            </div>
+        <div className="p-4 bg-red-50 border border-red-200 rounded-md text-red-700 flex items-center gap-2 mb-6">
+          <AlertCircle className="h-5 w-5 flex-shrink-0" />
+          <div>
+            <p className="font-medium">Error loading content</p>
+            <p className="text-sm">{fetchError}</p>
+          </div>
+        </div>
           )}
 
           {trendingContent.length === 0 ? (
-            <div className="text-center py-8 text-muted-foreground">
-              {isLoading ? "Loading trending content..." : "No trending content available"}
-            </div>
+        <div className="text-center py-8 text-muted-foreground">
+          {isLoading ? "Loading trending content..." : "No trending content available"}
+        </div>
           ) : (
-            <div className="grid grid-cols-1 md:grid-cols-3 lg:grid-cols-5 gap-6">
-              {trendingContent.map((item, index) => (
-                <Card
-                  key={item.id || index}
-                  className="overflow-hidden border-none shadow-md hover:shadow-lg transition-all group"
-                >
-                  <Link href={`/${item.type}s/${item._id || item.id}`}>
-                    <div
-                      className="relative aspect-video overflow-hidden bg-slate-200 dark:bg-slate-800 group"
-                      onMouseEnter={() => setTrendingHover(index)}
-                      onMouseLeave={() => setTrendingHover(null)}
-                    >
-                      {item.type === "video" && trendingHover === index ? (
-                        <video
-                          src={item.url}
-                          poster={
-                            item.thumbnail_url ||
-                            `https://res.cloudinary.com/${process.env.NEXT_PUBLIC_CLOUDINARY_CLOUD_NAME}/video/upload/so_0/${item.public_id}.jpg`
-                          }
-                          autoPlay
-                          muted
-                          loop
-                          playsInline
-                          className="w-full h-full object-cover"
-                          style={{ zIndex: 10 }}
-                        />
-                      ) : (
-                        <img
-                          src={
-                            item.thumbnail_url ||
-                            item.coverImage ||
-                            item.url ||
-                            (item.type === "video"
-                              ? `https://res.cloudinary.com/${process.env.NEXT_PUBLIC_CLOUDINARY_CLOUD_NAME}/video/upload/so_0/${item.public_id}.jpg`
-                              : "/diverse-media-landscape.png")
-                          }
-                          alt={item.title || "Media thumbnail"}
-                          className="w-full h-full object-cover transition-transform group-hover:scale-105"
-                        />
-                      )}
-                      <div className="absolute inset-0 bg-gradient-to-t from-black/70 to-transparent opacity-60"></div>
-                      <div className="absolute top-2 left-2">
-                        <Badge className="bg-black/50 text-white border-0 backdrop-blur-sm">
-                          {item.type === "video" && <Film className="h-3 w-3 mr-1" />}
-                          {item.type === "photo" && <ImageIcon className="h-3 w-3 mr-1" />}
-                          {item.type === "podcast" && <Mic className="h-3 w-3 mr-1" />}#{index + 1} Trending
-                        </Badge>
-                      </div>
-                      {item.type === "video" && (
-                        <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 transform">
-                          <div className="bg-white/20 backdrop-blur-sm rounded-full p-3 opacity-0 group-hover:opacity-100 transition-opacity">
-                            <Play className="h-6 w-6 text-white fill-white" />
-                          </div>
-                        </div>
-                      )}
-                    </div>
-                  </Link>
-
-                  <CardContent className="p-3">
-                    <Link href={`/${item.type}s/${item._id || item.id}`}>
-                      <h3 className="font-medium text-sm line-clamp-1 group-hover:text-gray-700 dark:group-hover:text-gray-300 transition-colors">
-                        {item.title || (item.type === "video" ? item.public_id?.split("/")?.pop() : "Untitled")}
-                      </h3>
-                    </Link>
-
-                    <div className="flex items-center justify-between mt-2 text-xs text-slate-500">
-                      <div className="flex items-center">
-                        <Lightning className="h-3 w-3 mr-1 text-gray-500" />
-                        {item.views.toLocaleString()} views
-                      </div>
-                      <Badge variant="outline" className="font-normal">
-                        {item.type}
-                      </Badge>
-                    </div>
-                  </CardContent>
-                </Card>
-              ))}
+        <div className="grid grid-cols-1 md:grid-cols-3 lg:grid-cols-5 gap-6">
+          {trendingContent.map((item, index) => (
+            <Card
+          key={item.id || index}
+          className="overflow-hidden border-none shadow-md hover:shadow-lg transition-all group"
+            >
+          <Link href={`/${item.type}s/${item._id || item.id}`}>
+            <div
+              className="relative aspect-video overflow-hidden bg-gray-200 dark:bg-slate-800 group"
+              onMouseEnter={() => setTrendingHover(index)}
+              onMouseLeave={() => setTrendingHover(null)}
+            >
+              {item.type === "video" && trendingHover === index ? (
+            <video
+              src={item.url}
+              poster={
+                item.thumbnail_url ||
+                `https://res.cloudinary.com/${process.env.NEXT_PUBLIC_CLOUDINARY_CLOUD_NAME}/video/upload/so_0/${item.public_id}.jpg`
+              }
+              autoPlay
+              muted
+              loop
+              playsInline
+              className="w-full h-full object-cover"
+              style={{ zIndex: 10 }}
+            />
+              ) : (
+            <img
+              src={
+                item.thumbnail_url ||
+                item.coverImage ||
+                item.url ||
+                (item.type === "video"
+              ? `https://res.cloudinary.com/${process.env.NEXT_PUBLIC_CLOUDINARY_CLOUD_NAME}/video/upload/so_0/${item.public_id}.jpg`
+              : "/diverse-media-landscape.png")
+              }
+              alt={item.title || "Media thumbnail"}
+              className="w-full h-full object-cover transition-transform group-hover:scale-105"
+            />
+              )}
+              <div className="absolute inset-0 bg-gradient-to-t from-black/70 to-transparent opacity-60"></div>
+              <div className="absolute top-2 left-2">
+            <Badge className="bg-black/50 text-white border-0 backdrop-blur-sm">
+              {item.type === "video" && <Film className="h-3 w-3 mr-1" />}
+              {item.type === "photo" && <ImageIcon className="h-3 w-3 mr-1" />}
+              {item.type === "podcast" && <Mic className="h-3 w-3 mr-1" />}#{index + 1} Trending
+            </Badge>
+              </div>
+              {item.type === "video" && (
+            <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 transform">
+              <div className="bg-white/20 backdrop-blur-sm rounded-full p-3 opacity-0 group-hover:opacity-100 transition-opacity">
+                <Play className="h-6 w-6 text-white fill-white" />
+              </div>
             </div>
+              )}
+            </div>
+          </Link>
+
+          <CardContent className="p-3">
+            <Link href={`/${item.type}s/${item._id || item.id}`}>
+              <h3 className="font-medium text-sm line-clamp-1 group-hover:text-gray-700 dark:group-hover:text-gray-300 transition-colors">
+            {item.title || (item.type === "video" ? item.public_id?.split("/")?.pop() : "Untitled")}
+              </h3>
+            </Link>
+
+            <div className="flex items-center justify-between mt-2 text-xs text-slate-500">
+              <div className="flex items-center">
+            <Lightning className="h-3 w-3 mr-1 text-gray-500" />
+            {item.views.toLocaleString()} views
+              </div>
+              <Badge variant="outline" className="font-normal">
+            {item.type}
+              </Badge>
+            </div>
+          </CardContent>
+            </Card>
+          ))}
+        </div>
           )}
         </div>
       </section>
@@ -547,42 +547,42 @@ export default function Home() {
               title="Videos"
               icon={<Film className="h-6 w-6" />}
               href="/videos"
-              bgClass="from-red-400 to-pink-600"
+              bgClass="from-zinc-900 to-gray-500"
               count={latestVideos.length}
             />
             <CategoryCard
               title="Photos"
               icon={<ImageIcon className="h-6 w-6" />}
               href="/photos"
-              bgClass="from-green-500 to-emerald-600"
+              bgClass="from-zinc-900 to-gray-500"
               count={latestPhotos.length}
             />
             <CategoryCard
               title="Podcasts"
               icon={<Radio className="h-6 w-6" />}
               href="/podcasts"
-              bgClass="from-cyan-500 to-blue-600"
+              bgClass="from-zinc-900 to-gray-500"
               count={latestPodcasts.length}
             />
             <CategoryCard
               title="News"
               icon={<Newspaper className="h-6 w-6" />}
               href="/news"
-              bgClass="from-yellow-400 to-orange-500"
+              bgClass="from-zinc-900 to-gray-500"
               count={12}
             />
             <CategoryCard
               title="Blogs"
               icon={<BookOpen className="h-6 w-6" />}
               href="/blogs"
-              bgClass="from-purple-500 to-fuchsia-600"
+              bgClass="from-zinc-900 to-gray-500"
               count={8}
             />
             <CategoryCard
               title="Community"
               icon={<Users className="h-6 w-6" />}
               href="/community"
-              bgClass="from-gray-800 to-gray-900"
+              bgClass="from-zinc-900 to-gray-500"
               count={featuredSailors.length}
             />
           </div>
