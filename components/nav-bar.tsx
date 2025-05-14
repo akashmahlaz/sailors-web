@@ -59,7 +59,7 @@ export default function NavBar() {
   ]
 
   return (
-    <div className="bg-white border-b border-gray-200 sticky top-0 z-50 shadow-sm dark:bg-gray-800 dark:border-gray-700">
+    <div className="bg-gray-200 border-b border-gray-200 sticky top-0 z-50 shadow-sm dark:bg-gray-800 dark:border-gray-700">
       <div className="container mx-auto flex h-16 items-center px-4 sm:px-6 lg:px-8">
         <div className="mr-4 flex flex-shrink-0 items-center">
           <Link
@@ -123,7 +123,7 @@ export default function NavBar() {
             href="/support"
             className={`flex items-center text-sm font-medium px-3 py-1.5 rounded-lg transition-all duration-300 ${
               pathname.startsWith("/support")
-                ? "bg-gray-800 text-white shadow-md dark:bg-gray-700"
+                ? "bg-gray-200 text-gray-900 shadow-md dark:bg-gray-700 dark:text-white"
                 : "text-gray-700 hover:text-gray-900 hover:bg-gray-100 dark:text-gray-300 dark:hover:text-white dark:hover:bg-gray-700"
             }`}
           >

@@ -271,7 +271,7 @@ export default function Home() {
   return (
     <div className="flex flex-col min-h-screen">
       {/* Light Gray Hero Section */}
-      <section className="relative bg-gradient-to-b from-gray-100 to-gray-200 overflow-hidden">
+      <section className="relative bg-gradient-to-b from-gray-400 to-gray-200 overflow-hidden">
         {/* Subtle Pattern Overlay */}
         <div className="absolute inset-0 opacity-5">
           <svg width="100%" height="100%" xmlns="http://www.w3.org/2000/svg">
@@ -329,13 +329,13 @@ export default function Home() {
 
               <motion.div className="flex flex-wrap gap-4" variants={fadeIn}>
                 <Link href="/videos">
-                  <Button size="lg" className="bg-white hover:bg-green-600 text-green-600 border-green-600 border-2 hover:text-white transition-colors">
+                  <Button size="lg" className="bg-white hover:bg-gray-600 text-gray-600 border-gray-600 border-2 hover:text-white transition-colors">
                     Explore Content <Compass className="ml-2 h-5 w-5" />
                   </Button>
                 </Link>
                 {!isAuthenticated ? (
                   <Link href="/signup">
-                    <Button size="lg" variant="outline" className="rounded-xl border-green-400 bg-white text-green-700 hover:bg-green-700 hover:text-white hover:border-green-700 border-2 transition-colors">
+                    <Button size="lg" variant="outline" className="rounded-xl border-gray-400 bg-white text-gray-700 hover:bg-gray-700 hover:text-white hover:border-gray-700 border-2 transition-colors">
                       Join the Crew <Anchor className="ml-2 h-5 w-5" />
                     </Button>
                   </Link>
