@@ -112,15 +112,31 @@ export default function VideoUploader({ onUploadSuccess }: VideoUploaderProps) {
       setError(null)
       setUploadProgress(0)
 
-      // Upload video using our server-side API route
-      const videoFormData = new FormData()
-      videoFormData.append("file", file)
-      videoFormData.append("folder", "videos")
-      videoFormData.append("resourceType", "video")
+      // 1. Get signature for video upload
+      const signatureResponse = await fetch("/api/cloudinary/signature", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ resourceType: "video", folder: "videos" }),
+      })
+      if (!signatureResponse.ok) {
+        const errorData = await signatureResponse.json()
+        throw new Error(`Failed to get upload signature: ${errorData.error || signatureResponse.statusText}`)
+      }
+      const { signature, timestamp, cloudName, apiKey, folder } = await signatureResponse.json()
+      if (!signature || !timestamp || !cloudName || !apiKey) {
+        throw new Error("Incomplete signature data received from server")
+      }
 
-      // Use XMLHttpRequest for progress tracking
+      // 2. Upload video to Cloudinary with progress
+      const formData = new FormData()
+      formData.append("file", file)
+      formData.append("api_key", apiKey)
+      formData.append("timestamp", timestamp.toString())
+      formData.append("signature", signature)
+      formData.append("folder", folder || "videos")
+
       const xhr = new XMLHttpRequest()
-      xhr.open("POST", "/api/cloudinary/upload")
+      xhr.open("POST", `https://api.cloudinary.com/v1_1/${cloudName}/video/upload`)
 
       xhr.upload.onprogress = (event) => {
         if (event.lengthComputable) {
@@ -138,24 +154,55 @@ export default function VideoUploader({ onUploadSuccess }: VideoUploaderProps) {
           let thumbnailUrl = null
 
           if (useCustomThumbnail && thumbnailFile) {
-            // Upload thumbnail using our server-side API route
-            const thumbnailFormData = new FormData()
-            thumbnailFormData.append("file", thumbnailFile)
-            thumbnailFormData.append("folder", "video_thumbnails")
-            thumbnailFormData.append("resourceType", "image")
-
-            const thumbnailResponse = await fetch("/api/cloudinary/upload", {
+            // Signed upload for thumbnail
+            // 1. Get signature for thumbnail upload
+            const thumbSigRes = await fetch("/api/cloudinary/signature", {
               method: "POST",
-              body: thumbnailFormData,
+              headers: { "Content-Type": "application/json" },
+              body: JSON.stringify({ resourceType: "image", folder: "video_thumbnails" }),
             })
-
-            if (!thumbnailResponse.ok) {
-              throw new Error("Failed to upload thumbnail")
+            if (!thumbSigRes.ok) {
+              const errorData = await thumbSigRes.json()
+              throw new Error(`Failed to get thumbnail upload signature: ${errorData.error || thumbSigRes.statusText}`)
             }
-
-            const thumbnailData = await thumbnailResponse.json()
-            thumbnailPublicId = thumbnailData.public_id
-            thumbnailUrl = thumbnailData.secure_url
+            const { signature: thumbSig, timestamp: thumbTs, cloudName: thumbCloud, apiKey: thumbKey, folder: thumbFolder } = await thumbSigRes.json()
+            if (!thumbSig || !thumbTs || !thumbCloud || !thumbKey) {
+              throw new Error("Incomplete thumbnail signature data received from server")
+            }
+            // 2. Upload thumbnail to Cloudinary
+            const thumbForm = new FormData()
+            thumbForm.append("file", thumbnailFile)
+            thumbForm.append("api_key", thumbKey)
+            thumbForm.append("timestamp", thumbTs.toString())
+            thumbForm.append("signature", thumbSig)
+            thumbForm.append("folder", thumbFolder || "video_thumbnails")
+            const thumbXhr = new XMLHttpRequest()
+            // Use the image upload endpoint
+            thumbXhr.open("POST", `https://api.cloudinary.com/v1_1/${thumbCloud}/image/upload`)
+            const thumbUploadPromise = new Promise<{ public_id: string, secure_url: string }>((resolve, reject) => {
+              thumbXhr.onload = () => {
+                if (thumbXhr.status === 200) {
+                  try {
+                    const thumbData = JSON.parse(thumbXhr.responseText)
+                    resolve(thumbData)
+                  } catch (e) {
+                    reject("Failed to parse thumbnail upload response")
+                  }
+                } else {
+                  let errorMessage = "Thumbnail upload failed"
+                  try {
+                    const errorResponse = JSON.parse(thumbXhr.responseText)
+                    errorMessage = errorResponse.error?.message || errorMessage
+                  } catch (e) {}
+                  reject(errorMessage)
+                }
+              }
+              thumbXhr.onerror = () => reject("Thumbnail upload failed (network error)")
+            })
+            thumbXhr.send(thumbForm)
+            const thumbResult = await thumbUploadPromise
+            thumbnailPublicId = thumbResult.public_id
+            thumbnailUrl = thumbResult.secure_url
           }
 
           // Save video metadata to our database
@@ -172,7 +219,7 @@ export default function VideoUploader({ onUploadSuccess }: VideoUploaderProps) {
               description: description,
               thumbnailPublicId: thumbnailPublicId,
               thumbnailUrl: thumbnailUrl,
-              userId: session?.user?.id || "anonymous",
+              userId: session?.user?.email || "anonymous",
               userName: session?.user?.name || "Anonymous User",
               userImage: session?.user?.image || null,
             }),
@@ -193,7 +240,15 @@ export default function VideoUploader({ onUploadSuccess }: VideoUploaderProps) {
           if (thumbnailInputRef.current) thumbnailInputRef.current.value = ""
           onUploadSuccess()
         } else {
-          throw new Error("Upload failed")
+          let errorMessage = "Upload failed"
+          try {
+            const errorResponse = JSON.parse(xhr.responseText)
+            errorMessage = errorResponse.error?.message || "Upload failed"
+          } catch (e) {
+            // If we can't parse the error response, use the default message
+          }
+          setUploading(false)
+          setError(errorMessage)
         }
       }
 
@@ -202,7 +257,7 @@ export default function VideoUploader({ onUploadSuccess }: VideoUploaderProps) {
         setError("Upload failed. Please try again.")
       }
 
-      xhr.send(videoFormData)
+      xhr.send(formData)
     } catch (err) {
       setUploading(false)
       setError(err instanceof Error ? err.message : "An unknown error occurred")

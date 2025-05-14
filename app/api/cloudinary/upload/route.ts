@@ -59,6 +59,9 @@ export async function POST(request: NextRequest) {
     const timestamp = Math.round(new Date().getTime() / 1000)
     const uploadPreset = process.env.UPLOAD_PRESET || ""
 
+    // Check if the client provided a signature (for signed uploads)
+    const clientSignature = formData.get("signature") as string | null
+
     // Create a new FormData instance for the Cloudinary API
     const cloudinaryFormData = new FormData()
     cloudinaryFormData.append("file", file)
@@ -66,10 +69,14 @@ export async function POST(request: NextRequest) {
     cloudinaryFormData.append("timestamp", timestamp.toString())
     cloudinaryFormData.append("folder", folder)
 
-    if (uploadPreset) {
+    if (clientSignature) {
+      // Signed upload: use the provided signature
+      cloudinaryFormData.append("signature", clientSignature)
+    } else if (uploadPreset) {
+      // Unsigned upload: use upload_preset (must be enabled for unsigned uploads in Cloudinary dashboard)
       cloudinaryFormData.append("upload_preset", uploadPreset)
     } else {
-      // If no upload preset, generate and use signature
+      // If no signature and no preset, generate a signature server-side (legacy fallback)
       const paramsToSign = { timestamp, folder }
       const signature = await generateSignature(paramsToSign, process.env.CLOUDINARY_API_SECRET)
       cloudinaryFormData.append("signature", signature)
