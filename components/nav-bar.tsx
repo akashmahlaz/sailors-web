@@ -66,7 +66,13 @@ export default function NavBar() {
             href="/"
             className="flex items-center text-xl font-bold text-gray-800 hover:text-gray-600 transition-colors dark:text-white dark:hover:text-gray-300"
           >
-            <Sailboat className="mr-2 h-6 w-6 text-gray-700 transition-transform hover:rotate-12 duration-300 dark:text-gray-300" />
+            {/* Logo image placeholder, replace src when image is provided */}
+            <img
+              src="/d0.jpg"
+              alt="Logo"
+              className="mr-2 h-12 w-12 object-contain rounded-full bg-gray-100 dark:bg-gray-700 border border-gray-200 dark:border-gray-600 shadow-sm"
+              style={{ minWidth: 32, minHeight: 32 }}
+            />
             <span className="hidden sm:inline">Sailor's Platform</span>
           </Link>
         </div>

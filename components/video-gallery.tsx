@@ -5,7 +5,7 @@ import { useRouter } from "next/navigation"
 import { Card, CardContent } from "@/components/ui/card"
 import { Button } from "@/components/ui/button"
 import { Skeleton } from "@/components/ui/skeleton"
-import { AlertCircle, Eye, Heart, MessageSquare, RefreshCw, User } from "lucide-react"
+import { AlertCircle, Eye, Heart, MessageSquare, RefreshCw, User, Play } from "lucide-react"
 import { formatDistanceToNow } from "date-fns"
 
 export interface VideoGalleryRef {
@@ -32,6 +32,7 @@ const VideoGallery = forwardRef<VideoGalleryRef, {}>((_, ref) => {
   const [videos, setVideos] = useState<Video[]>([])
   const [loading, setLoading] = useState(true)
   const [error, setError] = useState<string | null>(null)
+  const [hoveredIndex, setHoveredIndex] = useState<number | null>(null)
 
   const fetchVideos = async () => {
     try {
@@ -105,27 +106,45 @@ const VideoGallery = forwardRef<VideoGalleryRef, {}>((_, ref) => {
 
   return (
     <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4">
-      {videos.map((video) => (
+      {videos.map((video, idx) => (
         <Card
           key={video.id}
           className="overflow-hidden cursor-pointer group"
           onClick={() => handleVideoClick(video.id)}
+          onMouseEnter={() => setHoveredIndex(idx)}
+          onMouseLeave={() => setHoveredIndex(null)}
         >
-          <div className="aspect-video bg-muted relative overflow-hidden">
-            <img
-              src={
-                video.thumbnail_url ||
-                `https://res.cloudinary.com/${process.env.NEXT_PUBLIC_CLOUDINARY_CLOUD_NAME}/video/upload/so_0/${video.public_id}.jpg`
-              }
-              alt={video.title}
-              className="w-full h-full object-cover transition-transform group-hover:scale-105"
-            />
-            <div className="absolute inset-0 bg-black/40 opacity-0 group-hover:opacity-100 transition-opacity flex items-center justify-center">
-              <Button variant="secondary" size="sm">
-                Play Video
+          <div className="aspect-video bg-muted relative overflow-hidden group">
+            {hoveredIndex === idx ? (
+              <video
+                src={video.url}
+                poster={
+                  video.thumbnail_url ||
+                  `https://res.cloudinary.com/${process.env.NEXT_PUBLIC_CLOUDINARY_CLOUD_NAME}/video/upload/so_0/${video.public_id}.jpg`
+                }
+                autoPlay
+                muted
+                loop
+                playsInline
+                className="w-full h-full object-cover"
+                style={{ zIndex: 10 }}
+              />
+            ) : (
+              <img
+                src={
+                  video.thumbnail_url ||
+                  `https://res.cloudinary.com/${process.env.NEXT_PUBLIC_CLOUDINARY_CLOUD_NAME}/video/upload/so_0/${video.public_id}.jpg`
+                }
+                alt={video.title}
+                className="w-full h-full object-cover transition-transform group-hover:scale-105"
+              />
+            )}
+            <div className="absolute inset-0 bg-black/40 opacity-0 group-hover:opacity-100 transition-opacity flex items-center justify-center z-20">
+              <Button variant="secondary" size="icon">
+                <Play className="h-5 w-5" />
               </Button>
             </div>
-            <div className="absolute bottom-2 right-2 bg-black/70 text-white text-xs px-2 py-1 rounded flex items-center">
+            <div className="absolute bottom-2 right-2 bg-black/70 text-white text-xs px-2 py-1 rounded flex items-center z-30">
               <Eye className="h-3 w-3 mr-1" />
               {video.views.toLocaleString()}
             </div>

@@ -32,6 +32,7 @@ import {
   Sparkles,
   Sailboat,
 } from "lucide-react"
+import { useTypewriter, Cursor } from "react-simple-typewriter"
 
 import VideoGallery from "@/components/video-gallery"
 
@@ -52,6 +53,15 @@ export default function Home() {
   const [trendingContent, setTrendingContent] = useState<any[]>([])
   const [isLoading, setIsLoading] = useState(true)
   const [fetchError, setFetchError] = useState<string | null>(null)
+  const [trendingHover, setTrendingHover] = useState<number | null>(null)
+
+  const [typewriterText] = useTypewriter({
+    words: ["Discover the Sailor's World"],
+    loop: 0,
+    typeSpeed: 60,
+    deleteSpeed: 40,
+    delaySpeed: 1200,
+  })
 
   useEffect(() => {
     fetchLatestContent()
@@ -301,9 +311,11 @@ export default function Home() {
                 className="text-4xl sm:text-5xl md:text-6xl font-bold mb-6 text-gray-800 leading-tight"
                 variants={fadeIn}
               >
-                Discover the <br />
                 <span className="relative">
-                  <span className="relative z-10">Sailor's World</span>
+                  <span className="relative z-10">
+                    {typewriterText}
+                    <Cursor cursorColor="#333" />
+                  </span>
                   <span className="absolute bottom-2 left-0 w-full h-3 bg-gray-300 rounded-full -z-10"></span>
                 </span>
               </motion.h1>
@@ -321,12 +333,12 @@ export default function Home() {
                 </Link>
                 {!isAuthenticated ? (
                   <Link href="/signup">
-                    <Button size="lg" variant="outline" className="border-gray-400 text-gray-700 hover:bg-gray-100">
+                    <Button size="lg" variant="outline" className=" rounded-xl border-gray-400 bg-white text-black hover:bg-black hover:text-white hover:border-white border-2">
                       Join the Crew <Anchor className="ml-2 h-5 w-5" />
                     </Button>
                   </Link>
                 ) : (
-                  <Link href="/upload">
+                  <Link href="/community">
                     <Button size="lg" variant="outline" className="border-gray-400 text-gray-700 hover:bg-gray-100">
                       Upload Content <Upload className="ml-2 h-5 w-5" />
                     </Button>
@@ -445,22 +457,40 @@ export default function Home() {
                   className="overflow-hidden border-none shadow-md hover:shadow-lg transition-all group"
                 >
                   <Link href={`/${item.type}s/${item._id || item.id}`}>
-                    <div className="relative aspect-video overflow-hidden bg-slate-200 dark:bg-slate-800">
-                      <img
-                        src={
-                          item.thumbnail_url ||
-                          item.coverImage ||
-                          item.url ||
-                          (item.type === "video"
-                            ? `https://res.cloudinary.com/${process.env.NEXT_PUBLIC_CLOUDINARY_CLOUD_NAME}/video/upload/so_0/${item.public_id}.jpg`
-                            : "/diverse-media-landscape.png")
-                        }
-                        alt={item.title || "Media thumbnail"}
-                        className="w-full h-full object-cover transition-transform group-hover:scale-105"
-                      />
-
+                    <div
+                      className="relative aspect-video overflow-hidden bg-slate-200 dark:bg-slate-800 group"
+                      onMouseEnter={() => setTrendingHover(index)}
+                      onMouseLeave={() => setTrendingHover(null)}
+                    >
+                      {item.type === "video" && trendingHover === index ? (
+                        <video
+                          src={item.url}
+                          poster={
+                            item.thumbnail_url ||
+                            `https://res.cloudinary.com/${process.env.NEXT_PUBLIC_CLOUDINARY_CLOUD_NAME}/video/upload/so_0/${item.public_id}.jpg`
+                          }
+                          autoPlay
+                          muted
+                          loop
+                          playsInline
+                          className="w-full h-full object-cover"
+                          style={{ zIndex: 10 }}
+                        />
+                      ) : (
+                        <img
+                          src={
+                            item.thumbnail_url ||
+                            item.coverImage ||
+                            item.url ||
+                            (item.type === "video"
+                              ? `https://res.cloudinary.com/${process.env.NEXT_PUBLIC_CLOUDINARY_CLOUD_NAME}/video/upload/so_0/${item.public_id}.jpg`
+                              : "/diverse-media-landscape.png")
+                          }
+                          alt={item.title || "Media thumbnail"}
+                          className="w-full h-full object-cover transition-transform group-hover:scale-105"
+                        />
+                      )}
                       <div className="absolute inset-0 bg-gradient-to-t from-black/70 to-transparent opacity-60"></div>
-
                       <div className="absolute top-2 left-2">
                         <Badge className="bg-black/50 text-white border-0 backdrop-blur-sm">
                           {item.type === "video" && <Film className="h-3 w-3 mr-1" />}
@@ -468,7 +498,6 @@ export default function Home() {
                           {item.type === "podcast" && <Mic className="h-3 w-3 mr-1" />}#{index + 1} Trending
                         </Badge>
                       </div>
-
                       {item.type === "video" && (
                         <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 transform">
                           <div className="bg-white/20 backdrop-blur-sm rounded-full p-3 opacity-0 group-hover:opacity-100 transition-opacity">
