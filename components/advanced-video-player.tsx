@@ -1,7 +1,7 @@
 "use client"
 
 import { useState, useRef, useEffect } from "react"
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card"
+import { Card, CardContent } from "@/components/ui/card"
 import { Button } from "@/components/ui/button"
 import { Slider } from "@/components/ui/slider"
 import {
@@ -25,18 +25,27 @@ import {
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu"
 
-interface AdvancedVideoPlayerProps {
-  video: {
-    id: string
-    url: string
-    title: string
-    public_id: string
-  }
-  onNext?: () => void
-  onPrevious?: () => void
+interface Video {
+  id: string
+  url: string
+  title: string
+  public_id: string
+  thumbnail_url?: string | null
 }
 
-export default function AdvancedVideoPlayer({ video, onNext, onPrevious }: AdvancedVideoPlayerProps) {
+interface AdvancedVideoPlayerProps {
+  video: Video
+  onNext?: () => void
+  onPrevious?: () => void
+  relatedVideos?: Video[]
+}
+
+export default function AdvancedVideoPlayer({
+  video,
+  onNext,
+  onPrevious,
+  relatedVideos = [],
+}: AdvancedVideoPlayerProps) {
   const videoRef = useRef<HTMLVideoElement>(null)
   const containerRef = useRef<HTMLDivElement>(null)
   const [isPlaying, setIsPlaying] = useState(false)
@@ -228,10 +237,6 @@ export default function AdvancedVideoPlayer({ video, onNext, onPrevious }: Advan
 
   return (
     <Card className="w-full">
-      <CardHeader>
-        <CardTitle>{video.title || "Video Player"}</CardTitle>
-        <CardDescription>Advanced video player with controls</CardDescription>
-      </CardHeader>
       <CardContent className="p-0">
         <div
           ref={containerRef}
@@ -243,7 +248,10 @@ export default function AdvancedVideoPlayer({ video, onNext, onPrevious }: Advan
             ref={videoRef}
             src={video.url}
             className="w-full aspect-video"
-            poster={`https://res.cloudinary.com/${process.env.NEXT_PUBLIC_CLOUDINARY_CLOUD_NAME}/video/upload/so_0/${video.public_id}.jpg`}
+            poster={
+              video.thumbnail_url ||
+              `https://res.cloudinary.com/${process.env.NEXT_PUBLIC_CLOUDINARY_CLOUD_NAME}/video/upload/so_0/${video.public_id}.jpg`
+            }
             onClick={togglePlay}
             controls={false}
             preload="metadata"
@@ -252,7 +260,7 @@ export default function AdvancedVideoPlayer({ video, onNext, onPrevious }: Advan
 
           {!isLoaded && (
             <div className="absolute inset-0 flex items-center justify-center bg-black/50">
-              <div className="animate-spin rounded-full h-12 w-12 border-t-2 border-b-2 border-cyan-500"></div>
+              <div className="animate-spin rounded-full h-12 w-12 border-t-2 border-b-2 border-gray-300"></div>
             </div>
           )}
 

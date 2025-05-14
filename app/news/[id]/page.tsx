@@ -130,6 +130,11 @@ export default function NewsDetailPage() {
     </p>
   ))
 
+  // Group media items by type for better organization
+  const videoItems = article.media_items?.filter((item) => item.resourceType === "video") || []
+  const audioItems = article.media_items?.filter((item) => item.resourceType === "audio") || []
+  const imageItems = article.media_items?.filter((item) => item.resourceType === "image") || []
+
   return (
     <main className="container mx-auto py-8 px-4">
       <div className="flex justify-between items-center mb-4">
@@ -186,35 +191,47 @@ export default function NewsDetailPage() {
 
         <div className="text-lg font-medium italic mb-8">{article.summary}</div>
 
-        <div className="prose prose-lg max-w-none">{formattedContent}</div>
-
-        {article.media_items && article.media_items.length > 0 && (
-          <div className="mt-8 space-y-6">
-            <h2 className="text-2xl font-bold">Additional Media</h2>
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-              {article.media_items.map((item: any, index: number) => (
-                <div key={index} className="border rounded-md p-4">
-                  <h3 className="font-medium mb-2">
-                    {item.title ||
-                      `${item.resourceType.charAt(0).toUpperCase() + item.resourceType.slice(1)} ${index + 1}`}
-                  </h3>
-
-                  {item.resourceType === "image" ? (
-                    <img
-                      src={item.url || "/placeholder.svg"}
-                      alt={item.title || "Media"}
-                      className="w-full rounded-md"
-                    />
-                  ) : item.resourceType === "video" ? (
-                    <video src={item.url} className="w-full rounded-md" controls />
-                  ) : (
-                    <audio src={item.url} className="w-full mt-2" controls />
-                  )}
-                </div>
-              ))}
-            </div>
+        {/* Display video content first */}
+        {videoItems.length > 0 && (
+          <div className="mb-8 space-y-4">
+            {videoItems.map((item, index) => (
+              <div key={`video-${index}`} className="rounded-lg overflow-hidden">
+                <h3 className="font-medium mb-2">{item.title || `Video ${index + 1}`}</h3>
+                <video src={item.url} className="w-full rounded-md" controls />
+              </div>
+            ))}
           </div>
         )}
+
+        {/* Display audio content next */}
+        {audioItems.length > 0 && (
+          <div className="mb-8 space-y-4">
+            {audioItems.map((item, index) => (
+              <div key={`audio-${index}`} className="p-4 border rounded-lg bg-gray-50">
+                <h3 className="font-medium mb-2">{item.title || `Audio ${index + 1}`}</h3>
+                <audio src={item.url} className="w-full" controls />
+              </div>
+            ))}
+          </div>
+        )}
+
+        {/* Display additional images */}
+        {imageItems.length > 0 && (
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mb-8">
+            {imageItems.map((item, index) => (
+              <div key={`image-${index}`} className="rounded-lg overflow-hidden">
+                <img
+                  src={item.url || "/placeholder.svg"}
+                  alt={item.title || `Image ${index + 1}`}
+                  className="w-full h-auto rounded-md"
+                />
+                {item.title && <p className="text-sm text-center mt-1">{item.title}</p>}
+              </div>
+            ))}
+          </div>
+        )}
+
+        <div className="prose prose-lg max-w-none">{formattedContent}</div>
 
         {article.tags && article.tags.length > 0 && (
           <div className="flex flex-wrap gap-1 mt-8">

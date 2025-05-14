@@ -1,0 +1,51 @@
+import { type NextRequest, NextResponse } from "next/server"
+import { getVideosCollection } from "@/lib/mongodb-server"
+import { ObjectId } from "mongodb"
+
+export async function POST(request: NextRequest, { params }: { params: { id: string } }) {
+  try {
+    const videoId = params.id
+    const { userId } = await request.json()
+
+    if (!videoId || !ObjectId.isValid(videoId)) {
+      return NextResponse.json({ error: "Invalid video ID" }, { status: 400 })
+    }
+
+    if (!userId) {
+      return NextResponse.json({ error: "User ID is required" }, { status: 400 })
+    }
+
+    const collection = await getVideosCollection()
+
+    // Check if user already liked the video
+    const video = await collection.findOne({
+      _id: new ObjectId(videoId),
+      "likes.userId": userId,
+    })
+
+    if (video) {
+      // User already liked, so unlike
+      await collection.updateOne(
+        { _id: new ObjectId(videoId) },
+        {
+          $pull: { likes: { userId } },
+          $inc: { likeCount: -1 },
+        },
+      )
+      return NextResponse.json({ liked: false, message: "Like removed" })
+    } else {
+      // User hasn't liked, so add like
+      await collection.updateOne(
+        { _id: new ObjectId(videoId) },
+        {
+          $push: { likes: { userId, timestamp: new Date() } },
+          $inc: { likeCount: 1 },
+        },
+      )
+      return NextResponse.json({ liked: true, message: "Like added" })
+    }
+  } catch (error) {
+    console.error("Error updating like:", error)
+    return NextResponse.json({ error: "Failed to update like" }, { status: 500 })
+  }
+}

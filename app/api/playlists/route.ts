@@ -1,12 +1,16 @@
 import { type NextRequest, NextResponse } from "next/server"
-import { getPlaylistsCollection } from "@/lib/mongodb"
+import { getPlaylistsCollection } from "@/lib/mongodb-server"
 
 export async function POST(request: NextRequest) {
   try {
-    const { name, description, audioIds } = await request.json()
+    const { title, description, isPublic, videoIds, userId, userName, userImage } = await request.json()
 
-    if (!name) {
-      return NextResponse.json({ error: "Playlist name is required" }, { status: 400 })
+    if (!title) {
+      return NextResponse.json({ error: "Playlist title is required" }, { status: 400 })
+    }
+
+    if (!videoIds || !Array.isArray(videoIds) || videoIds.length === 0) {
+      return NextResponse.json({ error: "At least one video is required" }, { status: 400 })
     }
 
     // Get playlists collection
@@ -14,9 +18,14 @@ export async function POST(request: NextRequest) {
 
     // Store playlist in MongoDB
     const result = await collection.insertOne({
-      name,
+      title,
       description: description || "",
-      audioIds: audioIds || [],
+      isPublic: isPublic !== false, // Default to true
+      videoIds,
+      userId: userId || "anonymous",
+      userName: userName || "Anonymous User",
+      userImage: userImage || null,
+      views: 0,
       createdAt: new Date(),
       updatedAt: new Date(),
     })
@@ -37,20 +46,37 @@ export async function POST(request: NextRequest) {
   }
 }
 
-export async function GET() {
+export async function GET(request: NextRequest) {
   try {
+    const url = new URL(request.url)
+    const userId = url.searchParams.get("userId")
+
     // Get playlists collection
     const collection = await getPlaylistsCollection()
 
-    // Get all playlists, sorted by creation date (newest first)
-    const playlists = await collection.find({}).sort({ createdAt: -1 }).toArray()
+    // Build query
+    const query: any = {}
+    if (userId) {
+      query.userId = userId
+    } else {
+      // If no userId specified, only return public playlists
+      query.isPublic = true
+    }
+
+    // Get playlists, sorted by creation date (newest first)
+    const playlists = await collection.find(query).sort({ createdAt: -1 }).toArray()
 
     // Transform MongoDB _id to id for client-side compatibility
     const formattedPlaylists = playlists.map((playlist) => ({
       id: playlist._id.toString(),
-      name: playlist.name,
+      title: playlist.title,
       description: playlist.description,
-      audio_ids: playlist.audioIds,
+      isPublic: playlist.isPublic,
+      videoIds: playlist.videoIds,
+      userId: playlist.userId,
+      userName: playlist.userName,
+      userImage: playlist.userImage,
+      views: playlist.views || 0,
       created_at: playlist.createdAt.toISOString(),
       updated_at: playlist.updatedAt.toISOString(),
     }))

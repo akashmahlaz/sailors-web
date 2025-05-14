@@ -15,7 +15,18 @@ export async function POST(request: NextRequest) {
       return NextResponse.json({ error: "Invalid request body" }, { status: 400 })
     }
 
-    const { publicId, url, resourceType } = body
+    const {
+      publicId,
+      url,
+      resourceType,
+      title,
+      description,
+      thumbnailPublicId,
+      thumbnailUrl,
+      userId,
+      userName,
+      userImage,
+    } = body
 
     if (!publicId || !url) {
       console.error("POST /api/videos - Missing required fields:", { publicId, url })
@@ -32,6 +43,16 @@ export async function POST(request: NextRequest) {
       publicId,
       url,
       resourceType: resourceType || "video",
+      title: title || "Untitled Video",
+      description: description || "",
+      thumbnailPublicId,
+      thumbnailUrl,
+      userId: userId || "anonymous",
+      userName: userName || "Anonymous User",
+      userImage: userImage || null,
+      views: 0,
+      likes: 0,
+      comments: [],
       createdAt: new Date(),
     })
 
@@ -70,7 +91,16 @@ export async function GET() {
       id: video._id.toString(),
       public_id: video.publicId,
       url: video.url,
+      title: video.title || "Untitled Video",
+      description: video.description || "",
+      thumbnail_url: video.thumbnailUrl || null,
       resource_type: video.resourceType,
+      user_id: video.userId,
+      user_name: video.userName,
+      user_image: video.userImage,
+      views: video.views || 0,
+      likes: video.likes || 0,
+      comments: video.comments || [],
       created_at: video.createdAt.toISOString(),
     }))
 

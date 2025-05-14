@@ -14,6 +14,7 @@ import {
   Heart,
   MessageSquare,
   Share2,
+  Eye,
 } from "lucide-react"
 import { Button } from "@/components/ui/button"
 import { Dialog, DialogContent } from "@/components/ui/dialog"
@@ -21,6 +22,8 @@ import { Badge } from "@/components/ui/badge"
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar"
 import { Textarea } from "@/components/ui/textarea"
 import { useSession } from "next-auth/react"
+import { formatDistanceToNow } from "date-fns"
+import { toast } from "@/components/ui/use-toast"
 
 interface Photo {
   id: string
@@ -29,15 +32,22 @@ interface Photo {
   title: string
   description: string
   tags: string[]
+  user_id?: string
+  user_name?: string
+  user_image?: string
+  views: number
+  likes: number
   created_at: string
 }
 
 interface Comment {
   id: string
-  text: string
-  author: string
-  authorImage?: string
-  date: string
+  photo_id: string
+  user_id: string
+  user_name: string
+  user_image?: string
+  content: string
+  created_at: string
   likes: number
 }
 
@@ -55,9 +65,8 @@ const PhotoGallery = forwardRef<PhotoGalleryRef>((props, ref) => {
   const [likedPhotos, setLikedPhotos] = useState<Record<string, boolean>>({})
   const [commentText, setCommentText] = useState("")
   const [showComments, setShowComments] = useState(false)
-
-  // Mock comments for demonstration
-  const [photoComments, setPhotoComments] = useState<Record<string, Comment[]>>({})
+  const [comments, setComments] = useState<Comment[]>([])
+  const [loadingComments, setLoadingComments] = useState(false)
 
   const fetchPhotos = async () => {
     try {
@@ -68,39 +77,8 @@ const PhotoGallery = forwardRef<PhotoGalleryRef>((props, ref) => {
         throw new Error(`Failed to fetch photos: ${response.statusText}`)
       }
 
-      // Try to parse the response as JSON
-      let data
-      try {
-        data = await response.json()
-      } catch (parseError) {
-        console.error("Error parsing JSON:", parseError)
-        throw new Error("Invalid response format from server")
-      }
-
-      // Validate that data is an array
-      if (!Array.isArray(data)) {
-        console.error("Expected array but got:", typeof data)
-        setPhotos([])
-      } else {
-        setPhotos(data)
-
-        // Initialize mock comments for each photo
-        const initialComments: Record<string, Comment[]> = {}
-        data.forEach((photo) => {
-          initialComments[photo.id] = [
-            {
-              id: `comment-${Math.random().toString(36).substr(2, 9)}`,
-              text: "What a beautiful maritime moment! The colors are stunning.",
-              author: "Captain Morgan",
-              authorImage: "/diverse-avatars.png",
-              date: "2 days ago",
-              likes: 5,
-            },
-          ]
-        })
-        setPhotoComments(initialComments)
-      }
-
+      const data = await response.json()
+      setPhotos(data)
       setError(null)
     } catch (err) {
       console.error("Error fetching photos:", err)
@@ -118,6 +96,43 @@ const PhotoGallery = forwardRef<PhotoGalleryRef>((props, ref) => {
   useEffect(() => {
     fetchPhotos()
   }, [])
+
+  const fetchComments = async (photoId: string) => {
+    try {
+      setLoadingComments(true)
+      const response = await fetch(`/api/photos/${photoId}/comments`)
+
+      if (!response.ok) {
+        throw new Error("Failed to fetch comments")
+      }
+
+      const data = await response.json()
+      setComments(data)
+    } catch (error) {
+      console.error("Error fetching comments:", error)
+      setComments([])
+    } finally {
+      setLoadingComments(false)
+    }
+  }
+
+  const recordView = async (photoId: string) => {
+    try {
+      await fetch(`/api/photos/${photoId}/view`, {
+        method: "POST",
+      })
+    } catch (error) {
+      console.error("Error recording view:", error)
+    }
+  }
+
+  const handlePhotoSelect = async (photo: Photo) => {
+    setSelectedPhoto(photo)
+    setShowInfo(true)
+    setShowComments(false)
+    await recordView(photo.id)
+    await fetchComments(photo.id)
+  }
 
   const downloadPhoto = (photo: Photo) => {
     // Create a temporary anchor element
@@ -142,47 +157,146 @@ const PhotoGallery = forwardRef<PhotoGalleryRef>((props, ref) => {
       newIndex = (currentIndex + 1) % photos.length
     }
 
-    setSelectedPhoto(photos[newIndex])
+    handlePhotoSelect(photos[newIndex])
   }
 
-  const toggleLike = (photoId: string) => {
-    setLikedPhotos((prev) => ({
-      ...prev,
-      [photoId]: !prev[photoId],
-    }))
-  }
-
-  const handleComment = (photoId: string) => {
-    if (!commentText.trim()) return
-
-    const newComment: Comment = {
-      id: `comment-${Math.random().toString(36).substr(2, 9)}`,
-      text: commentText,
-      author: session?.user?.name || "Anonymous Sailor",
-      authorImage: session?.user?.image || "/diverse-avatars.png",
-      date: "Just now",
-      likes: 0,
+  const toggleLike = async (photoId: string) => {
+    if (!session) {
+      toast({
+        title: "Sign in required",
+        description: "Please sign in to like photos",
+        variant: "destructive",
+      })
+      return
     }
 
-    setPhotoComments((prev) => ({
-      ...prev,
-      [photoId]: [...(prev[photoId] || []), newComment],
-    }))
+    try {
+      const response = await fetch(`/api/photos/${photoId}/like`, {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({
+          userId: session.user?.id,
+        }),
+      })
 
-    setCommentText("")
-  }
-
-  const likeComment = (photoId: string, commentId: string) => {
-    setPhotoComments((prev) => {
-      const updatedComments = { ...prev }
-      const commentIndex = updatedComments[photoId].findIndex((c) => c.id === commentId)
-
-      if (commentIndex !== -1) {
-        updatedComments[photoId][commentIndex].likes += 1
+      if (!response.ok) {
+        throw new Error("Failed to like photo")
       }
 
-      return updatedComments
-    })
+      const data = await response.json()
+
+      // Update liked status
+      setLikedPhotos((prev) => ({
+        ...prev,
+        [photoId]: data.liked,
+      }))
+
+      // Update photo likes count
+      setPhotos((prev) =>
+        prev.map((photo) =>
+          photo.id === photoId
+            ? { ...photo, likes: data.liked ? photo.likes + 1 : Math.max(0, photo.likes - 1) }
+            : photo,
+        ),
+      )
+
+      // Update selected photo if it's the one being liked
+      if (selectedPhoto?.id === photoId) {
+        setSelectedPhoto((prev) =>
+          prev
+            ? {
+                ...prev,
+                likes: data.liked ? prev.likes + 1 : Math.max(0, prev.likes - 1),
+              }
+            : null,
+        )
+      }
+    } catch (error) {
+      console.error("Error liking photo:", error)
+      toast({
+        title: "Error",
+        description: "Failed to like photo",
+        variant: "destructive",
+      })
+    }
+  }
+
+  const handleComment = async () => {
+    if (!session || !selectedPhoto || !commentText.trim()) {
+      return
+    }
+
+    try {
+      const response = await fetch(`/api/photos/${selectedPhoto.id}/comments`, {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({
+          userId: session.user?.id,
+          userName: session.user?.name,
+          userImage: session.user?.image,
+          content: commentText.trim(),
+        }),
+      })
+
+      if (!response.ok) {
+        throw new Error("Failed to add comment")
+      }
+
+      const data = await response.json()
+      setComments((prev) => [data.comment, ...prev])
+      setCommentText("")
+    } catch (error) {
+      console.error("Error adding comment:", error)
+      toast({
+        title: "Error",
+        description: "Failed to add comment",
+        variant: "destructive",
+      })
+    }
+  }
+
+  const likeComment = async (commentId: string) => {
+    if (!session) {
+      toast({
+        title: "Sign in required",
+        description: "Please sign in to like comments",
+        variant: "destructive",
+      })
+      return
+    }
+
+    try {
+      const response = await fetch(`/api/photos/comments/${commentId}/like`, {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({
+          userId: session.user?.id,
+        }),
+      })
+
+      if (!response.ok) {
+        throw new Error("Failed to like comment")
+      }
+
+      const data = await response.json()
+
+      // Update comment likes
+      setComments((prev) =>
+        prev.map((comment) =>
+          comment.id === commentId
+            ? { ...comment, likes: data.liked ? comment.likes + 1 : Math.max(0, comment.likes - 1) }
+            : comment,
+        ),
+      )
+    } catch (error) {
+      console.error("Error liking comment:", error)
+    }
   }
 
   if (loading) {
@@ -243,7 +357,7 @@ const PhotoGallery = forwardRef<PhotoGalleryRef>((props, ref) => {
                   src={photo.url || "/placeholder.svg"}
                   alt={photo.title}
                   className="w-full h-full object-cover transition-transform group-hover:scale-105"
-                  onClick={() => setSelectedPhoto(photo)}
+                  onClick={() => handlePhotoSelect(photo)}
                 />
                 <div className="absolute inset-0 bg-gradient-to-t from-black/60 via-black/20 to-transparent opacity-0 group-hover:opacity-100 transition-opacity flex flex-col justify-end p-3">
                   <h3 className="font-medium text-white truncate">{photo.title}</h3>
@@ -266,7 +380,7 @@ const PhotoGallery = forwardRef<PhotoGalleryRef>((props, ref) => {
                         className="h-7 w-7 rounded-full bg-white/20 text-white hover:bg-white/40"
                         onClick={(e) => {
                           e.stopPropagation()
-                          setSelectedPhoto(photo)
+                          handlePhotoSelect(photo)
                           setShowComments(true)
                         }}
                       >
@@ -285,6 +399,10 @@ const PhotoGallery = forwardRef<PhotoGalleryRef>((props, ref) => {
                       <Download className="h-4 w-4" />
                     </Button>
                   </div>
+                </div>
+                <div className="absolute top-2 right-2 bg-black/70 text-white text-xs px-2 py-1 rounded flex items-center">
+                  <Eye className="h-3 w-3 mr-1" />
+                  {photo.views}
                 </div>
               </div>
             ))}
@@ -387,8 +505,15 @@ const PhotoGallery = forwardRef<PhotoGalleryRef>((props, ref) => {
                 )}
 
                 <div className="mt-4 flex justify-between items-center">
+                  <div className="flex items-center gap-2">
+                    <Avatar className="h-6 w-6">
+                      <AvatarImage src={selectedPhoto.user_image || "/placeholder.svg"} />
+                      <AvatarFallback>{selectedPhoto.user_name?.[0] || "U"}</AvatarFallback>
+                    </Avatar>
+                    <span className="text-sm">{selectedPhoto.user_name || "Anonymous"}</span>
+                  </div>
                   <span className="text-sm text-muted-foreground">
-                    Uploaded on {new Date(selectedPhoto.created_at).toLocaleDateString()}
+                    {formatDistanceToNow(new Date(selectedPhoto.created_at), { addSuffix: true })}
                   </span>
                 </div>
               </div>
@@ -411,41 +536,59 @@ const PhotoGallery = forwardRef<PhotoGalleryRef>((props, ref) => {
                       className="min-h-[80px] border-cyan-200 focus-visible:ring-cyan-500"
                     />
                     <Button
-                      onClick={() => selectedPhoto && handleComment(selectedPhoto.id)}
+                      onClick={handleComment}
                       className="mt-2 bg-cyan-600 hover:bg-cyan-700"
-                      disabled={!commentText.trim()}
+                      disabled={!commentText.trim() || !session}
                     >
                       Post Comment
                     </Button>
                   </div>
                 </div>
 
-                <div className="space-y-4">
-                  {selectedPhoto &&
-                    photoComments[selectedPhoto.id]?.map((comment) => (
+                {loadingComments ? (
+                  <div className="space-y-4">
+                    {[1, 2, 3].map((i) => (
+                      <div key={i} className="flex items-start gap-3">
+                        <Skeleton className="h-8 w-8 rounded-full" />
+                        <div className="flex-1">
+                          <Skeleton className="h-4 w-1/4 mb-2" />
+                          <Skeleton className="h-3 w-full" />
+                          <Skeleton className="h-3 w-3/4 mt-1" />
+                        </div>
+                      </div>
+                    ))}
+                  </div>
+                ) : comments.length > 0 ? (
+                  <div className="space-y-4">
+                    {comments.map((comment) => (
                       <div key={comment.id} className="flex items-start gap-3">
                         <Avatar className="h-8 w-8">
-                          <AvatarImage src={comment.authorImage || "/placeholder.svg"} />
-                          <AvatarFallback>{comment.author[0]}</AvatarFallback>
+                          <AvatarImage src={comment.user_image || "/placeholder.svg"} />
+                          <AvatarFallback>{comment.user_name[0]}</AvatarFallback>
                         </Avatar>
                         <div className="flex-1">
                           <div className="flex items-center gap-2">
-                            <span className="font-medium">{comment.author}</span>
-                            <span className="text-xs text-muted-foreground">{comment.date}</span>
+                            <span className="font-medium">{comment.user_name}</span>
+                            <span className="text-xs text-muted-foreground">
+                              {formatDistanceToNow(new Date(comment.created_at), { addSuffix: true })}
+                            </span>
                           </div>
-                          <p className="mt-1">{comment.text}</p>
+                          <p className="mt-1">{comment.content}</p>
                           <Button
                             variant="ghost"
                             size="sm"
                             className="h-auto p-0 text-xs text-muted-foreground mt-1"
-                            onClick={() => selectedPhoto && likeComment(selectedPhoto.id, comment.id)}
+                            onClick={() => likeComment(comment.id)}
                           >
                             <Heart className="h-3 w-3 mr-1" /> {comment.likes}
                           </Button>
                         </div>
                       </div>
                     ))}
-                </div>
+                  </div>
+                ) : (
+                  <p className="text-center text-muted-foreground">No comments yet. Be the first to comment!</p>
+                )}
               </div>
             )}
           </DialogContent>
