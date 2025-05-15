@@ -195,23 +195,23 @@ export default function NewsList() {
   }
 
   return (
-    <Card className="border-cyan-200 shadow-lg">
-      <CardHeader className="flex flex-row items-center justify-between border-b border-cyan-100">
+    <Card className="border border-gray-200 shadow-md dark:border-gray-800 dark:shadow-none">
+      <CardHeader className="flex flex-row items-center justify-between border-b border-gray-100 dark:border-gray-800">
         <div>
-          <CardTitle className="text-cyan-900">Maritime Reports</CardTitle>
-          <CardDescription>
+          <CardTitle className="text-gray-900 dark:text-gray-100">Maritime Reports</CardTitle>
+          <CardDescription className="text-gray-600 dark:text-gray-400">
             {news.length > 0 ? `${news.length} maritime reports available` : "No maritime reports yet"}
           </CardDescription>
         </div>
         <div className="flex gap-2">
           <DropdownMenu>
             <DropdownMenuTrigger asChild>
-              <Button variant="outline" size="sm" className="border-cyan-200">
+              <Button variant="outline" size="sm" className="border-gray-200 dark:border-gray-700 bg-white dark:bg-gray-900 text-gray-700 dark:text-gray-200">
                 <Filter className="h-4 w-4 mr-2" />
                 Chart Course
               </Button>
             </DropdownMenuTrigger>
-            <DropdownMenuContent align="end">
+            <DropdownMenuContent align="end" className="bg-white dark:bg-gray-900 border-gray-200 dark:border-gray-700">
               <DropdownMenuLabel>Categories</DropdownMenuLabel>
               <DropdownMenuSeparator />
               <DropdownMenuCheckboxItem
@@ -245,15 +245,15 @@ export default function NewsList() {
             </DropdownMenuContent>
           </DropdownMenu>
 
-          <Button variant="outline" size="sm" onClick={() => fetchNews()} className="border-cyan-200">
+          <Button variant="outline" size="sm" onClick={() => fetchNews()} className="border-gray-200 dark:border-gray-700 bg-white dark:bg-gray-900 text-gray-700 dark:text-gray-200">
             <RefreshCw className="h-4 w-4 mr-2" />
             Scan Horizon
           </Button>
         </div>
       </CardHeader>
-      <CardContent className="p-4">
+      <CardContent className="p-4 bg-gray-50 dark:bg-gray-950">
         {error && (
-          <div className="mb-4 p-4 bg-red-50 text-red-800 rounded-md flex items-start gap-2">
+          <div className="mb-4 p-4 bg-red-50 dark:bg-gray-900 text-red-800 dark:text-red-400 rounded-md flex items-start gap-2 border border-red-200 dark:border-red-700">
             <AlertCircle className="h-5 w-5 mt-0.5 flex-shrink-0" />
             <div>
               <p className="font-medium">Error loading news</p>
@@ -263,7 +263,7 @@ export default function NewsList() {
         )}
 
         {news.length === 0 && !error ? (
-          <div className="text-center py-8 text-muted-foreground">
+          <div className="text-center py-8 text-gray-400 dark:text-gray-500">
             No maritime reports yet. Check back later for updates!
           </div>
         ) : (
@@ -271,7 +271,7 @@ export default function NewsList() {
             {paginatedNews.map((article) => (
               <div
                 key={article.id}
-                className="bg-gradient-to-b from-white to-cyan-50 rounded-xl overflow-hidden shadow-sm"
+                className="bg-white dark:bg-gray-900 rounded-xl overflow-hidden shadow-sm border border-gray-100 dark:border-gray-800"
               >
                 <div className="flex flex-col md:flex-row gap-4">
                   {article.cover_image_url && (
@@ -279,24 +279,24 @@ export default function NewsList() {
                       <img
                         src={article.cover_image_url || "/placeholder.svg"}
                         alt={article.title}
-                        className="w-full h-full object-cover"
+                        className="w-full h-full object-cover rounded-t-xl md:rounded-l-xl md:rounded-tr-none"
                       />
                     </div>
                   )}
-                  <div className={`${article.cover_image_url ? "md:w-2/3" : "w-full"} p-4`}>
+                  <div className={`${article.cover_image_url ? "md:w-2/3" : "w-full"} p-4`}> 
                     <div className="flex items-center gap-2 mb-2">
-                      <Badge variant="secondary" className="bg-cyan-100 text-cyan-800 border-cyan-200">
+                      <Badge variant="secondary" className="bg-gray-100 dark:bg-gray-800 text-gray-800 dark:text-gray-200 border border-gray-200 dark:border-gray-700">
                         {article.category}
                       </Badge>
-                      {article.is_breaking && <Badge variant="destructive">Breaking</Badge>}
+                      {article.is_breaking && <Badge variant="destructive" className="bg-red-100 dark:bg-red-900 text-red-700 dark:text-red-300 border border-red-200 dark:border-red-700">Breaking</Badge>}
                     </div>
                     <Link href={`/news/${article.id}`}>
-                      <h3 className="text-xl font-bold mb-2 text-cyan-900 hover:text-cyan-700 transition-colors">
+                      <h3 className="text-xl font-bold mb-2 text-gray-900 dark:text-gray-100 hover:text-gray-700 dark:hover:text-gray-300 transition-colors">
                         {article.title}
                       </h3>
                     </Link>
-                    <p className="text-muted-foreground mb-2 line-clamp-3">{article.summary}</p>
-                    <div className="flex flex-wrap items-center gap-x-4 gap-y-1 text-sm text-muted-foreground">
+                    <p className="text-gray-600 dark:text-gray-400 mb-2 line-clamp-3">{article.summary}</p>
+                    <div className="flex flex-wrap items-center gap-x-4 gap-y-1 text-sm text-gray-500 dark:text-gray-400">
                       <span>By {article.author}</span>
                       <span>
                         {new Date(article.published_at).toLocaleDateString("en-US", {
@@ -310,25 +310,28 @@ export default function NewsList() {
                     {article.tags.length > 0 && (
                       <div className="flex flex-wrap gap-1 mt-2">
                         {article.tags.slice(0, 3).map((tag) => (
-                          <Badge key={tag} variant="outline" className="text-xs border-cyan-200">
+                          <Badge key={tag} variant="outline" className="text-xs border-gray-200 dark:border-gray-700 text-gray-700 dark:text-gray-300">
                             {tag}
                           </Badge>
                         ))}
                         {article.tags.length > 3 && (
-                          <Badge variant="outline" className="text-xs border-cyan-200">
+                          <Badge variant="outline" className="text-xs border-gray-200 dark:border-gray-700 text-gray-700 dark:text-gray-300">
                             +{article.tags.length - 3} more
                           </Badge>
                         )}
                       </div>
                     )}
 
-                    <div className="flex justify-between items-center mt-4 pt-2 border-t border-cyan-100">
+                    <div className="flex justify-between items-center mt-4 pt-2 border-t border-gray-100 dark:border-gray-800">
                       <div className="flex space-x-4">
                         <Button
                           variant="ghost"
                           size="sm"
                           onClick={() => toggleLike(article.id)}
-                          className={likedArticles[article.id] ? "text-red-500" : "text-gray-500"}
+                          className={
+                            (likedArticles[article.id] ? "text-red-500 dark:text-red-400" : "text-gray-500 dark:text-gray-400") +
+                            " hover:bg-gray-100 dark:hover:bg-gray-800"
+                          }
                         >
                           <Heart className="h-4 w-4 mr-2" fill={likedArticles[article.id] ? "currentColor" : "none"} />
                           {likedArticles[article.id] ? "Liked" : "Like"}
@@ -338,27 +341,27 @@ export default function NewsList() {
                           variant="ghost"
                           size="sm"
                           onClick={() => toggleExpand(article.id)}
-                          className="text-gray-500"
+                          className="text-gray-500 dark:text-gray-400 hover:bg-gray-100 dark:hover:bg-gray-800"
                         >
                           <MessageSquare className="h-4 w-4 mr-2" />
                           Comments ({articleComments[article.id]?.length || 0})
                         </Button>
 
-                        <Button variant="ghost" size="sm" className="text-gray-500">
+                        <Button variant="ghost" size="sm" className="text-gray-500 dark:text-gray-400 hover:bg-gray-100 dark:hover:bg-gray-800">
                           <Share2 className="h-4 w-4 mr-2" />
                           Share
                         </Button>
                       </div>
 
                       <Link href={`/news/${article.id}`}>
-                        <Button size="sm" className="bg-cyan-600 hover:bg-cyan-700">
+                        <Button size="sm" className="bg-gray-700 hover:bg-gray-800 text-white font-medium shadow-sm">
                           Read More
                         </Button>
                       </Link>
                     </div>
 
                     {expandedArticle === article.id && (
-                      <div className="mt-4 space-y-4 border-t border-cyan-100 pt-4">
+                      <div className="mt-4 space-y-4 border-t border-gray-100 dark:border-gray-800 pt-4">
                         <div className="flex items-start gap-3">
                           <Avatar className="h-8 w-8">
                             <AvatarImage
@@ -371,11 +374,11 @@ export default function NewsList() {
                               placeholder="Add a comment..."
                               value={commentText}
                               onChange={(e) => setCommentText(e.target.value)}
-                              className="min-h-[80px] border-cyan-200 focus-visible:ring-cyan-500"
+                              className="min-h-[80px] border-gray-200 dark:border-gray-700 focus-visible:ring-gray-500 dark:focus-visible:ring-gray-400 bg-white dark:bg-gray-900 text-gray-900 dark:text-gray-100"
                             />
                             <Button
                               onClick={() => handleComment(article.id)}
-                              className="mt-2 bg-cyan-600 hover:bg-cyan-700"
+                              className="mt-2 bg-gray-700 hover:bg-gray-800 text-white"
                               disabled={!commentText.trim()}
                             >
                               Post Comment
@@ -392,14 +395,14 @@ export default function NewsList() {
                               </Avatar>
                               <div className="flex-1">
                                 <div className="flex items-center gap-2">
-                                  <span className="font-medium">{comment.author}</span>
-                                  <span className="text-xs text-muted-foreground">{comment.date}</span>
+                                  <span className="font-medium text-gray-900 dark:text-gray-100">{comment.author}</span>
+                                  <span className="text-xs text-gray-500 dark:text-gray-400">{comment.date}</span>
                                 </div>
-                                <p className="mt-1">{comment.text}</p>
+                                <p className="mt-1 text-gray-800 dark:text-gray-200">{comment.text}</p>
                                 <Button
                                   variant="ghost"
                                   size="sm"
-                                  className="h-auto p-0 text-xs text-muted-foreground mt-1"
+                                  className="h-auto p-0 text-xs text-gray-500 dark:text-gray-400 mt-1 hover:bg-gray-100 dark:hover:bg-gray-800"
                                   onClick={() => likeComment(article.id, comment.id)}
                                 >
                                   <Heart className="h-3 w-3 mr-1" /> {comment.likes}
@@ -417,13 +420,13 @@ export default function NewsList() {
             {/* Pagination Controls */}
             {totalPages > 1 && (
               <div className="flex justify-center gap-2 mt-8">
-                <Button size="sm" variant="outline" onClick={() => setCurrentPage((p) => Math.max(1, p - 1))} disabled={currentPage === 1}>
+                <Button size="sm" variant="outline" onClick={() => setCurrentPage((p) => Math.max(1, p - 1))} disabled={currentPage === 1} className="border-gray-200 dark:border-gray-700 bg-white dark:bg-gray-900 text-gray-700 dark:text-gray-200">
                   Previous
                 </Button>
-                <span className="px-3 py-2 text-sm font-medium text-gray-700 bg-gray-100 rounded">
+                <span className="px-3 py-2 text-sm font-medium text-gray-700 dark:text-gray-200 bg-gray-100 dark:bg-gray-800 rounded">
                   Page {currentPage} of {totalPages}
                 </span>
-                <Button size="sm" variant="outline" onClick={() => setCurrentPage((p) => Math.min(totalPages, p + 1))} disabled={currentPage === totalPages}>
+                <Button size="sm" variant="outline" onClick={() => setCurrentPage((p) => Math.min(totalPages, p + 1))} disabled={currentPage === totalPages} className="border-gray-200 dark:border-gray-700 bg-white dark:bg-gray-900 text-gray-700 dark:text-gray-200">
                   Next
                 </Button>
               </div>

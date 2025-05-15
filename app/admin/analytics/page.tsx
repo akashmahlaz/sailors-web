@@ -195,7 +195,7 @@ export default function AdminAnalyticsPage() {
             </SelectContent>
           </Select>
           <Link href="/admin/content">
-            <Button className="bg-cyan-600 hover:bg-cyan-700 dark:bg-cyan-700 dark:hover:bg-cyan-600">
+            <Button className="bg-gray-600 hover:bg-gray-700 dark:bg-gray-200 dark:hover:bg-gray-400 dark:text-white">
               Manage Content
             </Button>
           </Link>
@@ -204,7 +204,7 @@ export default function AdminAnalyticsPage() {
 
       {loading ? (
         <div className="flex justify-center items-center h-64">
-          <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-cyan-700"></div>
+          <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-gray-700"></div>
         </div>
       ) : error ? (
         <Alert variant="destructive" className="mb-6">

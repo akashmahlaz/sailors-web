@@ -287,7 +287,7 @@ export default function AdminSupportPage() {
 
               <div>
                 <Link href={`/admin/support/${request.id}`}>
-                  <Button className="bg-amber-600 hover:bg-amber-700 dark:bg-amber-700 dark:hover:bg-amber-600">
+                  <Button className="bg-gray-600 text-white hover:bg-gray-700 dark:bg-white dark:text-black dark:hover:bg-gray-300 dark:hover:text-gray-700">
                     View Details
                   </Button>
                 </Link>

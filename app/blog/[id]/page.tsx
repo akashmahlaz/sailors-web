@@ -126,14 +126,14 @@ export default function BlogDetailPage() {
   ))
 
   return (
-    <main className="container mx-auto py-8 px-4">
+    <main className="container mx-auto py-10 px-4 min-h-screen bg-gradient-to-b from-gray-50 to-gray-100 dark:from-gray-900 dark:to-gray-950">
       <div className="flex justify-between items-center mb-4">
-        <Button variant="ghost" onClick={() => router.push("/blog")}>
+        <Button variant="ghost" className="text-gray-700 dark:text-gray-300" onClick={() => router.push("/blog")}> 
           <ArrowLeft className="mr-2 h-4 w-4" /> Back to Blog
         </Button>
         <div className="flex gap-2">
           <Link href={`/blog/edit/${blog.id}`}>
-            <Button variant="outline" size="sm">
+            <Button variant="outline" size="sm" className="border-gray-300 dark:border-gray-700 text-gray-700 dark:text-gray-300">
               <Edit className="mr-2 h-4 w-4" /> Edit
             </Button>
           </Link>
@@ -153,9 +153,9 @@ export default function BlogDetailPage() {
         </div>
       )}
 
-      <h1 className="text-4xl font-bold mb-4">{blog.title}</h1>
+      <h1 className="text-4xl font-bold mb-4 text-gray-900 dark:text-gray-100">{blog.title}</h1>
 
-      <div className="flex flex-wrap items-center gap-4 text-muted-foreground mb-8">
+      <div className="flex flex-wrap items-center gap-4 text-gray-500 dark:text-gray-400 mb-8">
         <span className="flex items-center gap-1">
           <Calendar className="h-4 w-4" />
           {formattedDate}
@@ -167,7 +167,7 @@ export default function BlogDetailPage() {
         {blog.tags && blog.tags.length > 0 && (
           <div className="flex flex-wrap gap-1">
             {blog.tags.map((tag) => (
-              <Badge key={tag} variant="secondary">
+              <Badge key={tag} variant="secondary" className="bg-gray-100 dark:bg-gray-800 text-gray-800 dark:text-gray-200 border border-gray-200 dark:border-gray-700">
                 {tag}
               </Badge>
             ))}
@@ -175,7 +175,7 @@ export default function BlogDetailPage() {
         )}
       </div>
 
-      <div className="prose prose-lg max-w-none">{formattedContent}</div>
+      <div className="prose prose-lg max-w-none text-gray-800 dark:text-gray-200">{formattedContent}</div>
     </main>
   )
 }

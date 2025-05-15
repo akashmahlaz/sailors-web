@@ -70,7 +70,7 @@ export default function NavBar() {
             <img
               src="/d4.jpg"
               alt="Logo"
-              className="mr-2 h-12 w-12 object-contain rounded-full bg-gray-100 dark:bg-gray-700 border border-gray-200 dark:border-gray-600 shadow-sm"
+              className="mr-2 h-10 w-10 object-contain rounded-sm bg-gray-100 dark:bg-gray-700 border border-gray-200 dark:border-gray-600 shadow-sm"
               style={{ minWidth: 32, minHeight: 32 }}
             />
             <span className="hidden sm:inline">Sailor's Platform</span>

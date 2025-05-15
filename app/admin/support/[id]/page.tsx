@@ -129,7 +129,7 @@ export default function SupportRequestDetailPage({ params }: { params: { id: str
         return (
           <Badge
             variant="outline"
-            className="bg-amber-100 text-amber-800 border-amber-300 dark:bg-amber-950 dark:text-amber-200 dark:border-amber-800"
+            className="bg-gray-100 text-gray-800 border-gray-300 dark:bg-gray-950 dark:text-gray-200 dark:border-gray-800"
           >
             Pending
           </Badge>
@@ -169,7 +169,7 @@ export default function SupportRequestDetailPage({ params }: { params: { id: str
   if (status === "loading" || loading) {
     return (
       <div className="container mx-auto px-4 py-8 text-center">
-        <div className="animate-spin h-8 w-8 border-4 border-amber-600 border-t-transparent rounded-full mx-auto mb-4"></div>
+        <div className="animate-spin h-8 w-8 border-4 border-gray-600 border-t-transparent rounded-full mx-auto mb-4"></div>
         <p>Loading support request details...</p>
       </div>
     )
@@ -223,17 +223,17 @@ export default function SupportRequestDetailPage({ params }: { params: { id: str
   }
 
   return (
-    <div className="container mx-auto px-4 py-8 bg-gradient-to-b from-slate-50 to-amber-50 dark:from-slate-950 dark:to-amber-950">
+    <div className="container mx-auto px-4 py-8 bg-gradient-to-b from-slate-50 to-gray-50 dark:from-slate-950 dark:to-gray-950">
       <div className="mb-6 flex flex-col md:flex-row md:items-center md:justify-between gap-4">
         <div>
           <Link href="/admin/support">
-            <Button variant="outline" className="mb-2 border-amber-200 dark:border-amber-900">
+            <Button variant="outline" className="mb-2 border-gray-200 dark:border-gray-900">
               <ArrowLeft className="h-4 w-4 mr-2" />
               Back to Support Requests
             </Button>
           </Link>
-          <h1 className="text-3xl font-bold text-amber-900 dark:text-amber-100 flex items-center gap-2">
-            <LifeBuoy className="h-6 w-6 text-amber-700 dark:text-amber-300" />
+          <h1 className="text-3xl font-bold text-gray-900 dark:text-gray-100 flex items-center gap-2">
+            <LifeBuoy className="h-6 w-6 text-gray-700 dark:text-gray-300" />
             Support Request Details
           </h1>
         </div>
@@ -246,9 +246,9 @@ export default function SupportRequestDetailPage({ params }: { params: { id: str
 
       <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
         <div className="lg:col-span-2 space-y-6">
-          <Card className="border-amber-200 shadow-lg shadow-amber-100 dark:border-amber-900 dark:shadow-none">
-            <CardHeader className="border-b border-amber-100 dark:border-amber-900 bg-gradient-to-r from-amber-50 to-white dark:from-slate-900 dark:to-amber-950">
-              <CardTitle className="text-amber-900 dark:text-amber-100">{supportRequest.title}</CardTitle>
+          <Card className="border-gray-200 shadow-lg shadow-gray-100 dark:border-gray-900 dark:shadow-none">
+            <CardHeader className="border-b border-gray-100 dark:border-gray-900 bg-gradient-to-r from-gray-50 to-white dark:from-slate-900 dark:to-gray-950">
+              <CardTitle className="text-gray-900 dark:text-gray-100">{supportRequest.title}</CardTitle>
               <CardDescription>
                 {supportRequest.category} • Submitted {formatDate(supportRequest.createdAt)}
               </CardDescription>
@@ -261,7 +261,7 @@ export default function SupportRequestDetailPage({ params }: { params: { id: str
                   <p className="text-slate-900 dark:text-slate-100">
                     {supportRequest.isAnonymous ? (
                       <span className="flex items-center gap-2">
-                        <Shield className="h-4 w-4 text-amber-600 dark:text-amber-400" />
+                        <Shield className="h-4 w-4 text-gray-600 dark:text-gray-400" />
                         Anonymous Submission
                       </span>
                     ) : (
@@ -275,7 +275,7 @@ export default function SupportRequestDetailPage({ params }: { params: { id: str
 
                 <div>
                   <h3 className="text-sm font-medium text-slate-500 dark:text-slate-400 mb-2">Description</h3>
-                  <div className="bg-white dark:bg-slate-900 p-4 rounded-md border border-amber-100 dark:border-amber-900 whitespace-pre-wrap">
+                  <div className="bg-white dark:bg-slate-900 p-4 rounded-md border border-gray-100 dark:border-gray-900 whitespace-pre-wrap">
                     {supportRequest.description}
                   </div>
                 </div>
@@ -283,9 +283,9 @@ export default function SupportRequestDetailPage({ params }: { params: { id: str
             </CardContent>
           </Card>
 
-          <Card className="border-amber-200 shadow-lg shadow-amber-100 dark:border-amber-900 dark:shadow-none">
-            <CardHeader className="border-b border-amber-100 dark:border-amber-900 bg-gradient-to-r from-amber-50 to-white dark:from-slate-900 dark:to-amber-950">
-              <CardTitle className="text-amber-900 dark:text-amber-100">Admin Response</CardTitle>
+          <Card className="border-gray-200 shadow-lg shadow-gray-100 dark:border-gray-900 dark:shadow-none">
+            <CardHeader className="border-b border-gray-100 dark:border-gray-900 bg-gradient-to-r from-gray-50 to-white dark:from-slate-900 dark:to-gray-950">
+              <CardTitle className="text-gray-900 dark:text-gray-100">Admin Response</CardTitle>
               <CardDescription>Update status and provide resolution details</CardDescription>
             </CardHeader>
 
@@ -301,7 +301,7 @@ export default function SupportRequestDetailPage({ params }: { params: { id: str
                 <div className="space-y-2">
                   <Label htmlFor="status">Status</Label>
                   <Select value={updateStatus} onValueChange={setUpdateStatus}>
-                    <SelectTrigger id="status" className="border-amber-200 dark:border-amber-900">
+                    <SelectTrigger id="status" className="border-gray-200 dark:border-gray-900">
                       <SelectValue placeholder="Select status" />
                     </SelectTrigger>
                     <SelectContent>
@@ -321,7 +321,7 @@ export default function SupportRequestDetailPage({ params }: { params: { id: str
                     onChange={(e) => setAdminNotes(e.target.value)}
                     placeholder="Add internal notes about this support request"
                     rows={4}
-                    className="border-amber-200 dark:border-amber-900"
+                    className="border-gray-200 dark:border-gray-900"
                   />
                 </div>
 
@@ -333,17 +333,17 @@ export default function SupportRequestDetailPage({ params }: { params: { id: str
                     onChange={(e) => setResolution(e.target.value)}
                     placeholder="Provide details about how this issue was resolved"
                     rows={4}
-                    className="border-amber-200 dark:border-amber-900"
+                    className="border-gray-200 dark:border-gray-900"
                   />
                 </div>
               </div>
             </CardContent>
 
-            <CardFooter className="border-t border-amber-100 dark:border-amber-900 bg-gradient-to-r from-white to-amber-50 dark:from-slate-900 dark:to-amber-950 py-4">
+            <CardFooter className="border-t border-gray-100 dark:border-gray-900 bg-gradient-to-r from-white to-gray-50 dark:from-slate-900 dark:to-gray-950 py-4">
               <Button
                 onClick={handleUpdate}
                 disabled={updating}
-                className="ml-auto bg-amber-600 hover:bg-amber-700 dark:bg-amber-700 dark:hover:bg-amber-600"
+                className="ml-auto bg-gray-600 hover:bg-gray-700 dark:bg-white dark:hover:bg-gray-300"
               >
                 {updating ? "Updating..." : "Update Support Request"}
               </Button>
@@ -352,9 +352,9 @@ export default function SupportRequestDetailPage({ params }: { params: { id: str
         </div>
 
         <div>
-          <Card className="border-amber-200 shadow-lg shadow-amber-100 dark:border-amber-900 dark:shadow-none">
-            <CardHeader className="border-b border-amber-100 dark:border-amber-900 bg-gradient-to-r from-amber-50 to-white dark:from-slate-900 dark:to-amber-950">
-              <CardTitle className="text-amber-900 dark:text-amber-100">Supporting Evidence</CardTitle>
+          <Card className="border-gray-200 shadow-lg shadow-gray-100 dark:border-gray-900 dark:shadow-none">
+            <CardHeader className="border-b border-gray-100 dark:border-gray-900 bg-gradient-to-r from-gray-50 to-white dark:from-slate-900 dark:to-gray-950">
+              <CardTitle className="text-gray-900 dark:text-gray-100">Supporting Evidence</CardTitle>
               <CardDescription>
                 {supportRequest.proofs.length} item{supportRequest.proofs.length !== 1 ? "s" : ""} attached
               </CardDescription>
@@ -367,7 +367,7 @@ export default function SupportRequestDetailPage({ params }: { params: { id: str
                   <p>No supporting evidence attached</p>
                 </div>
               ) : (
-                <div className="divide-y divide-amber-100 dark:divide-amber-900">
+                <div className="divide-y divide-gray-100 dark:divide-gray-900">
                   {supportRequest.proofs.map((proof, index) => (
                     <div key={index} className="p-4">
                       <div className="flex items-center justify-between">
@@ -385,8 +385,8 @@ export default function SupportRequestDetailPage({ params }: { params: { id: str
                               <video src={proof.url} className="h-full w-full object-cover" />
                             </div>
                           ) : (
-                            <div className="h-12 w-12 rounded bg-amber-100 dark:bg-amber-900 flex items-center justify-center">
-                              <Shield className="h-6 w-6 text-amber-600 dark:text-amber-400" />
+                            <div className="h-12 w-12 rounded bg-gray-100 dark:bg-gray-900 flex items-center justify-center">
+                              <Shield className="h-6 w-6 text-gray-600 dark:text-gray-400" />
                             </div>
                           )}
 
@@ -414,7 +414,7 @@ export default function SupportRequestDetailPage({ params }: { params: { id: str
                           <a
                             href={proof.url}
                             download
-                            className="inline-flex items-center justify-center h-8 px-3 text-xs font-medium rounded-md bg-amber-100 text-amber-900 hover:bg-amber-200 dark:bg-amber-900 dark:text-amber-100 dark:hover:bg-amber-800"
+                            className="inline-flex items-center justify-center h-8 px-3 text-xs font-medium rounded-md bg-gray-100 text-gray-900 hover:bg-gray-200 dark:bg-gray-900 dark:text-gray-100 dark:hover:bg-gray-800"
                           >
                             <Download className="h-3.5 w-3.5 mr-1" />
                             Download

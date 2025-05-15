@@ -3,6 +3,7 @@ import { getUsersCollection, getAdminActivityLogsCollection } from "@/lib/mongod
 import { getServerSession } from "next-auth/next"
 import { authOptions } from "../../../auth/[...nextauth]/route"
 import { ObjectId } from "mongodb"
+import { Session } from "next-auth"
 
 export async function GET(request: NextRequest, { params }: { params: { id: string } }) {
   try {

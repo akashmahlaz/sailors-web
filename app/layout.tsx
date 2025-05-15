@@ -10,9 +10,9 @@ const inter = Inter({ subsets: ["latin"] })
 
 // Update the metadata to reflect the sailing theme
 export const metadata = {
-  title: "Sailor's Media Voyage",
+  title: "Sailor's Platform - Sailors voice , experiences and media",
   description: "Navigate your media seas - videos, photos, podcasts and more",
-    generator: 'v0.dev'
+    developer: 'Akash Mahla'
 }
 
 export default function RootLayout({ children }: { children: React.ReactNode }) {

@@ -155,22 +155,22 @@ export default function PodcastList() {
   }
 
   return (
-    <Card className="border-cyan-200 shadow-lg">
-      <CardHeader className="flex flex-row items-center justify-between border-b border-cyan-100">
+    <Card className="border border-gray-200 shadow-md dark:border-gray-800 dark:shadow-none">
+      <CardHeader className="flex flex-row items-center justify-between border-b border-gray-100 dark:border-gray-800">
         <div>
-          <CardTitle className="text-cyan-900">Sea Waves</CardTitle>
-          <CardDescription>
-            {podcasts.length > 0 ? `${podcasts.length} sea waves available` : "No sea waves yet"}
+          <CardTitle className="text-gray-900 dark:text-gray-100">Podcasts</CardTitle>
+          <CardDescription className="text-gray-600 dark:text-gray-400">
+            {podcasts.length > 0 ? `${podcasts.length} podcasts available` : "No podcasts yet"}
           </CardDescription>
         </div>
-        <Button variant="outline" size="sm" onClick={fetchPodcasts} className="border-cyan-200">
+        <Button variant="outline" size="sm" onClick={fetchPodcasts} className="border-gray-200 dark:border-gray-700 bg-white dark:bg-gray-900 text-gray-700 dark:text-gray-200">
           <RefreshCw className="h-4 w-4 mr-2" />
-          Scan Horizon
+          Refresh
         </Button>
       </CardHeader>
-      <CardContent className="p-4">
+      <CardContent className="p-4 bg-gray-50 dark:bg-gray-950">
         {error && (
-          <div className="mb-4 p-4 bg-red-50 text-red-800 rounded-md flex items-start gap-2">
+          <div className="mb-4 p-4 bg-red-50 dark:bg-gray-900 text-red-800 dark:text-red-400 rounded-md flex items-start gap-2 border border-red-200 dark:border-red-700">
             <AlertCircle className="h-5 w-5 mt-0.5 flex-shrink-0" />
             <div>
               <p className="font-medium">Error loading podcasts</p>
@@ -180,13 +180,13 @@ export default function PodcastList() {
         )}
 
         {podcasts.length === 0 && !error ? (
-          <div className="text-center py-8 text-muted-foreground">No sea waves yet. Check back later!</div>
+          <div className="text-center py-8 text-gray-400 dark:text-gray-500">No podcasts yet. Check back later!</div>
         ) : (
           <div className="space-y-6">
             {podcasts.map((podcast) => (
               <div
                 key={podcast.id}
-                className="bg-gradient-to-b from-white to-cyan-50 rounded-xl overflow-hidden shadow-sm"
+                className="bg-white dark:bg-gray-900 rounded-xl overflow-hidden shadow-sm border border-gray-100 dark:border-gray-800"
               >
                 <div className="p-4">
                   <div className="flex gap-4">
@@ -197,24 +197,24 @@ export default function PodcastList() {
                         className="h-24 w-24 object-cover rounded-md flex-shrink-0 shadow-md"
                       />
                     ) : (
-                      <div className="h-24 w-24 bg-primary/10 rounded-md flex items-center justify-center flex-shrink-0 shadow-md">
-                        <Mic className="h-10 w-10 text-primary" />
+                      <div className="h-24 w-24 bg-gray-100 dark:bg-gray-800 rounded-md flex items-center justify-center flex-shrink-0 shadow-md">
+                        <Mic className="h-10 w-10 text-gray-400 dark:text-gray-500" />
                       </div>
                     )}
                     <div className="flex-1">
                       <Link href={`/podcasts/${podcast.id}`}>
-                        <h3 className="font-medium text-lg text-cyan-900 hover:text-cyan-700 transition-colors">
+                        <h3 className="font-medium text-lg text-gray-900 dark:text-gray-100 hover:text-gray-700 dark:hover:text-gray-300 transition-colors">
                           {podcast.title}
                         </h3>
                       </Link>
-                      <p className="text-sm text-cyan-700">Hosted by {podcast.host}</p>
-                      <p className="text-sm text-muted-foreground line-clamp-2 mt-1">{podcast.description}</p>
+                      <p className="text-sm text-gray-700 dark:text-gray-400">Hosted by {podcast.host}</p>
+                      <p className="text-sm text-gray-500 dark:text-gray-400 line-clamp-2 mt-1">{podcast.description}</p>
                       <div className="flex items-center gap-2 mt-2">
-                        <Badge variant="secondary" className="bg-cyan-100 text-cyan-800 border-cyan-200">
+                        <Badge variant="secondary" className="bg-gray-100 dark:bg-gray-800 text-gray-800 dark:text-gray-200 border border-gray-200 dark:border-gray-700">
                           {podcast.episode_count} episodes
                         </Badge>
                         {podcast.categories.slice(0, 2).map((category) => (
-                          <Badge key={category} variant="outline" className="border-cyan-200">
+                          <Badge key={category} variant="outline" className="border-gray-200 dark:border-gray-700 text-gray-700 dark:text-gray-300">
                             {category}
                           </Badge>
                         ))}
@@ -222,13 +222,16 @@ export default function PodcastList() {
                     </div>
                   </div>
 
-                  <div className="flex justify-between items-center mt-4 pt-2 border-t border-cyan-100">
+                  <div className="flex justify-between items-center mt-4 pt-2 border-t border-gray-100 dark:border-gray-800">
                     <div className="flex space-x-4">
                       <Button
                         variant="ghost"
                         size="sm"
                         onClick={() => toggleLike(podcast.id)}
-                        className={likedPodcasts[podcast.id] ? "text-red-500" : "text-gray-500"}
+                        className={
+                          (likedPodcasts[podcast.id] ? "text-red-500 dark:text-red-400" : "text-gray-500 dark:text-gray-400") +
+                          " hover:bg-gray-100 dark:hover:bg-gray-800"
+                        }
                       >
                         <Heart className="h-4 w-4 mr-2" fill={likedPodcasts[podcast.id] ? "currentColor" : "none"} />
                         {likedPodcasts[podcast.id] ? "Liked" : "Like"}
@@ -238,13 +241,13 @@ export default function PodcastList() {
                         variant="ghost"
                         size="sm"
                         onClick={() => toggleExpand(podcast.id)}
-                        className="text-gray-500"
+                        className="text-gray-500 dark:text-gray-400 hover:bg-gray-100 dark:hover:bg-gray-800"
                       >
                         <MessageSquare className="h-4 w-4 mr-2" />
                         Comments ({podcastComments[podcast.id]?.length || 0})
                       </Button>
 
-                      <Button variant="ghost" size="sm" className="text-gray-500">
+                      <Button variant="ghost" size="sm" className="text-gray-500 dark:text-gray-400 hover:bg-gray-100 dark:hover:bg-gray-800">
                         <Share2 className="h-4 w-4 mr-2" />
                         Share
                       </Button>
@@ -254,14 +257,14 @@ export default function PodcastList() {
                       <Button
                         variant="outline"
                         size="sm"
-                        className="border-cyan-200"
+                        className="border-gray-200 dark:border-gray-700 bg-white dark:bg-gray-900 text-gray-700 dark:text-gray-200"
                         onClick={() => window.open(`/podcasts/${podcast.id}`, '_blank')}
                       >
                         <Play className="h-4 w-4 mr-2" />
                         Preview
                       </Button>
                       <Link href={`/podcasts/${podcast.id}`}>
-                        <Button size="sm" className="bg-cyan-600 hover:bg-cyan-700">
+                        <Button size="sm" className="bg-gray-700 hover:bg-gray-800 text-white font-medium shadow-sm">
                           Listen
                         </Button>
                       </Link>
@@ -269,7 +272,7 @@ export default function PodcastList() {
                   </div>
 
                   {expandedPodcast === podcast.id && (
-                    <div className="mt-4 space-y-4 border-t border-cyan-100 pt-4">
+                    <div className="mt-4 space-y-4 border-t border-gray-100 dark:border-gray-800 pt-4">
                       <div className="flex items-start gap-3">
                         <Avatar className="h-8 w-8">
                           <AvatarImage
@@ -282,11 +285,11 @@ export default function PodcastList() {
                             placeholder="Add a comment..."
                             value={commentText}
                             onChange={(e) => setCommentText(e.target.value)}
-                            className="min-h-[80px] border-cyan-200 focus-visible:ring-cyan-500"
+                            className="min-h-[80px] border-gray-200 dark:border-gray-700 focus-visible:ring-gray-500 dark:focus-visible:ring-gray-400 bg-white dark:bg-gray-900 text-gray-900 dark:text-gray-100"
                           />
                           <Button
                             onClick={() => handleComment(podcast.id)}
-                            className="mt-2 bg-cyan-600 hover:bg-cyan-700"
+                            className="mt-2 bg-gray-700 hover:bg-gray-800 text-white"
                             disabled={!commentText.trim()}
                           >
                             Post Comment
@@ -303,14 +306,14 @@ export default function PodcastList() {
                             </Avatar>
                             <div className="flex-1">
                               <div className="flex items-center gap-2">
-                                <span className="font-medium">{comment.author}</span>
-                                <span className="text-xs text-muted-foreground">{comment.date}</span>
+                                <span className="font-medium text-gray-900 dark:text-gray-100">{comment.author}</span>
+                                <span className="text-xs text-gray-500 dark:text-gray-400">{comment.date}</span>
                               </div>
-                              <p className="mt-1">{comment.text}</p>
+                              <p className="mt-1 text-gray-800 dark:text-gray-200">{comment.text}</p>
                               <Button
                                 variant="ghost"
                                 size="sm"
-                                className="h-auto p-0 text-xs text-muted-foreground mt-1"
+                                className="h-auto p-0 text-xs text-gray-500 dark:text-gray-400 mt-1 hover:bg-gray-100 dark:hover:bg-gray-800"
                                 onClick={() => likeComment(podcast.id, comment.id)}
                               >
                                 <Heart className="h-3 w-3 mr-1" /> {comment.likes}

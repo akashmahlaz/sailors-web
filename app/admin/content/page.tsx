@@ -139,20 +139,20 @@ export default function AdminContentPage() {
   }
 
   return (
-    <div className="container mx-auto px-4 py-8 bg-gradient-to-b from-slate-50 to-cyan-50 dark:from-slate-950 dark:to-cyan-950">
+    <div className="container mx-auto px-4 py-8 bg-gray-50 dark:bg-gray-900">
       <div className="flex justify-between items-center mb-6">
-        <h1 className="text-3xl font-bold text-cyan-900 dark:text-cyan-100">Content Management</h1>
+        <h1 className="text-3xl font-bold text-gray-900 dark:text-gray-100">Content Management</h1>
         <Link href="/admin/analytics">
-          <Button className="bg-cyan-600 hover:bg-cyan-700 dark:bg-cyan-700 dark:hover:bg-cyan-600">
+          <Button className="bg-gray-800 hover:bg-gray-700 dark:bg-gray-700 dark:hover:bg-gray-600 text-white">
             <BarChart3 className="h-4 w-4 mr-2" />
             View Analytics
           </Button>
         </Link>
       </div>
 
-      <Card className="border-cyan-200 shadow-lg shadow-cyan-100 dark:border-cyan-900 dark:shadow-none mb-6">
-        <CardHeader className="border-b border-cyan-100 dark:border-cyan-900 bg-gradient-to-r from-cyan-50 to-white dark:from-slate-900 dark:to-cyan-950">
-          <CardTitle className="text-cyan-900 dark:text-cyan-100">Content Library</CardTitle>
+      <Card className="border-gray-200 shadow-lg shadow-gray-100 dark:border-gray-800 dark:shadow-none mb-6">
+        <CardHeader className="border-b border-gray-100 dark:border-gray-800 bg-gradient-to-r from-gray-50 to-white dark:from-gray-900 dark:to-gray-950">
+          <CardTitle className="text-gray-900 dark:text-gray-100">Content Library</CardTitle>
           <CardDescription>Manage all content across the platform</CardDescription>
         </CardHeader>
         <CardContent className="pt-6">
@@ -246,14 +246,14 @@ export default function AdminContentPage() {
             )}
           </div>
           <DialogFooter>
-            <Button variant="outline" onClick={() => setDeleteDialogOpen(false)} disabled={deleteInProgress}>
+            <Button variant="outline" onClick={() => setDeleteDialogOpen(false)} disabled={deleteInProgress} className="border-gray-200 dark:border-gray-800">
               Cancel
             </Button>
             <Button
               variant="destructive"
               onClick={handleDelete}
               disabled={deleteInProgress}
-              className="bg-red-600 hover:bg-red-700"
+              className="bg-red-600 hover:bg-red-700 text-white"
             >
               {deleteInProgress ? "Deleting..." : "Delete"}
             </Button>
@@ -277,7 +277,7 @@ function ContentTable({ items, loading, contentType, onDelete }: ContentTablePro
     console.log("ContentTable (loading):", { items, loading, contentType });
     return (
       <div className="py-8 text-center">
-        <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-cyan-700 mx-auto"></div>
+        <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-gray-700 mx-auto"></div>
         <p className="mt-2 text-muted-foreground">Loading {contentType}...</p>
       </div>
     )
@@ -293,10 +293,10 @@ function ContentTable({ items, loading, contentType, onDelete }: ContentTablePro
   }
 
   return (
-    <div className="rounded-md border border-cyan-100 dark:border-cyan-900 overflow-hidden">
+    <div className="rounded-md border border-gray-100 dark:border-gray-800 overflow-hidden">
       <Tabs>
       <Table>
-        <TableHeader className="bg-cyan-50 dark:bg-cyan-950">
+        <TableHeader className="bg-gray-50 dark:bg-gray-900">
           <TableRow>
             <TableHead className="w-[300px]">Title</TableHead>
             <TableHead>Author</TableHead>
@@ -307,7 +307,7 @@ function ContentTable({ items, loading, contentType, onDelete }: ContentTablePro
         </TableHeader>
         <TableBody>
           {items.map((item) => (
-            <TableRow key={item.id} className="hover:bg-cyan-50/50 dark:hover:bg-cyan-950/50">
+            <TableRow key={item.id} className="hover:bg-gray-50/50 dark:hover:bg-gray-900/50">
               <TableCell className="font-medium">
                 <div className="flex items-center gap-3">
                   {item.thumbnail_url && (
@@ -336,20 +336,20 @@ function ContentTable({ items, loading, contentType, onDelete }: ContentTablePro
               </TableCell>
               <TableCell className="text-right">
                 <div className="flex justify-end gap-2">
-                  <Button variant="outline" size="sm" asChild>
+                  <Button variant="outline" size="sm" asChild className="border-gray-200 dark:border-gray-800">
                     <Link href={`/${contentType}/${item.id}`}>
                       <Eye className="h-4 w-4" />
                     </Link>
                   </Button>
                   {contentType === "blogs" && (
-                    <Button variant="outline" size="sm" asChild>
+                    <Button variant="outline" size="sm" asChild className="border-gray-200 dark:border-gray-800">
                       <Link href={`/blog/edit/${item.id}`}>
                         <Edit className="h-4 w-4" />
                       </Link>
                     </Button>
                   )}
                   {item.url && (
-                    <Button variant="outline" size="sm" asChild>
+                    <Button variant="outline" size="sm" asChild className="border-gray-200 dark:border-gray-800">
                       <a href={item.url} download target="_blank" rel="noopener noreferrer">
                         <Download className="h-4 w-4" />
                       </a>

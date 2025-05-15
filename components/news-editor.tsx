@@ -333,7 +333,7 @@ export default function NewsEditor({ initialNews, onSave }: NewsEditorProps) {
         )}
       </CardContent>
       <CardFooter>
-        <Button onClick={saveNews} disabled={saving} className="ml-auto bg-cyan-600 hover:bg-cyan-700">
+        <Button onClick={saveNews} disabled={saving} className="ml-auto bg-gray-600 hover:bg-gray-700 dark:bg-white dark:text-black">
           {saving ? (
             "Charting Course..."
           ) : (

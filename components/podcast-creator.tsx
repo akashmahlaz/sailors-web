@@ -120,14 +120,14 @@ export default function PodcastCreator({ onSave }: PodcastCreatorProps) {
   }
 
   return (
-    <Card className="w-full">
+    <Card className="w-full border border-gray-200 shadow-md dark:border-gray-800 dark:shadow-none bg-white dark:bg-gray-900">
       <CardHeader>
-        <CardTitle>Create New Sea Waves</CardTitle>
-        <CardDescription>Start your maritime podcast journey</CardDescription>
+        <CardTitle className="text-gray-900 dark:text-gray-100">Create New Podcast</CardTitle>
+        <CardDescription className="text-gray-600 dark:text-gray-400">Start your podcast journey</CardDescription>
       </CardHeader>
       <CardContent className="space-y-6">
         <div className="space-y-2">
-          <label htmlFor="podcast-title" className="text-sm font-medium">
+          <label htmlFor="podcast-title" className="text-sm font-medium text-gray-700 dark:text-gray-300">
             Podcast Title
           </label>
           <Input
@@ -135,11 +135,12 @@ export default function PodcastCreator({ onSave }: PodcastCreatorProps) {
             value={title}
             onChange={(e) => setTitle(e.target.value)}
             placeholder="Enter a title for your podcast"
+            className="bg-white dark:bg-gray-900 border-gray-200 dark:border-gray-700 text-gray-900 dark:text-gray-100"
           />
         </div>
 
         <div className="space-y-2">
-          <label htmlFor="podcast-description" className="text-sm font-medium">
+          <label htmlFor="podcast-description" className="text-sm font-medium text-gray-700 dark:text-gray-300">
             Description
           </label>
           <Textarea
@@ -147,12 +148,12 @@ export default function PodcastCreator({ onSave }: PodcastCreatorProps) {
             value={description}
             onChange={(e) => setDescription(e.target.value)}
             placeholder="What is your podcast about?"
-            className="min-h-[100px]"
+            className="min-h-[100px] bg-white dark:bg-gray-900 border-gray-200 dark:border-gray-700 text-gray-900 dark:text-gray-100"
           />
         </div>
 
         <div className="space-y-2">
-          <label htmlFor="podcast-host" className="text-sm font-medium">
+          <label htmlFor="podcast-host" className="text-sm font-medium text-gray-700 dark:text-gray-300">
             Host Name
           </label>
           <Input
@@ -160,11 +161,12 @@ export default function PodcastCreator({ onSave }: PodcastCreatorProps) {
             value={host}
             onChange={(e) => setHost(e.target.value)}
             placeholder="Who hosts this podcast?"
+            className="bg-white dark:bg-gray-900 border-gray-200 dark:border-gray-700 text-gray-900 dark:text-gray-100"
           />
         </div>
 
         <div className="space-y-2">
-          <label htmlFor="podcast-categories" className="text-sm font-medium">
+          <label htmlFor="podcast-categories" className="text-sm font-medium text-gray-700 dark:text-gray-300">
             Categories (comma-separated)
           </label>
           <Input
@@ -172,28 +174,29 @@ export default function PodcastCreator({ onSave }: PodcastCreatorProps) {
             value={categories}
             onChange={(e) => setCategories(e.target.value)}
             placeholder="technology, business, education"
+            className="bg-white dark:bg-gray-900 border-gray-200 dark:border-gray-700 text-gray-900 dark:text-gray-100"
           />
         </div>
 
         <Tabs defaultValue="cover" className="w-full">
-          <TabsList className="grid w-full grid-cols-5">
-            <TabsTrigger value="cover" className="flex items-center gap-1">
+          <TabsList className="grid w-full grid-cols-5 bg-gray-100 dark:bg-gray-800 border border-gray-200 dark:border-gray-700">
+            <TabsTrigger value="cover" className="flex items-center gap-1 text-gray-700 dark:text-gray-200">
               <ImageIcon className="h-4 w-4" />
               <span className="hidden sm:inline">Cover</span>
             </TabsTrigger>
-            <TabsTrigger value="thumbnail" className="flex items-center gap-1">
+            <TabsTrigger value="thumbnail" className="flex items-center gap-1 text-gray-700 dark:text-gray-200">
               <ImageIcon className="h-4 w-4" />
               <span className="hidden sm:inline">Thumbnail</span>
             </TabsTrigger>
-            <TabsTrigger value="photo" className="flex items-center gap-1">
+            <TabsTrigger value="photo" className="flex items-center gap-1 text-gray-700 dark:text-gray-200">
               <ImageIcon className="h-4 w-4" />
               <span className="hidden sm:inline">Photo</span>
             </TabsTrigger>
-            <TabsTrigger value="audio" className="flex items-center gap-1">
+            <TabsTrigger value="audio" className="flex items-center gap-1 text-gray-700 dark:text-gray-200">
               <Music className="h-4 w-4" />
               <span className="hidden sm:inline">Audio</span>
             </TabsTrigger>
-            <TabsTrigger value="video" className="flex items-center gap-1">
+            <TabsTrigger value="video" className="flex items-center gap-1 text-gray-700 dark:text-gray-200">
               <Video className="h-4 w-4" />
               <span className="hidden sm:inline">Video</span>
             </TabsTrigger>
@@ -201,7 +204,7 @@ export default function PodcastCreator({ onSave }: PodcastCreatorProps) {
 
           <TabsContent value="cover" className="space-y-4">
             <div className="space-y-2">
-              <label className="text-sm font-medium">Cover Image</label>
+              <label className="text-sm font-medium text-gray-700 dark:text-gray-300">Cover Image</label>
               {coverImageUrl && (
                 <div className="mb-4">
                   <img
@@ -223,7 +226,7 @@ export default function PodcastCreator({ onSave }: PodcastCreatorProps) {
 
           <TabsContent value="thumbnail" className="space-y-4">
             <div className="space-y-2">
-              <label className="text-sm font-medium">Thumbnail Image</label>
+              <label className="text-sm font-medium text-gray-700 dark:text-gray-300">Thumbnail Image</label>
               {thumbnailUrl && (
                 <div className="mb-4">
                   <img
@@ -245,7 +248,7 @@ export default function PodcastCreator({ onSave }: PodcastCreatorProps) {
 
           <TabsContent value="photo" className="space-y-4">
             <div className="space-y-2">
-              <label className="text-sm font-medium">Photo</label>
+              <label className="text-sm font-medium text-gray-700 dark:text-gray-300">Photo</label>
               {photoUrl && (
                 <div className="mb-4">
                   <img
@@ -267,7 +270,7 @@ export default function PodcastCreator({ onSave }: PodcastCreatorProps) {
 
           <TabsContent value="audio" className="space-y-4">
             <div className="space-y-2">
-              <label className="text-sm font-medium">
+              <label className="text-sm font-medium text-gray-700 dark:text-gray-300">
                 Audio File <span className="text-red-500">*</span>
               </label>
               {audioUrl && (
@@ -282,13 +285,13 @@ export default function PodcastCreator({ onSave }: PodcastCreatorProps) {
                 accept="audio/*"
                 buttonText="Upload Audio File"
               />
-              <p className="text-xs text-muted-foreground">Required: Upload an audio file for your podcast</p>
+              <p className="text-xs text-gray-500 dark:text-gray-400">Required: Upload an audio file for your podcast</p>
             </div>
           </TabsContent>
 
           <TabsContent value="video" className="space-y-4">
             <div className="space-y-2">
-              <label className="text-sm font-medium">Video File (Optional)</label>
+              <label className="text-sm font-medium text-gray-700 dark:text-gray-300">Video File (Optional)</label>
               {videoUrl && (
                 <div className="mb-4">
                   <video src={videoUrl} controls className="w-full h-48 object-cover rounded-md" />
@@ -301,32 +304,32 @@ export default function PodcastCreator({ onSave }: PodcastCreatorProps) {
                 accept="video/*"
                 buttonText="Upload Video File"
               />
-              <p className="text-xs text-muted-foreground">Optional: Upload a video version of your podcast</p>
+              <p className="text-xs text-gray-500 dark:text-gray-400">Optional: Upload a video version of your podcast</p>
             </div>
           </TabsContent>
         </Tabs>
 
         {error && (
-          <div className="flex items-center gap-2 text-destructive text-sm">
+          <div className="flex items-center gap-2 text-red-600 dark:text-red-400 text-sm">
             <AlertCircle className="h-4 w-4" />
             <span>{error}</span>
           </div>
         )}
 
         {success && (
-          <div className="flex items-center gap-2 text-green-600 text-sm">
+          <div className="flex items-center gap-2 text-green-600 dark:text-green-400 text-sm">
             <CheckCircle className="h-4 w-4" />
-            <span>Sea Waves created successfully! Now you can add episodes.</span>
+            <span>Podcast created successfully! Now you can add episodes.</span>
           </div>
         )}
       </CardContent>
       <CardFooter>
-        <Button onClick={savePodcast} disabled={saving} className="ml-auto bg-cyan-600 hover:bg-cyan-700">
+        <Button onClick={savePodcast} disabled={saving} className="ml-auto bg-gray-700 hover:bg-gray-800 text-white font-medium shadow-sm">
           {saving ? (
-            "Charting Course..."
+            "Saving..."
           ) : (
             <>
-              <Save className="mr-2 h-4 w-4" /> Launch Sea Waves
+              <Save className="mr-2 h-4 w-4" /> Save Podcast
             </>
           )}
         </Button>

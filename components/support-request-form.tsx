@@ -85,7 +85,7 @@ export default function SupportRequestForm() {
           proofs,
           submitterId: !isAnonymous && session?.user?.id ? session.user.id : undefined,
           submitterName: !isAnonymous && session?.user?.name ? session.user.name : undefined,
-          submitterEmail: !isAnonymous && session?.user?.email ? session.user.email : undefined,
+          submitterEmail: !isAnonymous && session?.user?.id ? session.user.id : undefined,
         }),
       })
 
@@ -115,10 +115,10 @@ export default function SupportRequestForm() {
   }
 
   return (
-    <Card className="w-full max-w-3xl mx-auto border-amber-200 shadow-lg shadow-amber-100 dark:border-amber-900 dark:shadow-none">
-      <CardHeader className="bg-gradient-to-r from-amber-50 to-slate-50 dark:from-slate-900 dark:to-amber-950 border-b border-amber-100 dark:border-amber-900">
-        <CardTitle className="flex items-center gap-2 text-amber-900 dark:text-amber-100">
-          <LifeBuoy className="h-5 w-5 text-amber-600 dark:text-amber-400" />
+    <Card className="w-full max-w-3xl mx-auto border-gray-200 shadow-lg shadow-gray-100 dark:border-gray-800 dark:shadow-none">
+      <CardHeader className="bg-gradient-to-r from-gray-50 to-gray-100 dark:from-gray-900 dark:to-gray-950 border-b border-gray-100 dark:border-gray-800">
+        <CardTitle className="flex items-center gap-2 text-gray-900 dark:text-gray-100">
+          <LifeBuoy className="h-5 w-5 text-gray-600 dark:text-gray-400" />
           Sailor Support Request
         </CardTitle>
         <CardDescription>Submit your concerns confidentially to the ship's officers</CardDescription>
@@ -135,8 +135,8 @@ export default function SupportRequestForm() {
           )}
 
           {success && (
-            <Alert className="bg-green-50 text-green-800 border-green-200 dark:bg-green-950 dark:text-green-200 dark:border-green-900">
-              <CheckCircle className="h-4 w-4 text-green-600 dark:text-green-400" />
+            <Alert className="bg-gray-50 text-gray-800 border-gray-200 dark:bg-gray-900 dark:text-gray-200 dark:border-gray-800">
+              <CheckCircle className="h-4 w-4 text-gray-600 dark:text-gray-400" />
               <AlertTitle>Success</AlertTitle>
               <AlertDescription>
                 Your support request has been submitted successfully. A ship's officer will review it shortly.
@@ -147,7 +147,7 @@ export default function SupportRequestForm() {
           <div className="space-y-2">
             <Label htmlFor="template">Use a Template</Label>
             <Select value={selectedTemplate} onValueChange={handleTemplateChange} disabled={isSubmitting || success}>
-              <SelectTrigger id="template" className="border-amber-200 dark:border-amber-900">
+              <SelectTrigger id="template" className="border-gray-200 dark:border-gray-800">
                 <SelectValue placeholder="Select a template (optional)" />
               </SelectTrigger>
               <SelectContent>
@@ -159,7 +159,7 @@ export default function SupportRequestForm() {
                 ))}
               </SelectContent>
             </Select>
-            <p className="text-xs text-slate-500 dark:text-slate-400">
+            <p className="text-xs text-gray-500 dark:text-gray-400">
               Templates provide pre-filled information for common issues
             </p>
           </div>
@@ -175,7 +175,7 @@ export default function SupportRequestForm() {
               placeholder="Brief title describing your issue"
               required
               disabled={isSubmitting || success}
-              className="border-amber-200 dark:border-amber-900"
+              className="border-gray-200 dark:border-gray-800"
             />
           </div>
 
@@ -184,7 +184,7 @@ export default function SupportRequestForm() {
               Category <span className="text-red-500">*</span>
             </Label>
             <Select value={category} onValueChange={setCategory} disabled={isSubmitting || success}>
-              <SelectTrigger className="border-amber-200 dark:border-amber-900">
+              <SelectTrigger className="border-gray-200 dark:border-gray-800">
                 <SelectValue placeholder="Select issue category" />
               </SelectTrigger>
               <SelectContent>
@@ -209,7 +209,7 @@ export default function SupportRequestForm() {
               rows={6}
               required
               disabled={isSubmitting || success}
-              className="border-amber-200 dark:border-amber-900"
+              className="border-gray-200 dark:border-gray-800"
             />
           </div>
 
@@ -226,8 +226,8 @@ export default function SupportRequestForm() {
           </div>
 
           {isAnonymous && (
-            <Alert className="bg-amber-50 text-amber-800 border-amber-200 dark:bg-amber-950 dark:text-amber-200 dark:border-amber-900">
-              <AlertCircle className="h-4 w-4 text-amber-600 dark:text-amber-400" />
+            <Alert className="bg-gray-50 text-gray-800 border-gray-200 dark:bg-gray-900 dark:text-gray-200 dark:border-gray-800">
+              <AlertCircle className="h-4 w-4 text-gray-600 dark:text-gray-400" />
               <AlertDescription>
                 Your identity will be kept confidential. Note that this may limit our ability to follow up directly.
               </AlertDescription>
@@ -236,7 +236,7 @@ export default function SupportRequestForm() {
 
           <div className="space-y-2">
             <Label>Supporting Evidence</Label>
-            <div className="border border-amber-200 dark:border-amber-900 rounded-md p-4 bg-slate-50 dark:bg-slate-900">
+            <div className="border border-gray-200 dark:border-gray-800 rounded-md p-4 bg-gray-50 dark:bg-gray-900">
               <MultiMediaUploader onUploadSuccess={handleMediaUpload} />
 
               {proofs.length > 0 && (
@@ -246,7 +246,7 @@ export default function SupportRequestForm() {
                     {proofs.map((proof, index) => (
                       <div
                         key={index}
-                        className="flex items-center justify-between p-2 bg-white dark:bg-slate-800 rounded border border-amber-100 dark:border-amber-900"
+                        className="flex items-center justify-between p-2 bg-white dark:bg-gray-800 rounded border border-gray-100 dark:border-gray-800"
                       >
                         <div className="flex items-center gap-2 overflow-hidden">
                           {proof.resourceType === "image" ? (
@@ -258,8 +258,8 @@ export default function SupportRequestForm() {
                           ) : proof.resourceType === "video" ? (
                             <video src={proof.url} className="h-10 w-10 object-cover rounded" />
                           ) : (
-                            <div className="h-10 w-10 bg-amber-100 dark:bg-amber-900 rounded flex items-center justify-center">
-                              <Shield className="h-5 w-5 text-amber-600 dark:text-amber-400" />
+                            <div className="h-10 w-10 bg-gray-100 dark:bg-gray-900 rounded flex items-center justify-center">
+                              <Shield className="h-5 w-5 text-gray-600 dark:text-gray-400" />
                             </div>
                           )}
                           <span className="truncate text-sm">{proof.publicId.split("/").pop()}</span>
@@ -283,20 +283,19 @@ export default function SupportRequestForm() {
           </div>
         </CardContent>
 
-        <CardFooter className="flex justify-between border-t border-amber-100 dark:border-amber-900 bg-gradient-to-r from-slate-50 to-amber-50 dark:from-slate-900 dark:to-amber-950 py-4">
+        <CardFooter className="flex justify-between border-t border-gray-100 dark:border-gray-800 bg-gradient-to-r from-gray-50 to-gray-100 dark:from-gray-900 dark:to-gray-950 py-4">
           <Button
             type="button"
-            variant="outline"
             onClick={() => router.back()}
             disabled={isSubmitting || success}
-            className="border-amber-200 dark:border-amber-900"
+            className="border border-gray-300 bg-white text-gray-700 hover:bg-gray-100 hover:text-gray-900 dark:bg-gray-900 dark:text-gray-200 dark:border-gray-700 dark:hover:bg-gray-800"
           >
             Cancel
           </Button>
           <Button
             type="submit"
             disabled={isSubmitting || success}
-            className="bg-amber-600 hover:bg-amber-700 dark:bg-amber-700 dark:hover:bg-amber-600"
+            className="bg-gray-800 hover:bg-gray-700 dark:bg-gray-700 dark:hover:bg-gray-600 text-white"
           >
             {isSubmitting ? "Submitting..." : "Submit Support Request"}
           </Button>

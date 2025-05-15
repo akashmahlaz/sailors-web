@@ -10,10 +10,21 @@ export default function Footer() {
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-10 mb-14">
           {/* Logo and About */}
           <div>
-            <Link href="/" className="flex items-center mb-5">
-              <Sailboat className="h-9 w-9 text-gray-400 mr-2 drop-shadow-lg" />
-              <span className="text-2xl font-extrabold tracking-tight text-gray-700 dark:text-gray-200">Sailor's Platfrom</span>
-            </Link>
+            <div className="mr-4 flex flex-shrink-0 items-center">
+          <Link
+            href="/"
+            className="flex items-center text-xl font-bold text-gray-800 hover:text-gray-600 transition-colors dark:text-white dark:hover:text-gray-300"
+          >
+            {/* Logo image placeholder, replace src when image is provided */}
+            <img
+              src="/d4.jpg"
+              alt="Logo"
+              className="mr-2 h-10 w-10 object-contain rounded-sm bg-gray-100 dark:bg-gray-700 border border-gray-200 dark:border-gray-600 shadow-sm"
+              style={{ minWidth: 32, minHeight: 32 }}
+            />
+            <span className="hidden sm:inline">Sailor's Platform</span>
+          </Link>
+        </div>
             <p className="text-gray-500 mb-5 text-sm leading-relaxed dark:text-gray-400">
               Navigate the digital seas with your fellow sailors. Share stories, discover content, and connect with your maritime community.
             </p>
