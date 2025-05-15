@@ -5,32 +5,32 @@ export default function Footer() {
   const currentYear = new Date().getFullYear()
 
   return (
-    <footer className="bg-gradient-to-t from-slate-950 via-slate-900 to-slate-800 text-slate-100 pt-16 pb-8 border-t border-slate-800 shadow-inner">
+    <footer className="bg-gray-100 text-gray-700 pt-16 pb-8 border-t border-gray-300 shadow-inner dark:bg-gray-900 dark:text-gray-200 dark:border-gray-700">
       <div className="container mx-auto px-4">
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-10 mb-14">
           {/* Logo and About */}
           <div>
             <Link href="/" className="flex items-center mb-5">
-              <Sailboat className="h-9 w-9 text-black-400 mr-2 drop-shadow-lg" />
-              <span className="text-2xl font-extrabold tracking-tight text-black-300">Sailor's Voyage</span>
+              <Sailboat className="h-9 w-9 text-gray-400 mr-2 drop-shadow-lg" />
+              <span className="text-2xl font-extrabold tracking-tight text-gray-700 dark:text-gray-200">Sailor's Platfrom</span>
             </Link>
-            <p className="text-slate-400 mb-5 text-sm leading-relaxed">
+            <p className="text-gray-500 mb-5 text-sm leading-relaxed dark:text-gray-400">
               Navigate the digital seas with your fellow sailors. Share stories, discover content, and connect with your maritime community.
             </p>
             <div className="flex space-x-4 mt-2">
-              <Link href="#" className="text-slate-400 hover:text-gray-400 transition-colors focus:outline-none focus:ring-2 focus:ring-cyan-500 rounded">
+              <Link href="#" className="text-gray-400 hover:text-gray-600 transition-colors focus:outline-none focus:ring-2 focus:ring-gray-400 rounded dark:hover:text-gray-300 dark:focus:ring-gray-600">
                 <Twitter className="h-5 w-5" />
               </Link>
-              <Link href="#" className="text-slate-400 hover:text-gray-400 transition-colors focus:outline-none focus:ring-2 focus:ring-cyan-500 rounded">
+              <Link href="#" className="text-gray-400 hover:text-gray-600 transition-colors focus:outline-none focus:ring-2 focus:ring-gray-400 rounded dark:hover:text-gray-300 dark:focus:ring-gray-600">
                 <Facebook className="h-5 w-5" />
               </Link>
-              <Link href="#" className="text-slate-400 hover:text-gray-400 transition-colors focus:outline-none focus:ring-2 focus:ring-cyan-500 rounded">
+              <Link href="#" className="text-gray-400 hover:text-gray-600 transition-colors focus:outline-none focus:ring-2 focus:ring-gray-400 rounded dark:hover:text-gray-300 dark:focus:ring-gray-600">
                 <Instagram className="h-5 w-5" />
               </Link>
-              <Link href="#" className="text-slate-400 hover:text-gray-400 transition-colors focus:outline-none focus:ring-2 focus:ring-cyan-500 rounded">
+              <Link href="#" className="text-gray-400 hover:text-gray-600 transition-colors focus:outline-none focus:ring-2 focus:ring-gray-400 rounded dark:hover:text-gray-300 dark:focus:ring-gray-600">
                 <Youtube className="h-5 w-5" />
               </Link>
-              <Link href="#" className="text-slate-400 hover:text-gray-400 transition-colors focus:outline-none focus:ring-2 focus:ring-cyan-500 rounded">
+              <Link href="#" className="text-gray-400 hover:text-gray-600 transition-colors focus:outline-none focus:ring-2 focus:ring-gray-400 rounded dark:hover:text-gray-300 dark:focus:ring-gray-600">
                 <Github className="h-5 w-5" />
               </Link>
             </div>
@@ -38,36 +38,36 @@ export default function Footer() {
 
           {/* Quick Links */}
           <div>
-            <h3 className="text-lg font-semibold mb-4 text-black-300 tracking-wide">Quick Links</h3>
+            <h3 className="text-lg font-semibold mb-4 text-gray-700 tracking-wide dark:text-gray-200">Quick Links</h3>
             <ul className="space-y-2">
               <li>
-                <Link href="/videos" className="text-slate-300 hover:text-red-400 transition-colors flex items-center font-medium">
-                  <Anchor className="h-4 w-4 mr-2 text-black-400" /> Videos
+                <Link href="/videos" className="text-gray-600 hover:text-gray-900 transition-colors flex items-center font-medium dark:text-gray-400 dark:hover:text-gray-200">
+                  <Anchor className="h-4 w-4 mr-2 text-gray-400 dark:text-gray-500" /> Videos
                 </Link>
               </li>
               <li>
-                <Link href="/photos" className="text-slate-300 hover:text-red-400 transition-colors flex items-center font-medium">
-                  <Anchor className="h-4 w-4 mr-2 text-black-400" /> Photos
+                <Link href="/photos" className="text-gray-600 hover:text-gray-900 transition-colors flex items-center font-medium dark:text-gray-400 dark:hover:text-gray-200">
+                  <Anchor className="h-4 w-4 mr-2 text-gray-400 dark:text-gray-500" /> Photos
                 </Link>
               </li>
               <li>
-                <Link href="/audio" className="text-slate-300 hover:text-cyan-300 transition-colors flex items-center font-medium">
-                  <Anchor className="h-4 w-4 mr-2 text-black-400" /> Audio
+                <Link href="/audio" className="text-gray-600 hover:text-gray-900 transition-colors flex items-center font-medium dark:text-gray-400 dark:hover:text-gray-200">
+                  <Anchor className="h-4 w-4 mr-2 text-gray-400 dark:text-gray-500" /> Audio
                 </Link>
               </li>
               <li>
-                <Link href="/podcasts" className="text-slate-300 hover:text-cyan-300 transition-colors flex items-center font-medium">
-                  <Anchor className="h-4 w-4 mr-2 text-black-400" /> Podcasts
+                <Link href="/podcasts" className="text-gray-600 hover:text-gray-900 transition-colors flex items-center font-medium dark:text-gray-400 dark:hover:text-gray-200">
+                  <Anchor className="h-4 w-4 mr-2 text-gray-400 dark:text-gray-500" /> Podcasts
                 </Link>
               </li>
               <li>
-                <Link href="/blog" className="text-slate-300 hover:text-cyan-300 transition-colors flex items-center font-medium">
-                  <Anchor className="h-4 w-4 mr-2 text-black-400" /> Blog
+                <Link href="/blog" className="text-gray-600 hover:text-gray-900 transition-colors flex items-center font-medium dark:text-gray-400 dark:hover:text-gray-200">
+                  <Anchor className="h-4 w-4 mr-2 text-gray-400 dark:text-gray-500" /> Blog
                 </Link>
               </li>
               <li>
-                <Link href="/news" className="text-slate-300 hover:text-cyan-300 transition-colors flex items-center font-medium">
-                  <Anchor className="h-4 w-4 mr-2 text-black-400" /> News
+                <Link href="/news" className="text-gray-600 hover:text-gray-900 transition-colors flex items-center font-medium dark:text-gray-400 dark:hover:text-gray-200">
+                  <Anchor className="h-4 w-4 mr-2 text-gray-400 dark:text-gray-500" /> News
                 </Link>
               </li>
             </ul>
@@ -75,21 +75,21 @@ export default function Footer() {
 
           {/* Support */}
           <div>
-            <h3 className="text-lg font-semibold mb-4 text-black-300 tracking-wide">Support</h3>
+            <h3 className="text-lg font-semibold mb-4 text-gray-700 tracking-wide dark:text-gray-200">Support</h3>
             <ul className="space-y-2">
               <li>
-                <Link href="/support" className="text-slate-300 hover:text-black-300 transition-colors flex items-center font-medium">
-                  <LifeBuoy className="h-4 w-4 mr-2 text-black-400" /> Help Center
+                <Link href="/support" className="text-gray-600 hover:text-gray-900 transition-colors flex items-center font-medium dark:text-gray-400 dark:hover:text-gray-200">
+                  <LifeBuoy className="h-4 w-4 mr-2 text-gray-400 dark:text-gray-500" /> Help Center
                 </Link>
               </li>
               <li>
-                <Link href="/support/knowledge-base" className="text-slate-300 hover:text-black-300 transition-colors flex items-center font-medium">
-                  <Compass className="h-4 w-4 mr-2 text-black-400" /> Knowledge Base
+                <Link href="/support/knowledge-base" className="text-gray-600 hover:text-gray-900 transition-colors flex items-center font-medium dark:text-gray-400 dark:hover:text-gray-200">
+                  <Compass className="h-4 w-4 mr-2 text-gray-400 dark:text-gray-500" /> Knowledge Base
                 </Link>
               </li>
               <li>
-                <Link href="/support" className="text-slate-300 hover:text-black-300 transition-colors flex items-center font-medium">
-                  <Mail className="h-4 w-4 mr-2 text-black-400" /> Contact Us
+                <Link href="/support" className="text-gray-600 hover:text-gray-900 transition-colors flex items-center font-medium dark:text-gray-400 dark:hover:text-gray-200">
+                  <Mail className="h-4 w-4 mr-2 text-gray-400 dark:text-gray-500" /> Contact Us
                 </Link>
               </li>
             </ul>
@@ -97,17 +97,17 @@ export default function Footer() {
 
           {/* Newsletter */}
           <div>
-            <h3 className="text-lg font-semibold mb-4 text-black-300 tracking-wide">Stay Updated</h3>
-            <p className="text-slate-400 mb-4 text-sm">Subscribe to our newsletter for the latest updates and features.</p>
+            <h3 className="text-lg font-semibold mb-4 text-gray-700 tracking-wide dark:text-gray-200">Stay Updated</h3>
+            <p className="text-gray-500 mb-4 text-sm dark:text-gray-400">Subscribe to our newsletter for the latest updates and features.</p>
             <form className="flex">
               <input
                 type="email"
                 placeholder="Your email address"
-                className="bg-slate-800 border border-slate-700 rounded-l-md px-4 py-2 w-full focus:outline-none focus:ring-2 focus:ring-black-500 text-slate-100 placeholder:text-slate-400"
+                className="bg-gray-200 border border-gray-300 rounded-l-md px-4 py-2 w-full focus:outline-none focus:ring-2 focus:ring-gray-400 text-gray-700 placeholder:text-gray-400 dark:bg-gray-800 dark:border-gray-600 dark:focus:ring-gray-500 dark:text-gray-200 dark:placeholder:text-gray-500"
               />
               <button
                 type="submit"
-                className="bg-cyan-600 hover:bg-cyan-700 text-white px-4 py-2 rounded-r-md font-semibold shadow transition-colors focus:outline-none focus:ring-2 focus:ring-cyan-500"
+                className="bg-gray-700 hover:bg-gray-800 text-white px-4 py-2 rounded-r-md font-semibold shadow transition-colors focus:outline-none focus:ring-2 focus:ring-gray-400 dark:bg-gray-600 dark:hover:bg-gray-500 dark:focus:ring-gray-500"
               >
                 Subscribe
               </button>
@@ -116,22 +116,22 @@ export default function Footer() {
         </div>
 
         {/* Bottom Bar */}
-        <div className="border-t border-slate-800 pt-8 mt-8 text-center md:flex md:justify-between md:text-left">
-          <p className="text-slate-500 text-sm">© {currentYear} Sailor's Voyage. All rights reserved.</p>
+        <div className="border-t border-gray-300 pt-8 mt-8 text-center md:flex md:justify-between md:text-left dark:border-gray-700">
+          <p className="text-gray-500 text-sm dark:text-gray-400">© {currentYear} Sailor's Platform. All rights reserved.</p>
           <div className="mt-4 md:mt-0">
             <ul className="flex justify-center md:justify-end space-x-6">
               <li>
-                <Link href="/terms" className="text-slate-400 hover:text-cyan-300 transition-colors text-sm">
+                <Link href="/terms" className="text-gray-400 hover:text-gray-700 transition-colors text-sm dark:text-gray-500 dark:hover:text-gray-300">
                   Terms
                 </Link>
               </li>
               <li>
-                <Link href="/privacy" className="text-slate-400 hover:text-cyan-300 transition-colors text-sm">
+                <Link href="/privacy" className="text-gray-400 hover:text-gray-700 transition-colors text-sm dark:text-gray-500 dark:hover:text-gray-300">
                   Privacy
                 </Link>
               </li>
               <li>
-                <Link href="/cookies" className="text-slate-400 hover:text-cyan-300 transition-colors text-sm">
+                <Link href="/cookies" className="text-gray-400 hover:text-gray-700 transition-colors text-sm dark:text-gray-500 dark:hover:text-gray-300">
                   Cookies
                 </Link>
               </li>

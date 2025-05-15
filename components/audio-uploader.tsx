@@ -338,29 +338,29 @@ export default function AudioUploader({ onUploadSuccess }: AudioUploaderProps) {
   }
 
   return (
-    <Card className="w-full max-w-md mx-auto">
+    <Card className="w-full max-w-md mx-auto bg-gray-50 dark:bg-gray-900 border-gray-200 dark:border-gray-800">
       <CardHeader>
-        <CardTitle>Record Sea Shanties</CardTitle>
-        <CardDescription>Upload your maritime melodies and custom album art</CardDescription>
+        <CardTitle className="text-gray-800 dark:text-gray-100">Record Sea Shanties</CardTitle>
+        <CardDescription className="text-gray-500 dark:text-gray-400">Upload your maritime melodies and custom album art</CardDescription>
       </CardHeader>
       <CardContent>
         <Tabs defaultValue="audio" className="w-full">
-          <TabsList className="grid w-full grid-cols-2">
-            <TabsTrigger value="audio">Audio File</TabsTrigger>
-            <TabsTrigger value="thumbnail" disabled={!uploadedAudioId}>
+          <TabsList className="grid w-full grid-cols-2 bg-gray-100 dark:bg-gray-800 border-gray-200 dark:border-gray-700">
+            <TabsTrigger value="audio" className="text-gray-700 dark:text-gray-200">Audio File</TabsTrigger>
+            <TabsTrigger value="thumbnail" disabled={!uploadedAudioId} className="text-gray-700 dark:text-gray-200">
               Thumbnail
             </TabsTrigger>
           </TabsList>
           <TabsContent value="audio" className="space-y-4">
             <div className="grid w-full items-center gap-1.5">
-              <label htmlFor="audio-upload" className="text-sm font-medium">
+              <label htmlFor="audio-upload" className="text-sm font-medium text-gray-700 dark:text-gray-200">
                 Select Audio File
               </label>
               <input
                 id="audio-upload"
                 type="file"
                 accept="audio/*"
-                className="flex h-10 w-full rounded-md border border-input bg-background px-3 py-2 text-sm file:border-0 file:bg-transparent file:text-sm file:font-medium"
+                className="flex h-10 w-full rounded-md border border-gray-300 dark:border-gray-700 bg-gray-50 dark:bg-gray-900 px-3 py-2 text-sm file:border-0 file:bg-transparent file:text-sm file:font-medium text-gray-700 dark:text-gray-200"
                 onChange={handleFileChange}
                 disabled={uploading}
               />
@@ -396,7 +396,7 @@ export default function AudioUploader({ onUploadSuccess }: AudioUploaderProps) {
             <Button
               onClick={uploadAudio}
               disabled={uploading || !file}
-              className="w-full bg-cyan-600 hover:bg-cyan-700"
+              className="w-full bg-gray-700 hover:bg-gray-800 dark:bg-gray-800 dark:hover:bg-gray-700 text-white"
             >
               {uploading ? (
                 "Setting Sail..."
@@ -409,14 +409,14 @@ export default function AudioUploader({ onUploadSuccess }: AudioUploaderProps) {
           </TabsContent>
           <TabsContent value="thumbnail" className="space-y-4">
             <div className="grid w-full items-center gap-1.5">
-              <label htmlFor="thumbnail-upload" className="text-sm font-medium">
+              <label htmlFor="thumbnail-upload" className="text-sm font-medium text-gray-700 dark:text-gray-200">
                 Select Thumbnail Image
               </label>
               <input
                 id="thumbnail-upload"
                 type="file"
                 accept="image/*"
-                className="flex h-10 w-full rounded-md border border-input bg-background px-3 py-2 text-sm file:border-0 file:bg-transparent file:text-sm file:font-medium"
+                className="flex h-10 w-full rounded-md border border-gray-300 dark:border-gray-700 bg-gray-50 dark:bg-gray-900 px-3 py-2 text-sm file:border-0 file:bg-transparent file:text-sm file:font-medium text-gray-700 dark:text-gray-200"
                 onChange={handleThumbnailChange}
                 disabled={thumbnailUploading}
               />
@@ -450,7 +450,7 @@ export default function AudioUploader({ onUploadSuccess }: AudioUploaderProps) {
               </div>
             )}
 
-            <Button onClick={uploadThumbnail} disabled={thumbnailUploading || !thumbnailFile} className="w-full">
+            <Button onClick={uploadThumbnail} disabled={thumbnailUploading || !thumbnailFile} className="w-full bg-gray-700 hover:bg-gray-800 dark:bg-gray-800 dark:hover:bg-gray-700 text-white">
               {thumbnailUploading ? (
                 "Uploading..."
               ) : (

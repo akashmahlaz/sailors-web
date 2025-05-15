@@ -273,7 +273,7 @@ export default function PhotoUploader({ onUploadSuccess }: PhotoUploaderProps) {
             </div>
           )}
 
-          <Button onClick={uploadPhoto} disabled={uploading || !file} className="w-full bg-cyan-600 hover:bg-cyan-700">
+          <Button onClick={uploadPhoto} disabled={uploading || !file} className="w-full bg-gray-700 hover:bg-gray-900 dark:bg-white dark:hover:bg-gray-700 dark:hover:text-white">
             {uploading ? (
               "Charting Course..."
             ) : (

@@ -95,7 +95,7 @@ export default function NavBar() {
                 {dropdown.label}
                 <ChevronDown className="ml-1 h-4 w-4 text-gray-500 transform group-hover:rotate-180 transition-transform duration-300 dark:text-gray-400" />
               </button>
-              {/* Added pointer-events-none by default and pointer-events-auto on hover */}
+              {/* Dropdown menu */}
               <div className="absolute pt-2 top-full left-0 z-50 min-w-[240px] origin-top opacity-0 invisible group-hover:visible pointer-events-none group-hover:pointer-events-auto group-hover:opacity-100 translate-y-1 group-hover:translate-y-0 transition-all duration-300 ease-out">
                 <div className="bg-white backdrop-blur-lg rounded-xl shadow-lg ring-1 ring-gray-200 p-2 space-y-1 dark:bg-gray-800 dark:ring-gray-700">
                   {dropdown.subLinks.map((link) => (
@@ -130,12 +130,62 @@ export default function NavBar() {
             <LifeBuoy className="mr-2 h-5 w-5" />
             Support
           </Link>
+
+          {/* Theme Toggle */}
+          <div className="ml-2">
+            <ThemeToggle />
+          </div>
         </nav>
 
         {/* Mobile menu */}
         {mobileMenuOpen && (
-          <div className="absolute top-16 left-0 right-0 bg-white sm:hidden p-4 shadow-lg z-50 dark:bg-gray-800 bg-opacity-95 dark:bg-opacity-95 backdrop-blur-md">
+          <div className="absolute top-16 left-0 right-0 bg-gray-50 border-t border-gray-200 sm:hidden p-4 shadow-lg z-50 dark:bg-gray-800 dark:border-gray-700 bg-opacity-95 dark:bg-opacity-95 backdrop-blur-md">
             <div className="space-y-4">
+              {/* Admin Dropdown for mobile (always visible, adapts to user role) */}
+                {isAuthenticated && (
+                <div className="space-y-2">
+                  <div className="flex items-center text-gray-800 font-medium dark:text-white">
+                  <User className="h-6 w-6 text-gray-500 transition-transform group-hover:rotate-12 duration-300 dark:text-gray-400" />
+                  <span className="text-sm font-medium">
+                    {session?.user?.name}
+                    {isAdmin && (
+                    <span className="ml-2 px-2 py-0.5 bg-gray-800 text-white text-xs rounded-full dark:bg-gray-600">
+                      Admin
+                    </span>
+                    )}
+                  </span>
+                  </div>
+                  <div className="pl-7 space-y-2">
+                  <Link
+                    href={`/profile/${session?.user?.id || 'me'}`}
+                    className="flex items-center py-2 text-sm rounded-lg text-gray-800 hover:bg-gray-100 dark:text-gray-300 dark:hover:bg-gray-700"
+                    onClick={() => setMobileMenuOpen(false)}
+                  >
+                    <UserCircle className="mr-2 h-4 w-4" />
+                    Profile
+                  </Link>
+                  <Link
+                    href="/dashboard"
+                    className="flex items-center py-2 text-sm rounded-lg text-gray-800 hover:bg-gray-100 dark:text-gray-300 dark:hover:bg-gray-700"
+                    onClick={() => setMobileMenuOpen(false)}
+                  >
+                    <User className="mr-2 h-4 w-4" />
+                    Dashboard
+                  </Link>
+                  {isAdmin && (
+                    <Link
+                    href="/admin"
+                    className="flex items-center py-2 text-sm rounded-lg text-gray-800 hover:bg-gray-100 dark:text-gray-300 dark:hover:bg-gray-700"
+                    onClick={() => setMobileMenuOpen(false)}
+                    >
+                    <Shield className="mr-2 h-4 w-4" />
+                    Admin Quarter's
+                    </Link>
+                  )}
+                  </div>
+                </div>
+                )}
+              {/* Main dropdowns (always show both) */}
               {mainDropdowns.map((dropdown) => (
                 <div key={dropdown.label} className="space-y-2">
                   <div className="flex items-center text-gray-800 font-medium dark:text-white">
@@ -147,10 +197,10 @@ export default function NavBar() {
                       <Link
                         key={link.href}
                         href={link.href}
-                        className={`flex items-center py-2 text-sm ${
+                        className={`flex items-center py-2 text-sm rounded-lg transition-colors ${
                           pathname.startsWith(link.href)
-                            ? "text-gray-900 font-medium dark:text-white"
-                            : "text-gray-700 dark:text-gray-300"
+                            ? "bg-gray-200 text-gray-900 font-medium dark:bg-gray-700 dark:text-white"
+                            : "text-gray-800 hover:bg-gray-100 dark:text-gray-300 dark:hover:bg-gray-700"
                         }`}
                         onClick={() => setMobileMenuOpen(false)}
                       >
@@ -163,62 +213,72 @@ export default function NavBar() {
               ))}
               <Link
                 href="/support"
-                className="flex items-center text-gray-700 py-2 dark:text-gray-300"
+                className="flex items-center text-gray-800 py-2 rounded-lg hover:bg-gray-100 dark:text-gray-300 dark:hover:bg-gray-700"
                 onClick={() => setMobileMenuOpen(false)}
               >
                 <LifeBuoy className="mr-2 h-5 w-5" />
                 Support
               </Link>
+              {/* Theme Toggle for mobile */}
+              <div className="flex justify-center pt-2 border-t border-gray-100 dark:border-gray-700 mt-2">
+                <ThemeToggle />
+              </div>
+              {/* Auth/User section for mobile */}
+              <div className="flex items-center space-x-3 pt-2 border-t border-gray-100 dark:border-gray-700 mt-2">
+                {isAuthenticated ? (
+                  <>
+                    <span className="flex items-center text-gray-800 dark:text-white px-2">
+                      <User className="h-5 w-5 mr-1" />
+                      {session?.user?.name}
+                      {isAdmin && (
+                        <span className="ml-2 px-2 py-0.5 bg-gray-800 text-white text-xs rounded-full dark:bg-gray-600">Admin</span>
+                      )}
+                    </span>
+                    <Button
+                      variant="ghost"
+                      className="w-full text-gray-700 hover:bg-gray-100 hover:text-gray-900 focus-visible:ring-2 focus-visible:ring-offset-2 focus-visible:ring-gray-400 dark:text-gray-300 dark:hover:bg-gray-700 dark:hover:text-white dark:focus-visible:ring-gray-500"
+                      onClick={() => { setMobileMenuOpen(false); signOut({ callbackUrl: "/" }) }}
+                    >
+                      <LogOut className="h-5 w-5 mr-1" /> Log out
+                    </Button>
+                  </>
+                ) : (
+                  <>
+                    <Link href="/signin" className="w-full" onClick={() => setMobileMenuOpen(false)}>
+                      <Button
+                        variant="ghost"
+                        className="w-full text-gray-700 hover:bg-gray-100 hover:text-gray-900 focus-visible:ring-2 focus-visible:ring-offset-2 focus-visible:ring-gray-400 dark:text-gray-300 dark:hover:bg-gray-700 dark:hover:text-white dark:focus-visible:ring-gray-500"
+                      >
+                        Sign in
+                      </Button>
+                    </Link>
+                    <Link href="/signup" className="w-full" onClick={() => setMobileMenuOpen(false)}>
+                      <Button
+                        className="w-full bg-gray-800 hover:bg-gray-700 text-white shadow-sm transition-all duration-300 hover:scale-105 focus-visible:ring-2 focus-visible:ring-offset-2 focus-visible:ring-gray-400 dark:bg-gray-700 dark:hover:bg-gray-600 dark:focus-visible:ring-gray-500"
+                      >
+                        Sign up
+                      </Button>
+                    </Link>
+                  </>
+                )}
+              </div>
             </div>
           </div>
         )}
 
-        <div className="ml-auto hidden sm:flex items-center space-x-4">
-          {/* Search button */}
-          <Button
-            variant="ghost"
-            size="icon"
-            className="text-gray-700 hover:bg-gray-100 hover:text-gray-900 focus-visible:ring-2 focus-visible:ring-offset-2 focus-visible:ring-gray-400 dark:text-gray-300 dark:hover:bg-gray-700 dark:hover:text-white dark:focus-visible:ring-gray-500"
-          >
-            <Search className="h-5 w-5" />
-          </Button>
-
-          {/* Theme toggle always visible and with clear icon color using a wrapper */}
-          <span className="inline-flex items-center text-gray-700 dark:text-gray-500">
-            <ThemeToggle  />
-          </span>
-
-          {/* {isAuthenticated && (
-            <Button
-              variant="ghost"
-              size="icon"
-              className="relative text-gray-700 hover:bg-gray-100 hover:text-gray-900 focus-visible:ring-2 focus-visible:ring-offset-2 focus-visible:ring-gray-400 dark:text-gray-300 dark:hover:bg-gray-700 dark:hover:text-white dark:focus-visible:ring-gray-500"
-              onClick={toggleNotificationPanel}
-              aria-label="Open notifications"
-            >
-              <Bell className="h-5 w-5" />
-              {unreadCount > 0 && (
-                <span className="absolute -top-1 -right-1 bg-gray-800 text-white text-xs rounded-full h-5 w-5 flex items-center justify-center font-medium dark:bg-gray-600">
-                  {unreadCount > 9 ? "9+" : unreadCount}
-                </span>
-              )}
-            </Button>
-          )} */}
-
+        <div className="hidden sm:flex items-center space-x-3">
           {isAuthenticated ? (
             <div className="group relative inline-block">
-              <button className="flex items-center space-x-2 text-gray-700 bg-gray-100 px-3 py-1.5 rounded-lg transition-all duration-300 hover:bg-gray-200 hover:text-gray-900 focus-visible:ring-2 focus-visible:ring-offset-2 focus-visible:ring-gray-400 dark:text-gray-300 dark:bg-gray-700 dark:hover:bg-gray-600 dark:hover:text-white dark:focus-visible:ring-gray-500">
-                <div className="flex items-center space-x-2">
-                  <User className="h-6 w-6 text-gray-500 transition-transform group-hover:rotate-12 duration-300 dark:text-gray-400" />
-                  <span className="text-sm font-medium">
-                    {session?.user?.name}
-                    {isAdmin && (
-                      <span className="ml-2 px-2 py-0.5 bg-gray-800 text-white text-xs rounded-full dark:bg-gray-600">
-                        Admin
-                      </span>
-                    )}
-                  </span>
-                </div>
+              <button className="flex items-center text-sm font-medium text-gray-700 hover:text-gray-900 transition-all duration-300 hover:bg-gray-100 px-3 py-1.5 rounded-lg focus-visible:ring-2 focus-visible:ring-offset-2 focus-visible:ring-gray-400 dark:text-gray-300 dark:hover:text-white dark:hover:bg-gray-700 dark:focus-visible:ring-gray-500">
+                <User className="h-6 w-6 text-gray-500 transition-transform group-hover:rotate-12 duration-300 dark:text-gray-400" />
+                <span className="text-sm font-medium">
+                  {session?.user?.name}
+                  {isAdmin && (
+                    <span className="ml-2 px-2 py-0.5 bg-gray-800 text-white text-xs rounded-full dark:bg-gray-600">
+                      Admin
+                    </span>
+                  )}
+                </span>
                 <ChevronDown className="h-4 w-4 text-gray-500 transform group-hover:rotate-180 transition-transform duration-300 dark:text-gray-400" />
               </button>
               {/* Added pointer-events-none by default and pointer-events-auto on hover */}
@@ -226,7 +286,7 @@ export default function NavBar() {
                 <div className="bg-white backdrop-blur-lg rounded-xl shadow-lg ring-1 ring-gray-200 p-2 space-y-1 dark:bg-gray-800 dark:ring-gray-700">
                   {/* Profile Link */}
                   <Link
-                    href={`/profile/${session?.user?.id}`}
+                    href={`/profile/${session?.user?.id || 'me'}`}
                     className="flex items-center px-4 py-2.5 text-sm text-gray-700 hover:bg-gray-100 hover:text-gray-900 rounded-lg transition-all duration-200 transform hover:scale-[1.02] dark:text-gray-300 dark:hover:bg-gray-700 dark:hover:text-white"
                   >
                     <UserCircle className="mr-3 h-4 w-4" />

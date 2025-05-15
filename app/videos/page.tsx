@@ -28,7 +28,7 @@ export default function VideosPage() {
         </div>
         <Button
           onClick={() => setShowUploader(!showUploader)}
-          className={`${showUploader ? "bg-red-500 hover:bg-red-600" : "bg-cyan-600 hover:bg-cyan-700"}`}
+          className={`${showUploader ? "bg-red-500 hover:bg-red-600" : "bg-gray-700 hover:bg-gray-900 dark:bg-white dark:hover:bg-gray-700 dark:hover:text-white"}`}
         >
           {showUploader ? (
             <>

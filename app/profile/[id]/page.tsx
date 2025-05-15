@@ -192,7 +192,7 @@ export default function ProfilePage({ params }: { params: { id: string } }) {
   if (status === "loading" || (params.id === "me" && status !== "authenticated")) {
     return (
       <div className="container mx-auto px-4 py-8 text-center">
-        <div className="animate-spin h-8 w-8 border-4 border-cyan-600 border-t-transparent rounded-full mx-auto mb-4"></div>
+        <div className="animate-spin h-8 w-8 border-4 border-gray-600 border-t-transparent rounded-full mx-auto mb-4"></div>
         <p>Loading profile...</p>
       </div>
     )
@@ -201,7 +201,7 @@ export default function ProfilePage({ params }: { params: { id: string } }) {
   if (loading && !profile) {
     return (
       <div className="container mx-auto px-4 py-8 text-center">
-        <div className="animate-spin h-8 w-8 border-4 border-cyan-600 border-t-transparent rounded-full mx-auto mb-4"></div>
+        <div className="animate-spin h-8 w-8 border-4 border-gray-600 border-t-transparent rounded-full mx-auto mb-4"></div>
         <p>Loading profile...</p>
       </div>
     )
@@ -230,7 +230,7 @@ export default function ProfilePage({ params }: { params: { id: string } }) {
   }
 
   return (
-    <div className="min-h-screen bg-gradient-to-b from-slate-50 to-cyan-50 dark:from-slate-950 dark:to-cyan-950">
+    <div className="min-h-screen bg-gradient-to-b from-gray-50 to-gray-200 dark:from-gray-900 dark:to-gray-950">
       <ProfileHeader
         profile={profile}
         isOwnProfile={isOwnProfile}
@@ -252,8 +252,8 @@ export default function ProfilePage({ params }: { params: { id: string } }) {
 
             {Object.values(userContent).every((content: any) => content.length === 0) && (
               <div className="text-center py-12">
-                <h3 className="text-lg font-medium text-slate-900 dark:text-slate-100 mb-2">No content yet</h3>
-                <p className="text-slate-500 dark:text-slate-400">
+                <h3 className="text-lg font-medium text-gray-900 dark:text-gray-100 mb-2">No content yet</h3>
+                <p className="text-gray-500 dark:text-gray-400">
                   {isOwnProfile
                     ? "You haven't uploaded any content yet. Start sharing your voyage!"
                     : `${profile.name} hasn't uploaded any content yet.`}
@@ -263,33 +263,33 @@ export default function ProfilePage({ params }: { params: { id: string } }) {
           </TabsContent>
 
           <TabsContent value="about" className="mt-0">
-            <Card className="border-cyan-200 shadow-lg shadow-cyan-100 dark:border-cyan-900 dark:shadow-none">
+            <Card className="border-gray-200 shadow-lg shadow-gray-100 dark:border-gray-800 dark:shadow-none">
               <CardHeader>
-                <CardTitle className="text-cyan-900 dark:text-cyan-100">About {profile.name}</CardTitle>
+                <CardTitle className="text-gray-900 dark:text-gray-100">About {profile.name}</CardTitle>
               </CardHeader>
               <CardContent className="space-y-6">
                 <div>
-                  <h3 className="text-sm font-medium text-slate-500 dark:text-slate-400 mb-2">Bio</h3>
-                  <p className="text-slate-900 dark:text-slate-100">{profile.bio || "No bio provided"}</p>
+                  <h3 className="text-sm font-medium text-gray-500 dark:text-gray-400 mb-2">Bio</h3>
+                  <p className="text-gray-900 dark:text-gray-100">{profile.bio || "No bio provided"}</p>
                 </div>
 
                 {profile.location && (
                   <div>
-                    <h3 className="text-sm font-medium text-slate-500 dark:text-slate-400 mb-2">Location</h3>
-                    <p className="text-slate-900 dark:text-slate-100">{profile.location}</p>
+                    <h3 className="text-sm font-medium text-gray-500 dark:text-gray-400 mb-2">Location</h3>
+                    <p className="text-gray-900 dark:text-gray-100">{profile.location}</p>
                   </div>
                 )}
 
                 <div>
-                  <h3 className="text-sm font-medium text-slate-500 dark:text-slate-400 mb-2">Joined</h3>
-                  <p className="text-slate-900 dark:text-slate-100">
+                  <h3 className="text-sm font-medium text-gray-500 dark:text-gray-400 mb-2">Joined</h3>
+                  <p className="text-gray-900 dark:text-gray-100">
                     {new Date(profile.joinedAt || new Date()).toLocaleDateString()}
                   </p>
                 </div>
 
                 {profile.interests && profile.interests.length > 0 && (
                   <div>
-                    <h3 className="text-sm font-medium text-slate-500 dark:text-slate-400 mb-2">Interests</h3>
+                    <h3 className="text-sm font-medium text-gray-500 dark:text-gray-400 mb-2">Interests</h3>
                     <div className="flex flex-wrap gap-2">
                       {profile.interests.map((interest: string) => (
                         <Badge key={interest} variant="outline">
@@ -302,7 +302,7 @@ export default function ProfilePage({ params }: { params: { id: string } }) {
 
                 {profile.expertise && profile.expertise.length > 0 && (
                   <div>
-                    <h3 className="text-sm font-medium text-slate-500 dark:text-slate-400 mb-2">Expertise</h3>
+                    <h3 className="text-sm font-medium text-gray-500 dark:text-gray-400 mb-2">Expertise</h3>
                     <div className="flex flex-wrap gap-2">
                       {profile.expertise.map((skill: string) => (
                         <Badge key={skill} variant="outline">
@@ -317,22 +317,22 @@ export default function ProfilePage({ params }: { params: { id: string } }) {
           </TabsContent>
 
           <TabsContent value="followers" className="mt-0">
-            <Card className="border-cyan-200 shadow-lg shadow-cyan-100 dark:border-cyan-900 dark:shadow-none">
+            <Card className="border-gray-200 shadow-lg shadow-gray-100 dark:border-gray-800 dark:shadow-none">
               <CardHeader>
-                <CardTitle className="text-cyan-900 dark:text-cyan-100">Followers</CardTitle>
+                <CardTitle className="text-gray-900 dark:text-gray-100">Followers</CardTitle>
                 <CardDescription>People following {profile.name}</CardDescription>
               </CardHeader>
               <CardContent>
                 {followers.length === 0 ? (
                   <div className="text-center py-6">
-                    <p className="text-slate-500 dark:text-slate-400">No followers yet</p>
+                    <p className="text-gray-500 dark:text-gray-400">No followers yet</p>
                   </div>
                 ) : (
                   <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
                     {followers.map((follower) => (
                       <div
                         key={follower._id || follower.id || Math.random().toString(36).substr(2, 9)}
-                        className="flex items-center gap-3 p-3 rounded-lg border border-cyan-100 dark:border-cyan-900 hover:bg-cyan-50 dark:hover:bg-cyan-950/50"
+                        className="flex items-center gap-3 p-3 rounded-lg border border-gray-100 dark:border-gray-800 hover:bg-gray-50 dark:hover:bg-gray-900/50"
                         onClick={() => router.push(`/profile/${follower.userId || follower._id}`)}
                         role="button"
                       >
@@ -348,9 +348,9 @@ export default function ProfilePage({ params }: { params: { id: string } }) {
                           <AvatarFallback>{follower.name?.substring(0, 2).toUpperCase() || "US"}</AvatarFallback>
                         </Avatar>
                         <div>
-                          <p className="font-medium text-slate-900 dark:text-slate-100">{follower.name}</p>
+                          <p className="font-medium text-gray-900 dark:text-gray-100">{follower.name}</p>
                           {follower.location && (
-                            <p className="text-xs text-slate-500 dark:text-slate-400">{follower.location}</p>
+                            <p className="text-xs text-gray-500 dark:text-gray-400">{follower.location}</p>
                           )}
                         </div>
                       </div>
@@ -362,22 +362,22 @@ export default function ProfilePage({ params }: { params: { id: string } }) {
           </TabsContent>
 
           <TabsContent value="following" className="mt-0">
-            <Card className="border-cyan-200 shadow-lg shadow-cyan-100 dark:border-cyan-900 dark:shadow-none">
+            <Card className="border-gray-200 shadow-lg shadow-gray-100 dark:border-gray-800 dark:shadow-none">
               <CardHeader>
-                <CardTitle className="text-cyan-900 dark:text-cyan-100">Following</CardTitle>
+                <CardTitle className="text-gray-900 dark:text-gray-100">Following</CardTitle>
                 <CardDescription>People {profile.name} follows</CardDescription>
               </CardHeader>
               <CardContent>
                 {following.length === 0 ? (
                   <div className="text-center py-6">
-                    <p className="text-slate-500 dark:text-slate-400">Not following anyone yet</p>
+                    <p className="text-gray-500 dark:text-gray-400">Not following anyone yet</p>
                   </div>
                 ) : (
                   <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
                     {following.map((followedUser) => (
                       <div
                         key={followedUser._id || followedUser.id || Math.random().toString(36).substr(2, 9)}
-                        className="flex items-center gap-3 p-3 rounded-lg border border-cyan-100 dark:border-cyan-900 hover:bg-cyan-50 dark:hover:bg-cyan-950/50"
+                        className="flex items-center gap-3 p-3 rounded-lg border border-gray-100 dark:border-gray-800 hover:bg-gray-50 dark:hover:bg-gray-900/50"
                         onClick={() => router.push(`/profile/${followedUser.userId || followedUser._id}`)}
                         role="button"
                       >
@@ -393,9 +393,9 @@ export default function ProfilePage({ params }: { params: { id: string } }) {
                           <AvatarFallback>{followedUser.name?.substring(0, 2).toUpperCase() || "US"}</AvatarFallback>
                         </Avatar>
                         <div>
-                          <p className="font-medium text-slate-900 dark:text-slate-100">{followedUser.name}</p>
+                          <p className="font-medium text-gray-900 dark:text-gray-100">{followedUser.name}</p>
                           {followedUser.location && (
-                            <p className="text-xs text-slate-500 dark:text-slate-400">{followedUser.location}</p>
+                            <p className="text-xs text-gray-500 dark:text-gray-400">{followedUser.location}</p>
                           )}
                         </div>
                       </div>
@@ -414,9 +414,9 @@ export default function ProfilePage({ params }: { params: { id: string } }) {
     if (!items || items.length === 0) return null
 
     return (
-      <Card className="border-cyan-200 shadow-md dark:border-cyan-900 dark:shadow-none">
+      <Card className="border-gray-200 shadow-md dark:border-gray-800 dark:shadow-none">
         <CardHeader className="pb-2">
-          <CardTitle className="text-lg text-cyan-900 dark:text-cyan-100">{title}</CardTitle>
+          <CardTitle className="text-lg text-gray-900 dark:text-gray-100">{title}</CardTitle>
           <CardDescription>
             {items.length} item{items.length !== 1 ? "s" : ""}
           </CardDescription>
@@ -426,7 +426,7 @@ export default function ProfilePage({ params }: { params: { id: string } }) {
             {items.slice(0, 4).map((item) => (
               <div
                 key={item._id || item.id || Math.random().toString(36).substr(2, 9)}
-                className="aspect-square rounded-md bg-slate-100 dark:bg-slate-800 overflow-hidden"
+                className="aspect-square rounded-md bg-gray-100 dark:bg-gray-800 overflow-hidden"
                 onClick={() => {
                   const contentType = title.toLowerCase().replace(" ", "")
                   const contentId = item._id || item.id
@@ -441,7 +441,7 @@ export default function ProfilePage({ params }: { params: { id: string } }) {
                     className="h-full w-full object-cover"
                   />
                 ) : (
-                  <div className="h-full w-full flex items-center justify-center p-2 text-center text-xs text-slate-500 dark:text-slate-400">
+                  <div className="h-full w-full flex items-center justify-center p-2 text-center text-xs text-gray-500 dark:text-gray-400">
                     {item.title || "Untitled"}
                   </div>
                 )}
@@ -451,7 +451,7 @@ export default function ProfilePage({ params }: { params: { id: string } }) {
 
           {items.length > 4 && (
             <div className="mt-4 text-center">
-              <p className="text-sm text-cyan-600 dark:text-cyan-400 hover:underline cursor-pointer">
+              <p className="text-sm text-gray-600 dark:text-gray-400 hover:underline cursor-pointer">
                 View all {items.length} {title.toLowerCase()}
               </p>
             </div>

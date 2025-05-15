@@ -34,7 +34,6 @@ import {
   Group,
   UserCircle2,
 } from "lucide-react"
-import { useTypewriter, Cursor } from "react-simple-typewriter"
 
 import VideoGallery from "@/components/video-gallery"
 
@@ -56,14 +55,6 @@ export default function Home() {
   const [isLoading, setIsLoading] = useState(true)
   const [fetchError, setFetchError] = useState<string | null>(null)
   const [trendingHover, setTrendingHover] = useState<number | null>(null)
-
-  const [typewriterText] = useTypewriter({
-    words: ["Discover the Sailor's World"],
-    loop: 0,
-    typeSpeed: 60,
-    deleteSpeed: 40,
-    delaySpeed: 1200,
-  })
 
   useEffect(() => {
     fetchLatestContent()
@@ -304,7 +295,7 @@ export default function Home() {
               }}
             >
               <motion.div variants={fadeIn} className="mb-6">
-                <Badge className="px-3 py-1 text-sm bg-green-500 text-white border-none">
+                <Badge className="px-3 py-1 text-sm bg-gray-700 text-white border-none">
                   <Sparkles className="w-4 h-4 mr-1" /> Maritime Community
                 </Badge>
               </motion.div>
@@ -315,8 +306,7 @@ export default function Home() {
               >
                 <span className="relative">
                   <span className="relative z-10">
-                    {typewriterText}
-                    <Cursor cursorColor="#333" />
+                    Discover the Sailor's World
                   </span>
                   <span className="absolute bottom-2 left-0 w-full h-3 bg-gray-300 rounded-full -z-10"></span>
                 </span>
@@ -329,19 +319,19 @@ export default function Home() {
 
               <motion.div className="flex flex-wrap gap-4" variants={fadeIn}>
                 <Link href="/videos">
-                  <Button size="lg" className="bg-white hover:bg-gray-600 text-gray-600 border-gray-600 border-2 hover:text-white transition-colors">
+                  <Button size="lg" className="bg-gray-200 hover:bg-gray-300 text-gray-800 border border-gray-400 dark:bg-gray-800 dark:hover:bg-gray-700 dark:text-gray-100 dark:border-gray-600 transition-colors">
                     Explore Content <Compass className="ml-2 h-5 w-5" />
                   </Button>
                 </Link>
                 {!isAuthenticated ? (
                   <Link href="/signup">
-                    <Button size="lg" variant="outline" className="rounded-xl border-gray-400 bg-white text-gray-700 hover:bg-gray-700 hover:text-white hover:border-gray-700 border-2 transition-colors">
+                    <Button size="lg" variant="outline" className="rounded-xl border-gray-400 bg-gray-200 text-gray-700 hover:bg-gray-300 hover:text-gray-900 hover:border-gray-500 border transition-colors dark:bg-gray-900 dark:text-gray-100 dark:border-gray-600 dark:hover:bg-gray-800 dark:hover:text-white dark:hover:border-gray-400">
                       Join the Crew <Anchor className="ml-2 h-5 w-5" />
                     </Button>
                   </Link>
                 ) : (
                   <Link href="/community">
-                    <Button size="lg" variant="outline" className=" text-white  hover:bg-blue-600 hover:text-white transition-colors">
+                    <Button size="lg" variant="outline" className=" border-gray-400 bg-gray-200 text-gray-700 hover:bg-gray-300 hover:text-gray-900 hover:border-gray-500 border transition-colors dark:bg-gray-800 dark:text-gray-100 dark:border-gray-600 dark:hover:bg-gray-700 dark:hover:text-white dark:hover:border-gray-400">
                       Community <UserCircle2 className="ml-2 h-5 w-5" />
                     </Button>
                   </Link>
@@ -642,7 +632,7 @@ export default function Home() {
                         <div className="absolute inset-0 rounded-full bg-gradient-to-br from-gray-300 to-gray-400 animate-pulse opacity-70 group-hover:opacity-100 transition-opacity"></div>
                         <div className="absolute inset-1 rounded-full overflow-hidden bg-white dark:bg-slate-800">
                           <Avatar
-                            className="h-full w-full border-4 border-pink-500"
+                            className="h-full w-full"
                             style={{ boxShadow: "0 0 0 4px #22c55e, 0 0 0 8px #ec4899" }}
                           >
                             <AvatarImage
@@ -783,7 +773,7 @@ export default function Home() {
                   </Button>
                 </Link>
                 <Link href="/signin">
-                  <Button size="lg" variant="outline" className="border-white text-green-500 hover:bg-white/10">
+                  <Button size="lg" variant="outline" className="border-white text-gray-500 hover:bg-white/10">
                     Sign In <Anchor className="ml-2 h-5 w-5" />
                   </Button>
                 </Link>
@@ -796,7 +786,7 @@ export default function Home() {
                   </Button>
                 </Link>
                 <Link href="/profile/me">
-                  <Button size="lg" variant="outline" className="border-white text-green-500 hover:bg-green-500 hover:text-white">
+                  <Button size="lg" variant="outline" className="border-white text-gray-500 hover:bg-gray-500 hover:text-white">
                     My Profile <Ship className="ml-2 h-5 w-5" />
                   </Button>
                 </Link>

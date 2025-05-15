@@ -378,7 +378,7 @@ const PhotoGallery = forwardRef<PhotoGalleryRef>((props, ref) => {
     <Card className="border-gray-200 shadow-lg">
       <CardHeader className="flex flex-row items-center justify-between border-b border-gray-100">
         <div>
-          <CardTitle className="text-gray-900">Maritime Moments</CardTitle>
+          <CardTitle className="dark:text-white text-black">Maritime Moments</CardTitle>
           <CardDescription>
             {photos.length > 0 ? `${photos.length} moments in your gallery` : "No maritime moments yet"}
           </CardDescription>

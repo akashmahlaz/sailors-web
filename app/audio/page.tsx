@@ -20,15 +20,15 @@ export default function AudioPage() {
   }
 
   return (
-    <div className="container mx-auto py-8 px-4">
-      <div className="mb-8 flex flex-col md:flex-row md:items-center justify-between gap-4">
+    <div className="container mx-auto py-8 px-2 sm:px-4">
+      <div className="mb-8 flex flex-col sm:flex-row sm:items-center justify-between gap-4">
         <div>
-          <h1 className="text-3xl font-bold text-cyan-900">Sea Sounds</h1>
-          <p className="text-muted-foreground mt-1">Record and share your maritime melodies</p>
+          <h1 className="text-3xl font-bold text-gray-800 dark:text-gray-100">Sea Sounds</h1>
+          <p className="text-gray-500 dark:text-gray-400 mt-1">Record and share your maritime melodies</p>
         </div>
         <Button
           onClick={() => setShowUploader(!showUploader)}
-          className={`${showUploader ? "bg-red-500 hover:bg-red-600" : "bg-cyan-600 hover:bg-cyan-700"}`}
+          className={`w-full sm:w-auto flex items-center justify-center ${showUploader ? "bg-gray-500 hover:bg-gray-600" : "bg-gray-700 hover:bg-gray-800"} text-white transition-colors`}
         >
           {showUploader ? (
             <>
@@ -48,7 +48,9 @@ export default function AudioPage() {
         </div>
       )}
 
-      <AudioGallery ref={audioGalleryRef} />
+      <div className="bg-gray-100 dark:bg-gray-900 rounded-lg p-2 sm:p-4">
+        <AudioGallery ref={audioGalleryRef} />
+      </div>
     </div>
   )
 }
