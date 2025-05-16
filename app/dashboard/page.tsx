@@ -71,12 +71,12 @@ export default function Dashboard() {
                 Photos
               </Button>
              <Button onClick={() => router.push("/blog")} className="bg-gray-700 hover:bg-gray-800 text-white font-medium shadow-sm">
-                Blog
+                Blog  
               </Button>
               <Button>
                  <Link
                     href={`/profile/${session?.user?.id || 'me'}`}
-                    className="flex items-center py-2 text-sm rounded-lg text-gray-200 hover:bg-gray-400 dark:text-gray-800 dark:hover:bg-gray-300"
+                    className="flex items-center py-2 text-sm rounded-lg text-gray-200 hover:bg-gray- dark:bg-gray-300 dark:text-gray-800 dark:hover:bg-gray-400"
                     
                   >
                     <UserCircle className="mr-2 h-4 w-4" />
