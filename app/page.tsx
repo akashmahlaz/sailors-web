@@ -33,6 +33,7 @@ import {
   Sailboat,
   Group,
   UserCircle2,
+  MicVocal,
 } from "lucide-react"
 
 import VideoGallery from "@/components/video-gallery"
@@ -569,9 +570,9 @@ export default function Home() {
               count={8}
             />
             <CategoryCard
-              title="Community"
-              icon={<Users className="h-6 w-6" />}
-              href="/community"
+              title="Audio"
+              icon={<MicVocal className="h-6 w-6" />}
+              href="/audio"
               bgClass="from-zinc-900 to-gray-500"
               count={featuredSailors.length}
             />

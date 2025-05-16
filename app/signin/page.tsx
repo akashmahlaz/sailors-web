@@ -167,15 +167,11 @@ export default function SignIn() {
                   type="checkbox"
                   className="h-4 w-4 rounded border-gray-300 text-blue-600 focus:ring-blue-500"
                 />
-                <label htmlFor="remember-me" className="ml-2 block text-sm text-gray-900">
+                <label htmlFor="remember-me" className="ml-2 block text-sm dark:text-gray-300">
                   Remember me
                 </label>
               </div>
-              <div className="text-sm">
-                <Link href="/forgot-password" className="text-blue-600 hover:text-blue-500">
-                  Forgot your password?
-                </Link>
-              </div>
+             
             </div>
             <Button type="submit" className="w-full bg-cyan-600 hover:bg-cyan-700" disabled={isLoading}>
               {isLoading ? "Boarding..." : "Set Sail with Email"}

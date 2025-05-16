@@ -3,7 +3,7 @@
 import { useEffect, useState } from "react"
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card"
 import { Skeleton } from "@/components/ui/skeleton"
-import { AlertCircle, RefreshCw, Mic, Heart, MessageSquare, Share2, Play } from "lucide-react"
+import { AlertCircle, RefreshCw, Mic, Heart, MessageSquare, Share2, Play, Trash2 } from "lucide-react"
 import { Button } from "@/components/ui/button"
 import Link from "next/link"
 import { Badge } from "@/components/ui/badge"
@@ -34,6 +34,7 @@ interface Comment {
 
 export default function PodcastList() {
   const { data: session } = useSession()
+  const isAdmin = session?.user?.role === "admin"
   const [podcasts, setPodcasts] = useState<Podcast[]>([])
   const [loading, setLoading] = useState(true)
   const [error, setError] = useState<string | null>(null)
@@ -129,6 +130,24 @@ export default function PodcastList() {
     })
   }
 
+  const handleDeletePodcast = async (podcastId: string) => {
+    if (!confirm("Are you sure you want to delete this podcast? This action cannot be undone.")) {
+      return
+    }
+    try {
+      const response = await fetch(`/api/podcasts/${podcastId}`, {
+        method: "DELETE",
+      })
+      if (!response.ok) {
+        throw new Error("Failed to delete podcast")
+      }
+      setPodcasts(podcasts.filter((podcast) => podcast.id !== podcastId))
+    } catch (err) {
+      console.error("Error deleting podcast:", err)
+      setError(err instanceof Error ? err.message : "Failed to delete podcast")
+    }
+  }
+
   if (loading) {
     return (
       <Card>
@@ -163,9 +182,9 @@ export default function PodcastList() {
             {podcasts.length > 0 ? `${podcasts.length} podcasts available` : "No podcasts yet"}
           </CardDescription>
         </div>
+        {/* Refresh button */}
         <Button variant="outline" size="sm" onClick={fetchPodcasts} className="border-gray-200 dark:border-gray-700 bg-white dark:bg-gray-900 text-gray-700 dark:text-gray-200">
           <RefreshCw className="h-4 w-4 mr-2" />
-          Refresh
         </Button>
       </CardHeader>
       <CardContent className="p-4 bg-gray-50 dark:bg-gray-950">
@@ -268,6 +287,16 @@ export default function PodcastList() {
                           Listen
                         </Button>
                       </Link>
+                      {isAdmin && (
+                        <Button
+                          variant="destructive"
+                          size="sm"
+                          onClick={() => handleDeletePodcast(podcast.id)}
+                          className="bg-red-100 hover:bg-red-200 text-red-600 hover:text-red-700 border-red-200"
+                        >
+                          <Trash2 className="h-4 w-4" />
+                        </Button>
+                      )}
                     </div>
                   </div>
 

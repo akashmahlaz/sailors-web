@@ -7,7 +7,7 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs"
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card"
 import { Button } from "@/components/ui/button"
 import { Alert, AlertDescription } from "@/components/ui/alert"
-import { AlertCircle, Trash2, Eye, Download, Edit, BarChart3, Heart } from "lucide-react"
+import { AlertCircle, Trash2, Eye, Download, Edit, BarChart3, Heart, AlertTriangle } from "lucide-react"
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table"
 import {
   Dialog,
@@ -21,6 +21,7 @@ import { Input } from "@/components/ui/input"
 import { Badge } from "@/components/ui/badge"
 import Link from "next/link"
 import { formatDistanceToNow } from "date-fns"
+import { useToast } from "@/hooks/use-toast"
 
 interface ContentItem {
   id: string
@@ -39,6 +40,7 @@ interface ContentItem {
 export default function AdminContentPage() {
   const { data: session, status } = useSession()
   const router = useRouter()
+  const { toast } = useToast()
   const [activeTab, setActiveTab] = useState("videos")
   const [content, setContent] = useState<ContentItem[]>([])
   const [loading, setLoading] = useState(true)
@@ -63,7 +65,10 @@ export default function AdminContentPage() {
       setLoading(true)
       setError(null)
       try {
-        const endpoint = `/api/admin/${activeTab}`
+        let endpoint = `/api/admin/${activeTab}`
+        if (activeTab === "news" || activeTab === "podcasts") {
+          endpoint = `/api/${activeTab}`
+        }
         const response = await fetch(endpoint)
 
         if (!response.ok) {
@@ -85,24 +90,35 @@ export default function AdminContentPage() {
 
   const handleDelete = async () => {
     if (!itemToDelete) return
-
     setDeleteInProgress(true)
     try {
-      const endpoint = `/api/admin/${activeTab}/${itemToDelete.id}`
+      let endpoint = `/api/admin/${activeTab}/${itemToDelete.id}`
+      if (activeTab === "news") {
+        endpoint = `/api/news/${itemToDelete.id}`
+      } else if (activeTab === "podcasts") {
+        endpoint = `/api/admin/podcasts?id=${itemToDelete.id}`
+      }
       const response = await fetch(endpoint, {
         method: "DELETE",
       })
-
       if (!response.ok) {
         throw new Error(`Failed to delete: ${response.statusText}`)
       }
-
-      // Remove the deleted item from the list
       setContent(content.filter((item) => item.id !== itemToDelete.id))
       setDeleteDialogOpen(false)
+      toast({
+        title: "Deleted successfully",
+        description: `${activeTab.slice(0, -1).toUpperCase()} deleted.`,
+        variant: "default",
+      })
     } catch (err) {
       console.error("Error deleting item:", err)
       setError(err instanceof Error ? err.message : "Failed to delete item")
+      toast({
+        title: "Delete failed",
+        description: err instanceof Error ? err.message : "Failed to delete item",
+        variant: "destructive",
+      })
     } finally {
       setDeleteInProgress(false)
       setItemToDelete(null)
@@ -156,94 +172,136 @@ export default function AdminContentPage() {
           <CardDescription>Manage all content across the platform</CardDescription>
         </CardHeader>
         <CardContent className="pt-6">
-          <Tabs value={activeTab} onValueChange={setActiveTab} className="w-full">
-            <TabsList className="grid grid-cols-4 w-full">
-              <TabsTrigger value="videos">Videos</TabsTrigger>
-              <TabsTrigger value="audios">Audio</TabsTrigger>
-              <TabsTrigger value="blogs">Blogs</TabsTrigger>
-              <TabsTrigger value="photos">Photos</TabsTrigger>
-            </TabsList>
-            <div className="mb-6">
-              <Input
-                placeholder={`Search ${activeTab}...`}
-                value={searchQuery}
-                onChange={(e) => setSearchQuery(e.target.value)}
-                className="max-w-md"
-              />
-            </div>
-            {error && (
-              <Alert variant="destructive" className="mb-4">
-                <AlertCircle className="h-4 w-4" />
-                <AlertDescription>{error}</AlertDescription>
-              </Alert>
-            )}
-            <TabsContent value="videos" className="mt-0">
-              <ContentTable
-                items={filteredContent}
-                loading={loading}
-                contentType="videos"
-                onDelete={(item) => {
-                  setItemToDelete(item)
-                  setDeleteDialogOpen(true)
-                }}
-              />
-            </TabsContent>
-            <TabsContent value="audios" className="mt-0">
-              <ContentTable
-                items={filteredContent}
-                loading={loading}
-                contentType="audios"
-                onDelete={(item) => {
-                  setItemToDelete(item)
-                  setDeleteDialogOpen(true)
-                }}
-              />
-            </TabsContent>
-            <TabsContent value="blogs" className="mt-0">
-              <ContentTable
-                items={filteredContent}
-                loading={loading}
-                contentType="blogs"
-                onDelete={(item) => {
-                  setItemToDelete(item)
-                  setDeleteDialogOpen(true)
-                }}
-              />
-            </TabsContent>
-            <TabsContent value="photos" className="mt-0">
-              <ContentTable
-                items={filteredContent}
-                loading={loading}
-                contentType="photos"
-                onDelete={(item) => {
-                  setItemToDelete(item)
-                  setDeleteDialogOpen(true)
-                }}
-              />
-            </TabsContent>
-          </Tabs>
+          <div className="overflow-x-auto pb-2">
+            <Tabs value={activeTab} onValueChange={setActiveTab} className="w-full min-w-[700px]">
+              <TabsList className="grid grid-cols-6 w-full gap-2 mb-4 sticky top-0 z-10 bg-gray-50 dark:bg-gray-900">
+                <TabsTrigger value="videos" className="flex items-center gap-2 px-4 py-2 rounded-lg font-semibold text-gray-700 dark:text-gray-200 bg-white dark:bg-gray-800 shadow-sm hover:bg-gray-100 dark:hover:bg-gray-700 transition-colors data-[state=active]:bg-blue-600 data-[state=active]:text-white data-[state=active]:shadow-md">
+                  <BarChart3 className="h-4 w-4" /> Videos
+                </TabsTrigger>
+                <TabsTrigger value="audios" className="flex items-center gap-2 px-4 py-2 rounded-lg font-semibold text-gray-700 dark:text-gray-200 bg-white dark:bg-gray-800 shadow-sm hover:bg-gray-100 dark:hover:bg-gray-700 transition-colors data-[state=active]:bg-blue-600 data-[state=active]:text-white data-[state=active]:shadow-md">
+                  <Heart className="h-4 w-4" /> Audio
+                </TabsTrigger>
+                <TabsTrigger value="blogs" className="flex items-center gap-2 px-4 py-2 rounded-lg font-semibold text-gray-700 dark:text-gray-200 bg-white dark:bg-gray-800 shadow-sm hover:bg-gray-100 dark:hover:bg-gray-700 transition-colors data-[state=active]:bg-blue-600 data-[state=active]:text-white data-[state=active]:shadow-md">
+                  <Edit className="h-4 w-4" /> Blogs
+                </TabsTrigger>
+                <TabsTrigger value="photos" className="flex items-center gap-2 px-4 py-2 rounded-lg font-semibold text-gray-700 dark:text-gray-200 bg-white dark:bg-gray-800 shadow-sm hover:bg-gray-100 dark:hover:bg-gray-700 transition-colors data-[state=active]:bg-blue-600 data-[state=active]:text-white data-[state=active]:shadow-md">
+                  <Download className="h-4 w-4" /> Photos
+                </TabsTrigger>
+                <TabsTrigger value="news" className="flex items-center gap-2 px-4 py-2 rounded-lg font-semibold text-gray-700 dark:text-gray-200 bg-white dark:bg-gray-800 shadow-sm hover:bg-gray-100 dark:hover:bg-gray-700 transition-colors data-[state=active]:bg-blue-600 data-[state=active]:text-white data-[state=active]:shadow-md">
+                  <AlertCircle className="h-4 w-4" /> News
+                </TabsTrigger>
+                <TabsTrigger value="podcasts" className="flex items-center gap-2 px-4 py-2 rounded-lg font-semibold text-gray-700 dark:text-gray-200 bg-white dark:bg-gray-800 shadow-sm hover:bg-gray-100 dark:hover:bg-gray-700 transition-colors data-[state=active]:bg-blue-600 data-[state=active]:text-white data-[state=active]:shadow-md">
+                  <Trash2 className="h-4 w-4" /> Podcasts
+                </TabsTrigger>
+              </TabsList>
+              <div className="mb-6">
+                <Input
+                  placeholder={`Search ${activeTab}...`}
+                  value={searchQuery}
+                  onChange={(e) => setSearchQuery(e.target.value)}
+                  className="max-w-md"
+                />
+              </div>
+              {error && (
+                <Alert variant="destructive" className="mb-4">
+                  <AlertCircle className="h-4 w-4" />
+                  <AlertDescription>{error}</AlertDescription>
+                </Alert>
+              )}
+              <TabsContent value="videos" className="mt-0">
+                <ContentTable
+                  items={filteredContent}
+                  loading={loading}
+                  contentType="videos"
+                  onDelete={(item) => {
+                    setItemToDelete(item)
+                    setDeleteDialogOpen(true)
+                  }}
+                />
+              </TabsContent>
+              <TabsContent value="audios" className="mt-0">
+                <ContentTable
+                  items={filteredContent}
+                  loading={loading}
+                  contentType="audios"
+                  onDelete={(item) => {
+                    setItemToDelete(item)
+                    setDeleteDialogOpen(true)
+                  }}
+                />
+              </TabsContent>
+              <TabsContent value="blogs" className="mt-0">
+                <ContentTable
+                  items={filteredContent}
+                  loading={loading}
+                  contentType="blogs"
+                  onDelete={(item) => {
+                    setItemToDelete(item)
+                    setDeleteDialogOpen(true)
+                  }}
+                />
+              </TabsContent>
+              <TabsContent value="photos" className="mt-0">
+                <ContentTable
+                  items={filteredContent}
+                  loading={loading}
+                  contentType="photos"
+                  onDelete={(item) => {
+                    setItemToDelete(item)
+                    setDeleteDialogOpen(true)
+                  }}
+                />
+              </TabsContent>
+              <TabsContent value="news" className="mt-0">
+                <ContentTable
+                  items={filteredContent}
+                  loading={loading}
+                  contentType="news"
+                  onDelete={(item) => {
+                    setItemToDelete(item)
+                    setDeleteDialogOpen(true)
+                  }}
+                />
+              </TabsContent>
+              <TabsContent value="podcasts" className="mt-0">
+                <ContentTable
+                  items={filteredContent}
+                  loading={loading}
+                  contentType="podcasts"
+                  onDelete={(item) => {
+                    setItemToDelete(item)
+                    setDeleteDialogOpen(true)
+                  }}
+                />
+              </TabsContent>
+            </Tabs>
+          </div>
         </CardContent>
       </Card>
 
       <Dialog open={deleteDialogOpen} onOpenChange={setDeleteDialogOpen}>
         <DialogContent>
           <DialogHeader>
-            <DialogTitle>Confirm Deletion</DialogTitle>
+            <div className="flex items-center gap-2 text-red-600">
+              <AlertTriangle className="h-6 w-6" />
+              <DialogTitle>Confirm Deletion</DialogTitle>
+            </div>
             <DialogDescription>
-              Are you sure you want to delete this {activeTab.slice(0, -1)}? This action cannot be undone.
+              <span className="font-semibold text-red-700">Warning:</span> This action cannot be undone.<br />
+              Are you sure you want to delete this {activeTab.slice(0, -1)}?
             </DialogDescription>
           </DialogHeader>
-          <div className="py-4">
-            <p className="font-medium">{itemToDelete?.title || itemToDelete?.public_id}</p>
+          <div className="py-4 flex flex-col items-center">
             {itemToDelete?.thumbnail_url && (
               <div className="mt-2 w-full max-w-xs mx-auto">
                 <img
                   src={itemToDelete.thumbnail_url || "/placeholder.svg"}
                   alt={itemToDelete.title || "Content thumbnail"}
-                  className="w-full h-auto rounded-md"
+                  className="w-full h-auto rounded-md border border-gray-200 shadow"
                 />
               </div>
             )}
+            <p className="font-bold text-lg mt-4 mb-2 text-gray-900 dark:text-gray-100">{itemToDelete?.title || itemToDelete?.public_id}</p>
           </div>
           <DialogFooter>
             <Button variant="outline" onClick={() => setDeleteDialogOpen(false)} disabled={deleteInProgress} className="border-gray-200 dark:border-gray-800">
@@ -253,9 +311,10 @@ export default function AdminContentPage() {
               variant="destructive"
               onClick={handleDelete}
               disabled={deleteInProgress}
-              className="bg-red-600 hover:bg-red-700 text-white"
+              className="bg-red-600 hover:bg-red-700 text-white flex items-center gap-2 min-w-[110px]"
             >
-              {deleteInProgress ? "Deleting..." : "Delete"}
+              {deleteInProgress && <span className="loader border-white"></span>}
+              {deleteInProgress ? "Deleting..." : <><Trash2 className="h-4 w-4" /> Delete</>}
             </Button>
           </DialogFooter>
         </DialogContent>
@@ -294,7 +353,6 @@ function ContentTable({ items, loading, contentType, onDelete }: ContentTablePro
 
   return (
     <div className="rounded-md border border-gray-100 dark:border-gray-800 overflow-hidden">
-      <Tabs>
       <Table>
         <TableHeader className="bg-gray-50 dark:bg-gray-900">
           <TableRow>
@@ -307,22 +365,22 @@ function ContentTable({ items, loading, contentType, onDelete }: ContentTablePro
         </TableHeader>
         <TableBody>
           {items.map((item) => (
-            <TableRow key={item.id} className="hover:bg-gray-50/50 dark:hover:bg-gray-900/50">
+            <TableRow key={item.id} className="hover:bg-gray-50/70 dark:hover:bg-gray-900/70 transition-colors">
               <TableCell className="font-medium">
                 <div className="flex items-center gap-3">
                   {item.thumbnail_url && (
                     <img
                       src={item.thumbnail_url || "/placeholder.svg"}
                       alt={item.title || "Thumbnail"}
-                      className="w-10 h-10 object-cover rounded-md"
+                      className="w-10 h-10 object-cover rounded-md border border-gray-200"
                     />
                   )}
                   <div className="truncate max-w-[200px]">{item.title || item.public_id || "Untitled"}</div>
                 </div>
               </TableCell>
-              <TableCell>{item.author || item.userName || "Unknown"}</TableCell>
+              <TableCell>{item.author || item.userName || <span className="text-gray-400">Unknown</span>}</TableCell>
               <TableCell>
-                {item.created_at ? formatDistanceToNow(new Date(item.created_at), { addSuffix: true }) : "Unknown"}
+                {item.created_at ? formatDistanceToNow(new Date(item.created_at), { addSuffix: true }) : <span className="text-gray-400">Unknown</span>}
               </TableCell>
               <TableCell className="text-center">
                 <div className="flex justify-center gap-3">
@@ -359,9 +417,9 @@ function ContentTable({ items, loading, contentType, onDelete }: ContentTablePro
                     variant="destructive"
                     size="sm"
                     onClick={() => onDelete(item)}
-                    className="bg-red-100 hover:bg-red-200 text-red-600 hover:text-red-700 border-red-200"
+                    className="bg-red-100 hover:bg-red-200 text-red-600 hover:text-red-700 border-red-200 flex items-center gap-1 min-w-[90px]"
                   >
-                    <Trash2 className="h-4 w-4" />
+                    <Trash2 className="h-4 w-4" /> Delete
                   </Button>
                 </div>
               </TableCell>
@@ -369,7 +427,27 @@ function ContentTable({ items, loading, contentType, onDelete }: ContentTablePro
           ))}
         </TableBody>
       </Table>
-      </Tabs>
     </div>
   )
 }
+
+/* Add this CSS for loader spinner */
+<style jsx>{`
+  .loader {
+    border: 2px solid #f3f3f3;
+    border-top: 2px solid #fff;
+    border-radius: 50%;
+    width: 16px;
+    height: 16px;
+    animation: spin 0.8s linear infinite;
+    display: inline-block;
+  }
+  @keyframes spin {
+    0% {
+      transform: rotate(0deg);
+    }
+    100% {
+      transform: rotate(360deg);
+    }
+  }
+`}</style>

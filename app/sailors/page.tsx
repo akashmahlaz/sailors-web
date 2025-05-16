@@ -54,7 +54,7 @@ export default function SailorsPage() {
                   <div className="absolute inset-0 rounded-full bg-gradient-to-br from-gray-300 to-gray-400 animate-pulse opacity-70 group-hover:opacity-100 transition-opacity"></div>
                   <div className="absolute inset-1 rounded-full overflow-hidden bg-white dark:bg-slate-800">
                     <Avatar
-                      className="h-full w-full border-4 border-pink-500"
+                      className="h-full w-full border-4"
                       style={{ boxShadow: "0 0 0 4px #22c55e, 0 0 0 8px #ec4899" }}
                     >
                       <AvatarImage

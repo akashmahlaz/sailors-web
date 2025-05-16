@@ -102,7 +102,7 @@ export default function TrendingPage() {
               </Button>
             </Link>
             <div className="flex items-center gap-2">
-              <TrendingUp className="h-6 w-6 text-green-600" />
+              <TrendingUp className="h-6 w-6 text-gray-600" />
               <h1 className="text-3xl font-bold text-slate-900 dark:text-white">Trending Now</h1>
             </div>
           </div>
@@ -112,7 +112,7 @@ export default function TrendingPage() {
                 key={opt.value}
                 size="sm"
                 variant={type === opt.value ? "default" : "outline"}
-                className={type === opt.value ? "bg-green-600 text-white" : ""}
+                className={type === opt.value ? "bg-gray-600 text-white" : ""}
                 onClick={() => setType(opt.value)}
               >
                 {opt.label}
@@ -128,7 +128,7 @@ export default function TrendingPage() {
                 placeholder="Search by title..."
                 value={search}
                 onChange={(e) => setSearch(e.target.value)}
-                className="pl-9 pr-3 py-2 rounded-md border border-gray-300 dark:border-slate-700 bg-white dark:bg-slate-800 text-sm focus:outline-none focus:ring-2 focus:ring-green-400"
+                className="pl-9 pr-3 py-2 rounded-md border border-gray-300 dark:border-slate-700 bg-white dark:bg-slate-800 text-sm focus:outline-none focus:ring-2 focus:ring-gray-400"
                 style={{ minWidth: 220 }}
               />
               <Search className="absolute left-2 top-2.5 h-4 w-4 text-gray-400" />
@@ -141,7 +141,7 @@ export default function TrendingPage() {
                 key={opt.value}
                 size="sm"
                 variant={sort === opt.value ? "default" : "outline"}
-                className={sort === opt.value ? "bg-green-600 text-white" : ""}
+                className={sort === opt.value ? "bg-gray-600 text-white" : ""}
                 onClick={() => setSort(opt.value)}
               >
                 {opt.label} {opt.value === "views" ? <SortDesc className="inline h-4 w-4 ml-1" /> : <SortAsc className="inline h-4 w-4 ml-1" />}
@@ -190,7 +190,7 @@ export default function TrendingPage() {
                 </Link>
                 <CardContent className="p-4">
                   <Link href={`/${item.type}s/${item.id}`}>
-                    <h3 className="font-semibold text-base line-clamp-1 group-hover:text-green-700 dark:group-hover:text-green-400 transition-colors">
+                    <h3 className="font-semibold text-base line-clamp-1 group-hover:text-gray-700 dark:group-hover:text-gray-400 transition-colors">
                       {item.title || (item.type === "video" ? item.public_id?.split("/")?.pop() : "Untitled")}
                     </h3>
                   </Link>

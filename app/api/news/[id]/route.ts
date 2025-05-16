@@ -112,6 +112,14 @@ export async function DELETE(request: NextRequest, { params }: { params: { id: s
   try {
     const id = params.id
 
+    // Check if user is authenticated and is an admin
+    const { getServerSession } = await import("next-auth/next")
+    const { authOptions } = await import("@/app/api/auth/[...nextauth]/route")
+    const session = await getServerSession(authOptions)
+    if (!session || session.user?.role !== "admin") {
+      return NextResponse.json({ error: "Unauthorized" }, { status: 401 })
+    }
+
     // Get news collection
     const collection = await getNewsCollection()
 

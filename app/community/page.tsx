@@ -152,7 +152,7 @@ export default function CommunityPage() {
     <div className="min-h-screen flex flex-col items-center bg-gradient-to-b from-gray-50 to-white dark:from-slate-950 dark:to-slate-900 px-4">
       <div className="max-w-2xl w-full text-center py-10">
         <div className="flex justify-center mb-4">
-          <span className="inline-flex items-center bg-green-100 text-green-700 px-3 py-1 rounded-full font-medium text-sm">
+          <span className="inline-flex items-center bg-gray-100 text-gray-700 px-3 py-1 rounded-full font-medium text-sm">
             <Sparkles className="w-4 h-4 mr-1" /> Community
           </span>
         </div>
@@ -164,18 +164,18 @@ export default function CommunityPage() {
         </p>
         <div className="flex flex-wrap justify-center gap-4 mb-8">
           <Link href="/signup">
-            <Button size="lg" className="bg-green-600 hover:bg-green-700 text-white">
+            <Button size="lg" className="bg-gray-600 hover:bg-gray-700 text-white">
               Join the Community <Users className="ml-2 h-5 w-5" />
             </Button>
           </Link>
           <Link href="/support">
-            <Button size="lg" variant="outline" className="border-green-600 text-green-700 hover:bg-green-50">
+            <Button size="lg" variant="outline" className="border-gray-600 text-gray-700 hover:bg-gray-50">
               Need Help? <Anchor className="ml-2 h-5 w-5" />
             </Button>
           </Link>
           <Button
             variant="outline"
-            className="border-green-600 text-green-700 hover:bg-green-50"
+            className="border-gray-600 text-gray-700 hover:bg-gray-50"
             onClick={() => setGroupDialogOpen(true)}
           >
             + Create Group
@@ -186,21 +186,21 @@ export default function CommunityPage() {
           <h2 className="text-lg font-semibold mb-2 text-gray-800 dark:text-white">Groups</h2>
           <div className="grid gap-3 md:grid-cols-2">
             {groups.map(group => (
-              <div key={group.id} className={`bg-white dark:bg-slate-800 rounded-lg shadow p-4 text-left flex items-center gap-4 ${activeGroupId === group.id ? 'ring-2 ring-green-400' : ''}`}>
-                <img src={group.avatar || "/placeholder-logo.svg"} alt={group.name} className="h-12 w-12 rounded-full object-cover border border-green-200 dark:border-green-700 cursor-pointer" onClick={() => setActiveGroupId(group.id)} />
+              <div key={group.id} className={`bg-white dark:bg-slate-800 rounded-lg shadow p-4 text-left flex items-center gap-4 ${activeGroupId === group.id ? 'ring-2 ring-gray-400' : ''}`}>
+                <img src={group.avatar || "/placeholder-logo.svg"} alt={group.name} className="h-12 w-12 rounded-full object-cover border border-gray-200 dark:border-gray-700 cursor-pointer" onClick={() => setActiveGroupId(group.id)} />
                 <div className="flex-1 cursor-pointer" onClick={() => setActiveGroupId(group.id)}>
-                  <div className="font-bold text-green-800 dark:text-green-200 flex items-center gap-2">{group.name}</div>
+                  <div className="font-bold text-gray-800 dark:text-gray-200 flex items-center gap-2">{group.name}</div>
                   <div className="text-sm text-gray-600 dark:text-gray-300 mb-1">{group.description}</div>
                   <div className="text-xs text-gray-500 dark:text-gray-400 flex items-center gap-1">
                     <UsersIcon className="h-4 w-4 mr-1" /> {group.members} members
                   </div>
                 </div>
                 {joinedGroups.includes(group.id) ? (
-                  <Button size="sm" variant="outline" className="border-green-600 text-green-700 hover:bg-green-50" onClick={() => handleLeaveGroup(group.id)}>
+                  <Button size="sm" variant="outline" className="border-gray-600 text-gray-700 hover:bg-gray-50" onClick={() => handleLeaveGroup(group.id)}>
                     Leave
                   </Button>
                 ) : (
-                  <Button size="sm" variant="outline" className="border-green-600 text-green-700 hover:bg-green-50" onClick={() => handleJoinGroup(group.id)}>
+                  <Button size="sm" variant="outline" className="border-gray-600 text-gray-700 hover:bg-gray-50" onClick={() => handleJoinGroup(group.id)}>
                     <UserPlus className="h-4 w-4 mr-1" /> Join
                   </Button>
                 )}
@@ -223,28 +223,28 @@ export default function CommunityPage() {
                 onChange={e => setNewGroupPost({ ...newGroupPost, content: e.target.value })}
                 className="mb-2"
               />
-              <Button onClick={handleGroupPost} className="bg-green-600 hover:bg-green-700 text-white w-full mb-4">Post</Button>
+              <Button onClick={handleGroupPost} className="bg-gray-600 hover:bg-gray-700 text-white w-full mb-4">Post</Button>
               <div className="space-y-6">
                 {(groupPosts[activeGroupId] || []).length === 0 ? (
                   <div className="text-gray-500 dark:text-gray-400">No posts in this group yet.</div>
                 ) : (
                   groupPosts[activeGroupId].map(post => (
-                    <div key={post.id} className="bg-green-50 dark:bg-green-900 rounded-xl shadow p-4 text-left">
+                    <div key={post.id} className="bg-gray-50 dark:bg-gray-900 rounded-xl shadow p-4 text-left">
                       <div className="flex items-center gap-3 mb-2">
                         <Avatar className="h-8 w-8">
                           <AvatarImage src={post.author.avatar} />
                           <AvatarFallback>{post.author.name[0]}</AvatarFallback>
                         </Avatar>
                         <div>
-                          <div className="font-semibold text-green-900 dark:text-green-200 flex items-center gap-2">
+                          <div className="font-semibold text-gray-900 dark:text-gray-200 flex items-center gap-2">
                             {post.author.name}
                           </div>
                           <div className="text-xs text-gray-500 dark:text-gray-400">{post.date}</div>
                         </div>
                       </div>
                       <div className="mb-2">
-                        <h3 className="text-base font-bold text-green-900 dark:text-green-100">{post.title}</h3>
-                        <p className="text-green-800 dark:text-green-200 mt-1">{post.content}</p>
+                        <h3 className="text-base font-bold text-gray-900 dark:text-gray-100">{post.title}</h3>
+                        <p className="text-gray-800 dark:text-gray-200 mt-1">{post.content}</p>
                       </div>
                     </div>
                   ))
@@ -277,7 +277,7 @@ export default function CommunityPage() {
             onChange={e => setNewPost({ ...newPost, content: e.target.value })}
             className="mb-2"
           />
-          <Button onClick={handlePost} className="bg-green-600 hover:bg-green-700 text-white w-full">Post</Button>
+          <Button onClick={handlePost} className="bg-gray-600 hover:bg-gray-700 text-white w-full">Post</Button>
         </div>
         {/* Posts List */}
         <div className="space-y-6">
@@ -294,7 +294,7 @@ export default function CommunityPage() {
                   <div>
                     <div className="font-semibold text-gray-800 dark:text-white flex items-center gap-2">
                       {post.author.name}
-                      <Badge variant="outline" className="text-xs border-green-200 text-green-700 dark:border-green-700 dark:text-green-300">
+                      <Badge variant="outline" className="text-xs border-gray-200 text-gray-700 dark:border-gray-700 dark:text-gray-300">
                         {post.author.role}
                       </Badge>
                     </div>
@@ -307,7 +307,7 @@ export default function CommunityPage() {
                 </div>
                 <div className="flex flex-wrap gap-2 mb-2">
                   {post.tags.map(tag => (
-                    <Badge key={tag} variant="secondary" className="text-xs bg-green-50 text-green-700 dark:bg-green-900 dark:text-green-300">
+                    <Badge key={tag} variant="secondary" className="text-xs bg-gray-50 text-gray-700 dark:bg-gray-900 dark:text-gray-300">
                       {tag}
                     </Badge>
                   ))}
@@ -338,7 +338,7 @@ export default function CommunityPage() {
               className="mb-2"
             />
             <DialogFooter>
-              <Button onClick={handleCreateGroup} className="bg-green-600 hover:bg-green-700 text-white w-full">Create Group</Button>
+              <Button onClick={handleCreateGroup} className="bg-gray-600 hover:bg-gray-700 text-white w-full">Create Group</Button>
             </DialogFooter>
           </DialogContent>
         </Dialog>
@@ -349,14 +349,14 @@ export default function CommunityPage() {
               <GroupDialogTitle>{groupDetail?.name}</GroupDialogTitle>
             </GroupDialogHeader>
             <div className="flex items-center gap-4 mb-2">
-              <img src={groupDetail?.avatar || "/placeholder-logo.svg"} alt={groupDetail?.name} className="h-14 w-14 rounded-full object-cover border border-green-200 dark:border-green-700" />
+              <img src={groupDetail?.avatar || "/placeholder-logo.svg"} alt={groupDetail?.name} className="h-14 w-14 rounded-full object-cover border border-gray-200 dark:border-gray-700" />
               <div>
-                <div className="font-bold text-green-800 dark:text-green-200">{groupDetail?.name}</div>
+                <div className="font-bold text-gray-800 dark:text-gray-200">{groupDetail?.name}</div>
                 <div className="text-sm text-gray-600 dark:text-gray-300">{groupDetail?.description}</div>
                 <div className="text-xs text-gray-500 dark:text-gray-400 flex items-center gap-1">
                   <UsersIcon className="h-4 w-4 mr-1" /> {groupDetail?.members} members
                 </div>
-                <div className="text-xs text-green-700 dark:text-green-300 mt-1">Admin: {groupDetail?.admin}</div>
+                <div className="text-xs text-gray-700 dark:text-gray-300 mt-1">Admin: {groupDetail?.admin}</div>
               </div>
             </div>
             <div className="text-xs text-gray-500 dark:text-gray-400 mb-2">(Advanced: Group chat, events, and files can be added here.)</div>

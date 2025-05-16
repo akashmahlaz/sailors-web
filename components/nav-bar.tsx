@@ -139,52 +139,63 @@ export default function NavBar() {
 
         {/* Mobile menu */}
         {mobileMenuOpen && (
-          <div className="absolute top-16 left-0 right-0 bg-gray-50 border-t border-gray-200 sm:hidden p-4 shadow-lg z-50 dark:bg-gray-800 dark:border-gray-700 bg-opacity-95 dark:bg-opacity-95 backdrop-blur-md">
-            <div className="space-y-4">
+          <div className="fixed inset-x-0 top-16 bottom-0 bg-gray-50 border-t border-gray-200 sm:hidden shadow-lg z-50 dark:bg-gray-800 dark:border-gray-700 bg-opacity-95 dark:bg-opacity-95 backdrop-blur-md overflow-y-auto">
+            <div className="container mx-auto px-4 py-4 space-y-4">
+              {/* Home Link */}
+              <Link
+                href="/"
+                className="flex items-center py-2 text-sm rounded-lg text-gray-800 hover:bg-gray-100 dark:text-gray-300 dark:hover:bg-gray-700"
+                onClick={() => setMobileMenuOpen(false)}
+              >
+                <Sailboat className="mr-2 h-4 w-4" />
+                Home
+              </Link>
+
               {/* Admin Dropdown for mobile (always visible, adapts to user role) */}
-                {isAuthenticated && (
+              {isAuthenticated && (
                 <div className="space-y-2">
                   <div className="flex items-center text-gray-800 font-medium dark:text-white">
-                  <User className="h-6 w-6 text-gray-500 transition-transform group-hover:rotate-12 duration-300 dark:text-gray-400" />
-                  <span className="text-sm font-medium">
-                    {session?.user?.name}
-                    {isAdmin && (
-                    <span className="ml-2 px-2 py-0.5 bg-gray-800 text-white text-xs rounded-full dark:bg-gray-600">
-                      Admin
+                    <User className="h-6 w-6 text-gray-500 transition-transform group-hover:rotate-12 duration-300 dark:text-gray-400" />
+                    <span className="text-sm font-medium">
+                      {session?.user?.name}
+                      {isAdmin && (
+                        <span className="ml-2 px-2 py-0.5 bg-gray-800 text-white text-xs rounded-full dark:bg-gray-600">
+                          Admin
+                        </span>
+                      )}
                     </span>
-                    )}
-                  </span>
                   </div>
                   <div className="pl-7 space-y-2">
-                  <Link
-                    href={`/profile/${session?.user?.id || 'me'}`}
-                    className="flex items-center py-2 text-sm rounded-lg text-gray-800 hover:bg-gray-100 dark:text-gray-300 dark:hover:bg-gray-700"
-                    onClick={() => setMobileMenuOpen(false)}
-                  >
-                    <UserCircle className="mr-2 h-4 w-4" />
-                    Profile
-                  </Link>
-                  <Link
-                    href="/dashboard"
-                    className="flex items-center py-2 text-sm rounded-lg text-gray-800 hover:bg-gray-100 dark:text-gray-300 dark:hover:bg-gray-700"
-                    onClick={() => setMobileMenuOpen(false)}
-                  >
-                    <User className="mr-2 h-4 w-4" />
-                    Dashboard
-                  </Link>
-                  {isAdmin && (
                     <Link
-                    href="/admin"
-                    className="flex items-center py-2 text-sm rounded-lg text-gray-800 hover:bg-gray-100 dark:text-gray-300 dark:hover:bg-gray-700"
-                    onClick={() => setMobileMenuOpen(false)}
+                      href={`/profile/${session?.user?.id || 'me'}`}
+                      className="flex items-center py-2 text-sm rounded-lg text-gray-800 hover:bg-gray-100 dark:text-gray-300 dark:hover:bg-gray-700"
+                      onClick={() => setMobileMenuOpen(false)}
                     >
-                    <Shield className="mr-2 h-4 w-4" />
-                    Admin Quarter's
+                      <UserCircle className="mr-2 h-4 w-4" />
+                      Profile
                     </Link>
-                  )}
+                    <Link
+                      href="/dashboard"
+                      className="flex items-center py-2 text-sm rounded-lg text-gray-800 hover:bg-gray-100 dark:text-gray-300 dark:hover:bg-gray-700"
+                      onClick={() => setMobileMenuOpen(false)}
+                    >
+                      <User className="mr-2 h-4 w-4" />
+                      Dashboard
+                    </Link>
+                    {isAdmin && (
+                      <Link
+                        href="/admin"
+                        className="flex items-center py-2 text-sm rounded-lg text-gray-800 hover:bg-gray-100 dark:text-gray-300 dark:hover:bg-gray-700"
+                        onClick={() => setMobileMenuOpen(false)}
+                      >
+                        <Shield className="mr-2 h-4 w-4" />
+                        Admin Quarter's
+                      </Link>
+                    )}
                   </div>
                 </div>
-                )}
+              )}
+
               {/* Main dropdowns (always show both) */}
               {mainDropdowns.map((dropdown) => (
                 <div key={dropdown.label} className="space-y-2">
@@ -199,7 +210,7 @@ export default function NavBar() {
                         href={link.href}
                         className={`flex items-center py-2 text-sm rounded-lg transition-colors ${
                           pathname.startsWith(link.href)
-                            ? "bg-gray-200 text-gray-900 font-medium dark:bg-gray-700 dark:text-white"
+                            ? "bg-gray-200 text-gray-900 dark:bg-gray-700 dark:text-white"
                             : "text-gray-800 hover:bg-gray-100 dark:text-gray-300 dark:hover:bg-gray-700"
                         }`}
                         onClick={() => setMobileMenuOpen(false)}
@@ -211,57 +222,39 @@ export default function NavBar() {
                   </div>
                 </div>
               ))}
+
+              {/* Support Link */}
               <Link
                 href="/support"
-                className="flex items-center text-gray-800 py-2 rounded-lg hover:bg-gray-100 dark:text-gray-300 dark:hover:bg-gray-700"
+                className={`flex items-center py-2 text-sm rounded-lg transition-colors ${
+                  pathname.startsWith("/support")
+                    ? "bg-gray-200 text-gray-900 dark:bg-gray-700 dark:text-white"
+                    : "text-gray-800 hover:bg-gray-100 dark:text-gray-300 dark:hover:bg-gray-700"
+                }`}
                 onClick={() => setMobileMenuOpen(false)}
               >
-                <LifeBuoy className="mr-2 h-5 w-5" />
+                <LifeBuoy className="mr-2 h-4 w-4" />
                 Support
               </Link>
-              {/* Theme Toggle for mobile */}
-              <div className="flex justify-center pt-2 border-t border-gray-100 dark:border-gray-700 mt-2">
+
+              {/* Theme Toggle */}
+              <div className="flex items-center py-2">
                 <ThemeToggle />
               </div>
-              {/* Auth/User section for mobile */}
-              <div className="flex items-center space-x-3 pt-2 border-t border-gray-100 dark:border-gray-700 mt-2">
-                {isAuthenticated ? (
-                  <>
-                    <span className="flex items-center text-gray-800 dark:text-white px-2">
-                      <User className="h-5 w-5 mr-1" />
-                      {session?.user?.name}
-                      {isAdmin && (
-                        <span className="ml-2 px-2 py-0.5 bg-gray-800 text-white text-xs rounded-full dark:bg-gray-600">Admin</span>
-                      )}
-                    </span>
-                    <Button
-                      variant="ghost"
-                      className="w-full text-gray-700 hover:bg-gray-100 hover:text-gray-900 focus-visible:ring-2 focus-visible:ring-offset-2 focus-visible:ring-gray-400 dark:text-gray-300 dark:hover:bg-gray-700 dark:hover:text-white dark:focus-visible:ring-gray-500"
-                      onClick={() => { setMobileMenuOpen(false); signOut({ callbackUrl: "/" }) }}
-                    >
-                      <LogOut className="h-5 w-5 mr-1" /> Log out
-                    </Button>
-                  </>
-                ) : (
-                  <>
-                    <Link href="/signin" className="w-full" onClick={() => setMobileMenuOpen(false)}>
-                      <Button
-                        variant="ghost"
-                        className="w-full text-gray-700 hover:bg-gray-100 hover:text-gray-900 focus-visible:ring-2 focus-visible:ring-offset-2 focus-visible:ring-gray-400 dark:text-gray-300 dark:hover:bg-gray-700 dark:hover:text-white dark:focus-visible:ring-gray-500"
-                      >
-                        Sign in
-                      </Button>
-                    </Link>
-                    <Link href="/signup" className="w-full" onClick={() => setMobileMenuOpen(false)}>
-                      <Button
-                        className="w-full bg-gray-800 hover:bg-gray-700 text-white shadow-sm transition-all duration-300 hover:scale-105 focus-visible:ring-2 focus-visible:ring-offset-2 focus-visible:ring-gray-400 dark:bg-gray-700 dark:hover:bg-gray-600 dark:focus-visible:ring-gray-500"
-                      >
-                        Sign up
-                      </Button>
-                    </Link>
-                  </>
-                )}
-              </div>
+
+              {/* Logout Button */}
+              {isAuthenticated && (
+                <button
+                  onClick={() => {
+                    signOut()
+                    setMobileMenuOpen(false)
+                  }}
+                  className="flex items-center w-full py-2 text-sm rounded-lg text-gray-800 hover:bg-gray-100 dark:text-gray-300 dark:hover:bg-gray-700"
+                >
+                  <LogOut className="mr-2 h-4 w-4" />
+                  Logout
+                </button>
+              )}
             </div>
           </div>
         )}

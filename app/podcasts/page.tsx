@@ -10,23 +10,25 @@ export default function PodcastsPage() {
   const isAdmin = session?.user?.role === "admin"
 
   return (
-    <main className="container mx-auto py-8 px-4">
-      <div className="flex justify-between items-center mb-6">
-        <h1 className="text-3xl font-bold text-gray-900 dark:text-gray-100">Sailors Podcasts</h1>
-        <h2 className="text-gray-600 dark:text-gray-400">Listen to the latest episodes</h2>
-        <h3 className="text-gray-600 dark:text-gray-400">Sailors podcast where sailors share their stories, Experiences and voice</h3>
-
+    <main className="container mx-auto py-10 px-4 max-w-5xl">
+      <div className="flex flex-col md:flex-row md:items-center md:justify-between gap-4 mb-8">
+        <div>
+          <h1 className="text-4xl font-extrabold text-gray-900 dark:text-white mb-1 tracking-tight">Sailors Podcasts</h1>
+          <p className="text-lg text-gray-600 dark:text-gray-300 mb-1">Listen to the latest episodes and stories from the sea.</p>
+          <p className="text-base text-gray-500 dark:text-gray-400">Where sailors share their stories, experiences, and voices.</p>
+        </div>
         {isAdmin && (
           <Link href="/podcasts/new">
-            <Button className="bg-gray-600 hover:bg-gray-700 dark:bg-white dark:hover:bg-gray-300 dark:text-black">
-              <Plus className="h-4 w-4 mr-2" />
+            <Button className="bg-gray-500 hover:bg-gray-700 dark:bg-gray-200 dark:hover:bg-gray-400 dark:text-gray-800 text-white font-semibold px-6 py-2 rounded-lg shadow-md flex items-center gap-2">
+              <Plus className="h-5 w-5" />
               New Podcast
             </Button>
           </Link>
         )}
       </div>
-
-      <PodcastList />
+      <section>
+        <PodcastList />
+      </section>
     </main>
   )
 }
