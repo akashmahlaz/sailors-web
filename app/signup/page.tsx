@@ -72,9 +72,9 @@ export default function SignUp() {
 
   return (
     <div className="flex min-h-screen items-center justify-center bg-gradient-to-b from-slate-50 to-white dark:from-slate-900 dark:to-slate-950 px-4 py-12 sm:px-6 lg:px-8">
-      <Card className="w-full max-w-md border-emerald-200 shadow-lg dark:border-emerald-900 dark:shadow-none">
-        <CardHeader className="space-y-1 border-b border-emerald-100 dark:border-emerald-900">
-          <CardTitle className="text-2xl font-bold text-center text-emerald-900 dark:text-emerald-200">Hoist Your Colors</CardTitle>
+      <Card className="w-full max-w-md border-gray-200 shadow-lg dark:border-gray-900 dark:shadow-none">
+        <CardHeader className="space-y-1 border-b border-gray-100 dark:border-gray-900">
+          <CardTitle className="text-2xl font-bold text-center text-gray-900 dark:text-gray-200">Hoist Your Colors</CardTitle>
           <CardDescription className="text-center">
             Enter your information to join our maritime crew or use a social provider
           </CardDescription>
@@ -83,7 +83,7 @@ export default function SignUp() {
           <div className="grid grid-cols-2 gap-4 mb-4">
             <Button
               variant="outline"
-              className="w-full border-emerald-200 text-emerald-700 hover:bg-emerald-50 dark:border-emerald-700 dark:text-emerald-300 dark:hover:bg-emerald-900"
+              className="w-full border-gray-200 text-gray-700 hover:bg-gray-50 dark:border-gray-700 dark:text-gray-300 dark:hover:bg-gray-900"
               onClick={() => handleOAuthSignIn("google")}
               disabled={isLoading}
             >
@@ -110,7 +110,7 @@ export default function SignUp() {
             </Button>
             <Button
               variant="outline"
-              className="w-full border-emerald-200 text-emerald-700 hover:bg-emerald-50 dark:border-emerald-700 dark:text-emerald-300 dark:hover:bg-emerald-900"
+              className="w-full border-gray-200 text-gray-700 hover:bg-gray-50 dark:border-gray-700 dark:text-gray-300 dark:hover:bg-gray-900"
               onClick={() => handleOAuthSignIn("github")}
               disabled={isLoading}
             >
@@ -170,7 +170,7 @@ export default function SignUp() {
                 required
               />
             </div>
-            <Button type="submit" className="w-full bg-emerald-600 hover:bg-emerald-700 text-white" disabled={isLoading}>
+            <Button type="submit" className="w-full bg-gray-600 hover:bg-gray-700 text-white" disabled={isLoading}>
               {isLoading ? "Hoisting Colors..." : "Join the Crew with Email"}
             </Button>
           </form>
@@ -178,7 +178,7 @@ export default function SignUp() {
         <CardFooter className="flex justify-center">
           <p className="text-sm text-slate-600 dark:text-slate-400">
             Already have a ship?{" "}
-            <Link href="/signin" className="text-emerald-600 hover:text-emerald-500 dark:text-emerald-400 dark:hover:text-emerald-300">
+            <Link href="/signin" className="text-gray-600 hover:text-gray-500 dark:text-gray-400 dark:hover:text-gray-300">
               Board Ship
             </Link>
           </p>
