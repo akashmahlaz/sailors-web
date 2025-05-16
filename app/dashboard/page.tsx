@@ -46,9 +46,15 @@ export default function Dashboard() {
                 <p className="text-gray-600 dark:text-gray-400"><span className="font-medium text-gray-700 dark:text-gray-300">Last login:</span> {session?.user?.lastLogin ? new Date(session.user.lastLogin).toLocaleString() : "-"}</p>
                 <p className="text-gray-600 dark:text-gray-400"><span className="font-medium text-gray-700 dark:text-gray-300">Created:</span> {session?.user?.createdAt ? new Date(session.user.createdAt).toLocaleString() : "-"}</p>
                 <p className="text-gray-600 dark:text-gray-400"><span className="font-medium text-gray-700 dark:text-gray-300">Updated:</span> {session?.user?.updatedAt ? new Date(session.user.updatedAt).toLocaleString() : "-"}</p>
+                
+
               </div>
             </div>
             <div className="grid gap-4 grid-cols-1 sm:grid-cols-2 lg:grid-cols-4">
+               <Button onClick={() => router.push("/")} className="bg-gray-700 hover:bg-gray-800 text-white font-medium shadow-sm">
+                Home 
+              </Button>
+              
               <Button onClick={() => router.push("/podcasts")} className="bg-gray-700 hover:bg-gray-800 text-white font-medium shadow-sm">
                 Podcasts
               </Button>
@@ -58,8 +64,14 @@ export default function Dashboard() {
               <Button onClick={() => router.push("/videos")} className="bg-gray-700 hover:bg-gray-800 text-white font-medium shadow-sm">
                 Videos
               </Button>
+              <Button onClick={() => router.push("/audio")} className="bg-gray-700 hover:bg-gray-800 text-white font-medium shadow-sm">
+                Audio   
+              </Button>
               <Button onClick={() => router.push("/photos")} className="bg-gray-700 hover:bg-gray-800 text-white font-medium shadow-sm">
                 Photos
+              </Button>
+             <Button onClick={() => router.push("/blog")} className="bg-gray-700 hover:bg-gray-800 text-white font-medium shadow-sm">
+                Blog
               </Button>
               <Button>
                  <Link

@@ -208,7 +208,7 @@ export default function NewsList() {
             <DropdownMenuTrigger asChild>
               <Button variant="outline" size="sm" className="border-gray-200 dark:border-gray-700 bg-white dark:bg-gray-900 text-gray-700 dark:text-gray-200">
                 <Filter className="h-4 w-4 mr-2" />
-                Chart Course
+                Filter 
               </Button>
             </DropdownMenuTrigger>
             <DropdownMenuContent align="end" className="bg-white dark:bg-gray-900 border-gray-200 dark:border-gray-700">
@@ -244,10 +244,10 @@ export default function NewsList() {
               </DropdownMenuCheckboxItem>
             </DropdownMenuContent>
           </DropdownMenu>
-
+           
+           {/* Refress button Scan Horizon*/}
           <Button variant="outline" size="sm" onClick={() => fetchNews()} className="border-gray-200 dark:border-gray-700 bg-white dark:bg-gray-900 text-gray-700 dark:text-gray-200">
-            <RefreshCw className="h-4 w-4 mr-2" />
-            Scan Horizon
+            <RefreshCw className="h-4 w-2 mr-2" />  
           </Button>
         </div>
       </CardHeader>
