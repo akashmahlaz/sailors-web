@@ -42,6 +42,7 @@ export default function NavBar() {
       label: "Sailor Chronicles",
       icon: Anchor,
       subLinks: [
+        { href: "/", label: "Home", icon: Film },
         { href: "/videos", label: "Shorts", icon: Film },
         { href: "/audio", label: "Sailor's Voice", icon: Music },
         { href: "/photos", label: "Moments", icon: ImageIcon },

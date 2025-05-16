@@ -34,6 +34,7 @@ import {
   Group,
   UserCircle2,
   MicVocal,
+  UserCircle
 } from "lucide-react"
 
 import VideoGallery from "@/components/video-gallery"
@@ -788,7 +789,14 @@ export default function Home() {
                 </Link>
                 <Link href="/profile/me">
                   <Button size="lg" variant="outline" className="border-white text-gray-500 hover:bg-gray-500 hover:text-white">
-                    My Profile <Ship className="ml-2 h-5 w-5" />
+                    <Link
+                      href={`/profile/${session?.user?.id || 'me'}`}
+                      className="flex items-center py-2 text-sm rounded-lg text-gray-800  dark:text-gray-300 "
+                      
+                    >
+                      <UserCircle className="mr-2 h-4 w-4" />
+                      Profile
+                    </Link>
                   </Button>
                 </Link>
               </>
