@@ -146,7 +146,11 @@ export default function NavBar() {
               {/* Home Link */}
               <Link
                 href="/"
-                className="flex items-center py-2 text-sm rounded-lg text-gray-800 hover:bg-gray-100 dark:text-gray-300 dark:hover:bg-gray-700"
+                className={`flex items-center py-2 text-sm rounded-lg transition-colors ${
+                  pathname === "/"
+                    ? "bg-gray-200 text-gray-900 dark:bg-gray-700 dark:text-white"
+                    : "text-gray-800 hover:bg-gray-100 dark:text-gray-300 dark:hover:bg-gray-700"
+                }`}
                 onClick={() => setMobileMenuOpen(false)}
               >
                 <Sailboat className="mr-2 h-4 w-4" />
@@ -206,21 +210,27 @@ export default function NavBar() {
                     {dropdown.label}
                   </div>
                   <div className="pl-7 space-y-2">
-                    {dropdown.subLinks.map((link) => (
-                      <Link
-                        key={link.href}
-                        href={link.href}
-                        className={`flex items-center py-2 text-sm rounded-lg transition-colors ${
-                          pathname.startsWith(link.href)
-                            ? "bg-gray-200 text-gray-900 dark:bg-gray-700 dark:text-white"
-                            : "text-gray-800 hover:bg-gray-100 dark:text-gray-300 dark:hover:bg-gray-700"
-                        }`}
-                        onClick={() => setMobileMenuOpen(false)}
-                      >
-                        <link.icon className="mr-2 h-4 w-4" />
-                        {link.label}
-                      </Link>
-                    ))}
+                    {dropdown.subLinks
+                      .filter(link => !(dropdown.label === "Sailor Chronicles" && link.href === "/"))
+                      .map((link) => (
+                        <Link
+                          key={link.href}
+                          href={link.href}
+                          className={`flex items-center py-2 text-sm rounded-lg transition-colors ${
+                            link.href === "/"
+                              ? pathname === "/"
+                                ? "bg-gray-200 text-gray-900 dark:bg-gray-700 dark:text-white"
+                                : "text-gray-800 hover:bg-gray-100 dark:text-gray-300 dark:hover:bg-gray-700"
+                              : pathname.startsWith(link.href)
+                                ? "bg-gray-200 text-gray-900 dark:bg-gray-700 dark:text-white"
+                                : "text-gray-800 hover:bg-gray-100 dark:text-gray-300 dark:hover:bg-gray-700"
+                          }`}
+                          onClick={() => setMobileMenuOpen(false)}
+                        >
+                          <link.icon className="mr-2 h-4 w-4" />
+                          {link.label}
+                        </Link>
+                      ))}
                   </div>
                 </div>
               ))}
