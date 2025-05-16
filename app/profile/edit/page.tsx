@@ -8,7 +8,7 @@ export const metadata: Metadata = {
 
 export default function EditProfilePage() {
   return (
-    <div className="min-h-screen bg-gradient-to-b from-slate-50 to-cyan-50 dark:from-slate-950 dark:to-cyan-950">
+    <div className="min-h-screen bg-gradient-to-b from-slate-50 to-cyan-50 dark:from-slate-950 dark:to-gray-700">
       <ProfileEditForm />
     </div>
   )

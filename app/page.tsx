@@ -310,7 +310,7 @@ export default function Home() {
                   <span className="relative z-10">
                     Discover the Sailor's World
                   </span>
-                  <span className="absolute bottom-2 left-0 w-full h-3 bg-gray-400 rounded-full -z-10"></span>
+                  {/* <span className="absolute bottom-2 left-0 w-full h-3 bg-gray-400 rounded-full -z-10"></span> */}
                 </span>
               </motion.h1>
 
@@ -321,19 +321,19 @@ export default function Home() {
 
               <motion.div className="flex flex-wrap gap-4" variants={fadeIn}>
                 <Link href="/videos">
-                  <Button size="lg" className="bg-gray-100 hover:bg-gray-200 text-gray-900 border border-gray-400 dark:bg-gray-800 dark:hover:bg-gray-700 dark:text-gray-100 dark:border-gray-600 transition-colors">
+                  <Button size="lg" className="bg-gray-300 hover:bg-gray-200 text-gray-900 border border-gray-400 dark:bg-gray-800 dark:hover:bg-gray-700 dark:text-gray-100 dark:border-gray-600 transition-colors">
                     Explore Content <Compass className="ml-2 h-5 w-5 text-gray-600 dark:text-gray-300" />
                   </Button>
                 </Link>
                 {!isAuthenticated ? (
                   <Link href="/signup">
-                    <Button size="lg" variant="outline" className="rounded-xl border-gray-400 bg-gray-100 text-gray-700 hover:bg-gray-200 hover:text-gray-900 hover:border-gray-500 border transition-colors dark:bg-gray-900 dark:text-gray-100 dark:border-gray-600 dark:hover:bg-gray-800 dark:hover:text-white dark:hover:border-gray-400">
+                    <Button size="lg" variant="outline" className="rounded-xl border-gray-400 bg-gray-300 text-gray-700 hover:bg-gray-200 hover:text-gray-900 hover:border-gray-500 border transition-colors dark:bg-gray-900 dark:text-gray-100 dark:border-gray-600 dark:hover:bg-gray-800 dark:hover:text-white dark:hover:border-gray-400">
                       Join the Crew <Anchor className="ml-2 h-5 w-5 text-gray-600 dark:text-gray-300" />
                     </Button>
                   </Link>
                 ) : (
                   <Link href="/community">
-                    <Button size="lg" variant="outline" className=" border-gray-400 bg-gray-100 text-gray-700 hover:bg-gray-200 hover:text-gray-900 hover:border-gray-500 border transition-colors dark:bg-gray-800 dark:text-gray-100 dark:border-gray-600 dark:hover:bg-gray-700 dark:hover:text-white dark:hover:border-gray-400">
+                    <Button size="lg" variant="outline" className=" border-gray-400 bg-gray-300 text-gray-700 hover:bg-gray-200 hover:text-gray-900 hover:border-gray-500 border transition-colors dark:bg-gray-800 dark:text-gray-100 dark:border-gray-600 dark:hover:bg-gray-700 dark:hover:text-white dark:hover:border-gray-400">
                       Community <UserCircle2 className="ml-2 h-5 w-5 text-gray-600 dark:text-gray-300" />
                     </Button>
                   </Link>
@@ -392,7 +392,7 @@ export default function Home() {
         </div>
 
         {/* Bottom wave */}
-        <div className="absolute bottom-0 left-0 right-0">
+        <div className="absolute bg-gray-300 bottom-0 left-0 right-0">
           <svg
             viewBox="0 0 1440 120"
             fill="none"
@@ -403,14 +403,14 @@ export default function Home() {
             <path
               d="M0 120L48 105C96 90 192 60 288 55C384 50 480 70 576 75C672 80 768 70 864 65C960 60 1056 60 1152 65C1248 70 1344 80 1392 85L1440 90V120H1392C1344 120 1248 120 1152 120C1056 120 960 120 864 120C768 120 672 120 576 120C480 120 384 120 288 120C192 120 96 120 48 120H0Z"
               fill="white"
-              className="dark:fill-slate-900"
+              className=" dark:fill-slate-900"
             />
           </svg>
         </div>
       </section>
 
       {/* Trending Now Section */}
-      <section className="py-12 bg-gray-100 dark:bg-gray-900">
+      <section className="py-12 bg-gray-200 dark:bg-gray-900">
         <div className="container mx-auto px-4">
           <div className="flex items-center justify-between mb-8">
         <div className="flex items-center gap-3">
@@ -528,7 +528,7 @@ export default function Home() {
 
       {/* Rest of the sections remain unchanged */}
       {/* Media Categories */}
-      <section className="py-12 bg-gray-50 dark:bg-gray-900">
+      <section className="py-12 bg-gray-300 dark:bg-gray-900">
         <div className="container mx-auto px-4">
           <h2 className="text-2xl font-bold text-slate-900 dark:text-white mb-8 text-center">
             Explore Maritime Content
@@ -582,7 +582,7 @@ export default function Home() {
       </section>
 
       {/* Featured Videos Section */}
-      <section className="py-12 bg-white dark:bg-gray-900">
+      <section className="py-12 bg-gray-300 dark:bg-gray-900">
         <div className="container mx-auto px-4">
           <div className="flex items-center justify-between mb-6">
             <div className="flex items-center gap-2">
@@ -604,7 +604,7 @@ export default function Home() {
       </section>
 
       {/* Featured Sailors Section */}
-      <section className="py-12 bg-gradient-to-b from-gray-50 to-white dark:from-gray-900 dark:to-gray-900">
+      <section className="py-12 bg-gradient-to-b from-gray-300 to-white dark:from-gray-900 dark:to-gray-900">
         <div className="container mx-auto px-4">
           <div className="flex items-center justify-between mb-8">
             <div className="flex items-center gap-2">
@@ -681,7 +681,7 @@ export default function Home() {
       </section>
 
       {/* Featured Podcasts Section */}
-      <section className="py-12 bg-white dark:bg-slate-900">
+      <section className="py-12 bg-gray-200 dark:bg-slate-900">
         <div className="container mx-auto px-4">
           <div className="flex items-center justify-between mb-8">
             <div className="flex items-center gap-2">
@@ -770,7 +770,7 @@ export default function Home() {
             {!isAuthenticated ? (
               <>
                 <Link href="/signup">
-                  <Button size="lg" className="bg-white text-gray-800 hover:bg-gray-100">
+                  <Button size="lg" className="bg-white text-gray-800 hover:bg-gray-300">
                     Signup <Users className="ml-2 h-5 w-5" />
                   </Button>
                 </Link>
@@ -783,7 +783,7 @@ export default function Home() {
             ) : (
               <>
                 <Link href="/photos">
-                  <Button size="lg" className="bg-white text-gray-800 hover:bg-gray-100">
+                  <Button size="lg" className="bg-white text-gray-800 hover:bg-gray-300">
                     Share Moments of Sea <Upload className="ml-2 h-5 w-5" />
                   </Button>
                 </Link>

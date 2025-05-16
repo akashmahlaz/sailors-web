@@ -87,7 +87,7 @@ export default function ProfileHeader({
   return (
     <div className="relative">
       {/* Cover Image */}
-      <div className="h-48 md:h-64 w-full bg-gradient-to-r from-cyan-500 to-blue-500 relative overflow-hidden">
+      <div className="h-48 md:h-64 w-full bg-gradient-to-r from-gray-500 to-slate-700 relative overflow-hidden">
         {profile.coverImage && (
           <img
             src={profile.coverImage || "/placeholder.svg"}
@@ -104,7 +104,7 @@ export default function ProfileHeader({
           <div className="flex-shrink-0">
             <Avatar className="h-32 w-32 border-4 border-white dark:border-slate-900 shadow-lg">
               <AvatarImage src={profile.profileImage || "/placeholder.svg"} alt={profile.name} />
-              <AvatarFallback className="text-3xl bg-cyan-100 text-cyan-800 dark:bg-cyan-900 dark:text-cyan-100">
+              <AvatarFallback className="text-3xl bg-slate-100 text-slate-800 dark:bg-slate-800 dark:text-slate-300">
                 {getInitials(profile.name)}
               </AvatarFallback>
             </Avatar>
@@ -117,7 +117,7 @@ export default function ProfileHeader({
                 <h1 className="text-2xl font-bold text-slate-900 dark:text-slate-100 flex items-center gap-2">
                   {profile.name}
                   {profile.role === "admin" && (
-                    <Badge className="bg-cyan-100 text-cyan-800 dark:bg-cyan-900 dark:text-cyan-100">
+                    <Badge className="bg-slate-100 text-slate-800 dark:bg-slate-900 dark:text-slate-100">
                       <Ship className="h-3 w-3 mr-1" />
                       Captain
                     </Badge>
@@ -136,7 +136,7 @@ export default function ProfileHeader({
                     <Users className="h-4 w-4" />
                     <Link
                       href={`/profile/${profile.userId}/followers`}
-                      className="hover:text-cyan-600 dark:hover:text-cyan-400"
+                      className="hover:text-slate-600 dark:hover:text-slate-400"
                     >
                       <span className="font-medium text-slate-900 dark:text-slate-100">{followerCount}</span> Followers
                     </Link>
@@ -146,7 +146,7 @@ export default function ProfileHeader({
                     <Users className="h-4 w-4" />
                     <Link
                       href={`/profile/${profile.userId}/following`}
-                      className="hover:text-cyan-600 dark:hover:text-cyan-400"
+                      className="hover:text-slate-600 dark:hover:text-slate-400"
                     >
                       <span className="font-medium text-slate-900 dark:text-slate-100">{followingCount}</span> Following
                     </Link>
@@ -159,7 +159,7 @@ export default function ProfileHeader({
                   <Button
                     onClick={() => router.push("/profile/edit")}
                     variant="outline"
-                    className="border-cyan-200 dark:border-cyan-900"
+                    className="border-slate-200 dark:border-slate-900"
                   >
                     <Edit className="h-4 w-4 mr-2" />
                     Edit Profile
@@ -171,8 +171,8 @@ export default function ProfileHeader({
                     variant={isFollowing ? "outline" : "default"}
                     className={
                       isFollowing
-                        ? "border-cyan-200 dark:border-cyan-900"
-                        : "bg-cyan-600 hover:bg-cyan-700 dark:bg-cyan-700 dark:hover:bg-cyan-600"
+                        ? "border-slate-200 dark:border-slate-900"
+                        : "bg-slate-600 hover:bg-slate-700 dark:bg-slate-700 dark:hover:bg-slate-600"
                     }
                   >
                     {isFollowing ? "Unfollow" : "Follow"}
@@ -190,7 +190,7 @@ export default function ProfileHeader({
                     href={profile.socialLinks.website}
                     target="_blank"
                     rel="noopener noreferrer"
-                    className="text-cyan-600 dark:text-cyan-400 hover:text-cyan-800 dark:hover:text-cyan-300 flex items-center gap-1"
+                    className="text-slate-600 dark:text-slate-400 hover:text-slate-800 dark:hover:text-slate-300 flex items-center gap-1"
                   >
                     <Anchor className="h-4 w-4" />
                     Website
@@ -208,25 +208,25 @@ export default function ProfileHeader({
             <TabsList className="bg-transparent h-12">
               <TabsTrigger
                 value="content"
-                className="data-[state=active]:bg-cyan-100 dark:data-[state=active]:bg-cyan-900"
+                className="data-[state=active]:bg-slate-100 dark:data-[state=active]:bg-slate-900"
               >
                 Content
               </TabsTrigger>
               <TabsTrigger
                 value="about"
-                className="data-[state=active]:bg-cyan-100 dark:data-[state=active]:bg-cyan-900"
+                className="data-[state=active]:bg-slate-100 dark:data-[state=active]:bg-slate-900"
               >
                 About
               </TabsTrigger>
               <TabsTrigger
                 value="followers"
-                className="data-[state=active]:bg-cyan-100 dark:data-[state=active]:bg-cyan-900"
+                className="data-[state=active]:bg-slate-100 dark:data-[state=active]:bg-slate-900"
               >
                 Followers
               </TabsTrigger>
               <TabsTrigger
                 value="following"
-                className="data-[state=active]:bg-cyan-100 dark:data-[state=active]:bg-cyan-900"
+                className="data-[state=active]:bg-slate-100 dark:data-[state=active]:bg-slate-900"
               >
                 Following
               </TabsTrigger>

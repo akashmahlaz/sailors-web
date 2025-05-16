@@ -161,7 +161,7 @@ export default function ProfileEditForm() {
   if (loading) {
     return (
       <div className="container mx-auto px-4 py-8 text-center">
-        <div className="animate-spin h-8 w-8 border-4 border-cyan-600 border-t-transparent rounded-full mx-auto mb-4"></div>
+        <div className="animate-spin h-8 w-8 border-4 border-slate-600 border-t-transparent rounded-full mx-auto mb-4"></div>
         <p>Loading profile...</p>
       </div>
     )
@@ -169,9 +169,9 @@ export default function ProfileEditForm() {
 
   return (
     <div className="container mx-auto px-4 py-8">
-      <Card className="max-w-3xl mx-auto border-cyan-200 shadow-lg shadow-cyan-100 dark:border-cyan-900 dark:shadow-none">
-        <CardHeader className="bg-gradient-to-r from-cyan-50 to-slate-50 dark:from-slate-900 dark:to-cyan-950 border-b border-cyan-100 dark:border-cyan-900">
-          <CardTitle className="text-cyan-900 dark:text-cyan-100">Edit Your Profile</CardTitle>
+      <Card className="max-w-3xl mx-auto border-slate-200 shadow-lg shadow-slate-100 dark:border-slate-900 dark:shadow-none">
+        <CardHeader className="bg-gradient-to-r from-slate-50 to-slate-50 dark:from-slate-900 dark:to-slate-950 border-b border-slate-100 dark:border-slate-900">
+          <CardTitle className="text-slate-900 dark:text-slate-100">Edit Your Profile</CardTitle>
           <CardDescription>Update your personal information and profile images</CardDescription>
         </CardHeader>
 
@@ -201,7 +201,7 @@ export default function ProfileEditForm() {
                 id="name"
                 value={name}
                 onChange={(e) => setName(e.target.value)}
-                className="border-cyan-200 dark:border-cyan-900"
+                className="border-slate-200 dark:border-slate-900"
                 required
               />
             </div>
@@ -213,7 +213,7 @@ export default function ProfileEditForm() {
                 value={bio}
                 onChange={(e) => setBio(e.target.value)}
                 placeholder="Tell others about yourself..."
-                className="border-cyan-200 dark:border-cyan-900"
+                className="border-slate-200 dark:border-slate-900"
                 rows={4}
               />
             </div>
@@ -225,7 +225,7 @@ export default function ProfileEditForm() {
                 value={location}
                 onChange={(e) => setLocation(e.target.value)}
                 placeholder="e.g., 'Pacific Ocean' or 'San Francisco, CA'"
-                className="border-cyan-200 dark:border-cyan-900"
+                className="border-slate-200 dark:border-slate-900"
               />
             </div>
 
@@ -237,13 +237,13 @@ export default function ProfileEditForm() {
                 value={website}
                 onChange={(e) => setWebsite(e.target.value)}
                 placeholder="https://yourwebsite.com"
-                className="border-cyan-200 dark:border-cyan-900"
+                className="border-slate-200 dark:border-slate-900"
               />
             </div>
 
             <div className="space-y-2">
               <Label>Profile Image</Label>
-              <div className="border border-cyan-200 dark:border-cyan-900 rounded-md p-4 bg-slate-50 dark:bg-slate-900">
+              <div className="border border-slate-200 dark:border-slate-900 rounded-md p-4 bg-slate-50 dark:bg-slate-900">
                 {profileImage ? (
                   <div className="flex items-center gap-4">
                     <img
@@ -275,7 +275,7 @@ export default function ProfileEditForm() {
                       uploadPreset={process.env.NEXT_PUBLIC_UPLOAD_PRESET || ""}
                       resourceType="image"
                     >
-                      <Button type="button" variant="outline" className="border-cyan-200 dark:border-cyan-900">
+                      <Button type="button" variant="outline" className="border-slate-200 dark:border-slate-900">
                         <Upload className="h-4 w-4 mr-2" />
                         Upload Profile Image
                       </Button>
@@ -287,7 +287,7 @@ export default function ProfileEditForm() {
 
             <div className="space-y-2">
               <Label>Cover Image</Label>
-              <div className="border border-cyan-200 dark:border-cyan-900 rounded-md p-4 bg-slate-50 dark:bg-slate-900">
+              <div className="border border-slate-200 dark:border-slate-900 rounded-md p-4 bg-slate-50 dark:bg-slate-900">
                 {coverImage ? (
                   <div className="space-y-4">
                     <img
@@ -319,7 +319,7 @@ export default function ProfileEditForm() {
                       uploadPreset={process.env.NEXT_PUBLIC_UPLOAD_PRESET || ""}
                       resourceType="image"
                     >
-                      <Button type="button" variant="outline" className="border-cyan-200 dark:border-cyan-900">
+                      <Button type="button" variant="outline" className="border-slate-200 dark:border-slate-900">
                         <Upload className="h-4 w-4 mr-2" />
                         Upload Cover Image
                       </Button>
@@ -330,20 +330,20 @@ export default function ProfileEditForm() {
             </div>
           </CardContent>
 
-          <CardFooter className="flex justify-between border-t border-cyan-100 dark:border-cyan-900 bg-gradient-to-r from-slate-50 to-cyan-50 dark:from-slate-900 dark:to-cyan-950 py-4">
+          <CardFooter className="flex justify-between border-t border-slate-100 dark:border-slate-900 bg-gradient-to-r from-slate-50 to-slate-50 dark:from-slate-900 dark:to-slate-950 py-4">
             <Button
               type="button"
               variant="outline"
               onClick={() => router.back()}
               disabled={saving}
-              className="border-cyan-200 dark:border-cyan-900"
+              className="border-slate-200 dark:border-slate-900"
             >
               Cancel
             </Button>
             <Button
               type="submit"
               disabled={saving}
-              className="bg-cyan-600 hover:bg-cyan-700 dark:bg-cyan-700 dark:hover:bg-cyan-600"
+              className="bg-slate-600 hover:bg-slate-700 dark:bg-slate-700 dark:hover:bg-slate-600"
             >
               {saving ? "Saving..." : "Save Profile"}
             </Button>
