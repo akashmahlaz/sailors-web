@@ -264,7 +264,7 @@ export default function Home() {
   return (
     <div className="flex flex-col min-h-screen">
       {/* Light Gray Hero Section */}
-      <section className="relative bg-gradient-to-b from-gray-600 to-gray-200 overflow-hidden">
+      <section className="relative bg-gradient-to-b from-gray-700 to-gray-200 overflow-hidden">
         {/* Subtle Pattern Overlay */}
         <div className="absolute inset-0 opacity-5">
           <svg width="100%" height="100%" xmlns="http://www.w3.org/2000/svg">
@@ -278,8 +278,8 @@ export default function Home() {
         </div>
 
         {/* Decorative Elements */}
-        <div className="absolute top-20 right-10 w-64 h-64 bg-gradient-to-br from-gray-300/40 to-gray-400/20 rounded-full blur-3xl"></div>
-        <div className="absolute bottom-10 left-10 w-40 h-40 bg-gradient-to-tr from-gray-300/40 to-gray-400/20 rounded-full blur-3xl"></div>
+        <div className="absolute top-20 right-10 w-64 h-64 bg-gradient-to-br from-gray-400/40 to-gray-500/20 rounded-full blur-3xl"></div>
+        <div className="absolute bottom-10 left-10 w-40 h-40 bg-gradient-to-tr from-gray-400/40 to-gray-500/20 rounded-full blur-3xl"></div>
 
         <div className="container mx-auto px-4 py-16 md:py-24 relative z-10">
           <div className="grid grid-cols-1 lg:grid-cols-2 gap-12 items-center">
@@ -297,44 +297,44 @@ export default function Home() {
               }}
             >
               <motion.div variants={fadeIn} className="mb-6">
-                <Badge className="px-3 py-1 text-sm bg-gray-700 text-white border-none">
-                  <Sparkles className="w-4 h-4 mr-1" /> Maritime Community
+                <Badge className="px-3 py-1 text-sm bg-gray-800 text-white border-none">
+                  <Sparkles className="w-4 h-4 mr-1 text-gray-300" /> Maritime Community
                 </Badge>
               </motion.div>
 
               <motion.h1
-                className="text-4xl sm:text-5xl md:text-6xl font-bold mb-6 text-gray-800 leading-tight"
+                className="text-4xl sm:text-5xl md:text-6xl font-bold mb-6 text-gray-900 leading-tight"
                 variants={fadeIn}
               >
                 <span className="relative">
                   <span className="relative z-10">
                     Discover the Sailor's World
                   </span>
-                  <span className="absolute bottom-2 left-0 w-full h-3 bg-gray-300 rounded-full -z-10"></span>
+                  <span className="absolute bottom-2 left-0 w-full h-3 bg-gray-400 rounded-full -z-10"></span>
                 </span>
               </motion.h1>
 
-              <motion.p className="text-lg md:text-xl mb-8 text-gray-600 max-w-lg" variants={fadeIn}>
+              <motion.p className="text-lg md:text-xl mb-8 text-gray-700 max-w-lg" variants={fadeIn}>
                 Connect with fellow sailors, share your maritime adventures, and explore a sea of content created by our
                 vibrant community.
               </motion.p>
 
               <motion.div className="flex flex-wrap gap-4" variants={fadeIn}>
                 <Link href="/videos">
-                  <Button size="lg" className="bg-gray-200 hover:bg-gray-300 text-gray-800 border border-gray-400 dark:bg-gray-800 dark:hover:bg-gray-700 dark:text-gray-100 dark:border-gray-600 transition-colors">
-                    Explore Content <Compass className="ml-2 h-5 w-5" />
+                  <Button size="lg" className="bg-gray-100 hover:bg-gray-200 text-gray-900 border border-gray-400 dark:bg-gray-800 dark:hover:bg-gray-700 dark:text-gray-100 dark:border-gray-600 transition-colors">
+                    Explore Content <Compass className="ml-2 h-5 w-5 text-gray-600 dark:text-gray-300" />
                   </Button>
                 </Link>
                 {!isAuthenticated ? (
                   <Link href="/signup">
-                    <Button size="lg" variant="outline" className="rounded-xl border-gray-400 bg-gray-200 text-gray-700 hover:bg-gray-300 hover:text-gray-900 hover:border-gray-500 border transition-colors dark:bg-gray-900 dark:text-gray-100 dark:border-gray-600 dark:hover:bg-gray-800 dark:hover:text-white dark:hover:border-gray-400">
-                      Join the Crew <Anchor className="ml-2 h-5 w-5" />
+                    <Button size="lg" variant="outline" className="rounded-xl border-gray-400 bg-gray-100 text-gray-700 hover:bg-gray-200 hover:text-gray-900 hover:border-gray-500 border transition-colors dark:bg-gray-900 dark:text-gray-100 dark:border-gray-600 dark:hover:bg-gray-800 dark:hover:text-white dark:hover:border-gray-400">
+                      Join the Crew <Anchor className="ml-2 h-5 w-5 text-gray-600 dark:text-gray-300" />
                     </Button>
                   </Link>
                 ) : (
                   <Link href="/community">
-                    <Button size="lg" variant="outline" className=" border-gray-400 bg-gray-200 text-gray-700 hover:bg-gray-300 hover:text-gray-900 hover:border-gray-500 border transition-colors dark:bg-gray-800 dark:text-gray-100 dark:border-gray-600 dark:hover:bg-gray-700 dark:hover:text-white dark:hover:border-gray-400">
-                      Community <UserCircle2 className="ml-2 h-5 w-5" />
+                    <Button size="lg" variant="outline" className=" border-gray-400 bg-gray-100 text-gray-700 hover:bg-gray-200 hover:text-gray-900 hover:border-gray-500 border transition-colors dark:bg-gray-800 dark:text-gray-100 dark:border-gray-600 dark:hover:bg-gray-700 dark:hover:text-white dark:hover:border-gray-400">
+                      Community <UserCircle2 className="ml-2 h-5 w-5 text-gray-600 dark:text-gray-300" />
                     </Button>
                   </Link>
                 )}

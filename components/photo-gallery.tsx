@@ -1,6 +1,7 @@
 "use client"
 
 import { useEffect, useState, forwardRef, useImperativeHandle } from "react"
+import React from "react"
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card"
 import { Skeleton } from "@/components/ui/skeleton"
 import {
@@ -57,6 +58,89 @@ interface Comment {
 
 export interface PhotoGalleryRef {
   fetchPhotos: () => Promise<void>
+}
+
+function ZoomableImage({ src, alt, onSwipeLeft, onSwipeRight }: { src: string, alt: string, onSwipeLeft: () => void, onSwipeRight: () => void }) {
+  const imgRef = React.useRef<HTMLImageElement>(null)
+  const [zoom, setZoom] = React.useState(1)
+  const [offset, setOffset] = React.useState({ x: 0, y: 0 })
+  const [dragging, setDragging] = React.useState(false)
+  const [start, setStart] = React.useState<{ x: number, y: number } | null>(null)
+  const [touchStart, setTouchStart] = React.useState<{ x: number, y: number, time: number } | null>(null)
+  const [lastTap, setLastTap] = React.useState<number>(0)
+
+  // Double-tap/double-click to zoom
+  const handleDoubleClick = (e: React.MouseEvent | React.TouchEvent) => {
+    setZoom((z) => (z === 1 ? 2 : 1))
+    setOffset({ x: 0, y: 0 })
+  }
+
+  // Mouse drag to pan
+  const handleMouseDown = (e: React.MouseEvent) => {
+    if (zoom === 1) return
+    setDragging(true)
+    setStart({ x: e.clientX - offset.x, y: e.clientY - offset.y })
+  }
+  const handleMouseMove = (e: React.MouseEvent) => {
+    if (!dragging || zoom === 1) return
+    setOffset({ x: e.clientX - (start?.x || 0), y: e.clientY - (start?.y || 0) })
+  }
+  const handleMouseUp = () => setDragging(false)
+
+  // Touch drag to pan, swipe to navigate, double-tap to zoom
+  const handleTouchStart = (e: React.TouchEvent) => {
+    if (e.touches.length === 1) {
+      const now = Date.now()
+      if (now - lastTap < 300) {
+        handleDoubleClick(e)
+        setLastTap(0)
+      } else {
+        setLastTap(now)
+        setTouchStart({ x: e.touches[0].clientX, y: e.touches[0].clientY, time: now })
+      }
+    }
+  }
+  const handleTouchMove = (e: React.TouchEvent) => {
+    if (zoom === 1 || e.touches.length !== 1 || !touchStart) return
+    setOffset({
+      x: e.touches[0].clientX - touchStart.x,
+      y: e.touches[0].clientY - touchStart.y,
+    })
+  }
+  const handleTouchEnd = (e: React.TouchEvent) => {
+    if (!touchStart) return
+    const dx = (offset.x || 0)
+    if (zoom === 1 && Math.abs(dx) > 60) {
+      if (dx < 0) onSwipeLeft()
+      else onSwipeRight()
+    }
+    setDragging(false)
+    setTouchStart(null)
+    setOffset({ x: 0, y: 0 })
+  }
+
+  return (
+    <img
+      ref={imgRef}
+      src={src}
+      alt={alt}
+      className="max-h-full max-w-full object-contain select-none touch-none cursor-zoom-in"
+      style={{
+        transform: `scale(${zoom}) translate(${offset.x / zoom}px, ${offset.y / zoom}px)`,
+        transition: dragging ? "none" : "transform 0.2s cubic-bezier(.4,2,.6,1)",
+        touchAction: "none",
+      }}
+      onDoubleClick={handleDoubleClick}
+      onMouseDown={handleMouseDown}
+      onMouseMove={handleMouseMove}
+      onMouseUp={handleMouseUp}
+      onMouseLeave={handleMouseUp}
+      onTouchStart={handleTouchStart}
+      onTouchMove={handleTouchMove}
+      onTouchEnd={handleTouchEnd}
+      draggable={false}
+    />
+  )
 }
 
 const PhotoGallery = forwardRef<PhotoGalleryRef>((props, ref) => {
@@ -409,12 +493,12 @@ const PhotoGallery = forwardRef<PhotoGalleryRef>((props, ref) => {
               <div
                 key={photo.id}
                 className="relative group aspect-square rounded-md overflow-hidden cursor-pointer bg-gradient-to-b from-white to-gray-50 shadow-sm hover:shadow-md transition-all"
+                onClick={() => handlePhotoSelect(photo)}
               >
                 <img
                   src={photo.url || "/placeholder.svg"}
                   alt={photo.title}
                   className="w-full h-full object-cover transition-transform group-hover:scale-105"
-                  onClick={() => handlePhotoSelect(photo)}
                 />
                 <div className="absolute inset-0 bg-gradient-to-t from-black/60 via-black/20 to-transparent opacity-0 group-hover:opacity-100 transition-opacity flex flex-col justify-end p-3">
                   <h3 className="font-medium text-white truncate">{photo.title}</h3>
@@ -474,20 +558,21 @@ const PhotoGallery = forwardRef<PhotoGalleryRef>((props, ref) => {
 
         {/* Photo Lightbox */}
         <Dialog open={!!selectedPhoto} onOpenChange={(open) => !open && setSelectedPhoto(null)}>
-          <DialogContent className="max-w-5xl w-full p-0 h-[90vh] flex flex-col md:flex-row">
-            <div className="relative flex-1 flex items-center justify-center bg-black">
+          <DialogContent className="w-full max-w-full sm:max-w-3xl md:max-w-5xl p-0 h-[90vh] max-h-[90dvh] flex flex-col md:flex-row min-h-0 overflow-hidden">
+            <div className="relative flex-1 flex items-center justify-center bg-black min-h-0 overflow-hidden w-full">
               {selectedPhoto && (
-                <img
+                <ZoomableImage
                   src={selectedPhoto.url || "/placeholder.svg"}
                   alt={selectedPhoto.title}
-                  className="max-h-full max-w-full object-contain"
+                  onSwipeLeft={() => navigatePhoto("next")}
+                  onSwipeRight={() => navigatePhoto("prev")}
                 />
               )}
 
               <Button
                 variant="ghost"
                 size="icon"
-                className="absolute top-2 right-2 text-white hover:bg-black/20"
+                className="absolute top-2 right-2 text-white hover:bg-black/20 z-10"
                 onClick={() => setSelectedPhoto(null)}
               >
                 <X className="h-6 w-6" />
@@ -496,7 +581,7 @@ const PhotoGallery = forwardRef<PhotoGalleryRef>((props, ref) => {
               <Button
                 variant="ghost"
                 size="icon"
-                className="absolute left-2 top-1/2 -translate-y-1/2 text-white hover:bg-black/20"
+                className="absolute left-2 top-1/2 -translate-y-1/2 text-white hover:bg-black/20 z-10"
                 onClick={() => navigatePhoto("prev")}
               >
                 <ChevronLeft className="h-8 w-8" />
@@ -505,14 +590,14 @@ const PhotoGallery = forwardRef<PhotoGalleryRef>((props, ref) => {
               <Button
                 variant="ghost"
                 size="icon"
-                className="absolute right-2 top-1/2 -translate-y-1/2 text-white hover:bg-black/20"
+                className="absolute right-2 top-1/2 -translate-y-1/2 text-white hover:bg-black/20 z-10"
                 onClick={() => navigatePhoto("next")}
               >
                 <ChevronRight className="h-8 w-8" />
               </Button>
 
               {/* Social buttons */}
-              <div className="absolute bottom-4 left-1/2 -translate-x-1/2 flex items-center gap-4">
+              <div className="absolute bottom-4 left-1/2 -translate-x-1/2 flex items-center gap-4 z-10">
                 <Button
                   variant="ghost"
                   size="icon"
@@ -553,8 +638,8 @@ const PhotoGallery = forwardRef<PhotoGalleryRef>((props, ref) => {
             </div>
 
             {selectedPhoto && (
-              <div className="w-full md:w-96 bg-white border-t md:border-t-0 md:border-l border-gray-200 flex flex-col">
-                <Tabs value={activeTab} onValueChange={setActiveTab} className="flex-1 flex flex-col">
+              <div className="w-full md:w-96 bg-white border-t md:border-t-0 md:border-l border-gray-200 flex flex-col min-h-0 max-h-[50vh] md:max-h-full overflow-y-auto">
+                <Tabs value={activeTab} onValueChange={setActiveTab} className="flex-1 flex flex-col min-h-0">
                   <TabsList className="grid w-full grid-cols-2 p-0 h-12">
                     <TabsTrigger value="info" className="rounded-none data-[state=active]:bg-gray-100">
                       <Info className="h-4 w-4 mr-2" />

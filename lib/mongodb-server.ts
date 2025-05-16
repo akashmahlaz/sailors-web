@@ -128,3 +128,9 @@ export async function getAdminNotificationsCollection() {
   const db = client.db("sailor_platform")
   return db.collection("admin_notifications")
 }
+
+export async function getPostsCollection() {
+  const client = await clientPromise;
+  const db = client.db("sailor_platform");
+  return db.collection("posts");
+}

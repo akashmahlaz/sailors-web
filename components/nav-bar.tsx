@@ -23,6 +23,7 @@ import {
   UserCircle,
   Search,
   Menu,
+  HomeIcon,
 } from "lucide-react"
 import { ThemeToggle } from "./theme-toggle"
 import { useNotifications } from "@/hooks/use-notifications"
@@ -42,7 +43,7 @@ export default function NavBar() {
       label: "Sailor Chronicles",
       icon: Anchor,
       subLinks: [
-        { href: "/", label: "Home", icon: Film },
+        { href: "/", label: "Home", icon: HomeIcon},
         { href: "/videos", label: "Shorts", icon: Film },
         { href: "/audio", label: "Sailor's Voice", icon: Music },
         { href: "/photos", label: "Moments", icon: ImageIcon },
@@ -104,7 +105,7 @@ export default function NavBar() {
                       key={link.href}
                       href={link.href}
                       className={`flex items-center px-4 py-2.5 text-sm rounded-lg transition-all duration-200 transform hover:scale-[1.02] ${
-                        pathname.startsWith(link.href)
+                        (link.href === "/" ? pathname === "/" : pathname.startsWith(link.href))
                           ? "bg-gray-800 text-white shadow-md dark:bg-gray-700"
                           : "text-gray-700 hover:bg-gray-100 hover:text-gray-900 hover:shadow-sm dark:text-gray-300 dark:hover:bg-gray-700 dark:hover:text-white"
                       }`}
