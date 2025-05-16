@@ -68,17 +68,17 @@ export default function SignIn() {
   }
 
   return (
-    <div className="flex min-h-screen items-center justify-center bg-gray-50 px-4 py-12 sm:px-6 lg:px-8">
-      <Card className="w-full max-w-md">
-        <CardHeader className="space-y-1">
-          <CardTitle className="text-2xl font-bold text-center text-gray-900">Board Your Ship</CardTitle>
-          <CardDescription className="text-center">
+    <div className="flex min-h-screen items-center justify-center bg-gradient-to-b from-gray-100 to-gray-200 dark:from-gray-800 dark:to-gray-900 px-4 py-12 sm:px-6 lg:px-8">
+      <Card className="w-full max-w-md border-gray-200 shadow-lg dark:border-gray-700 dark:shadow-none bg-white/90 dark:bg-gray-800/90 backdrop-blur-sm">
+        <CardHeader className="space-y-1 border-b border-gray-100 dark:border-gray-700">
+          <CardTitle className="text-2xl font-bold text-center text-gray-900 dark:text-gray-100">Board Your Ship</CardTitle>
+          <CardDescription className="text-center text-gray-600 dark:text-gray-400">
             Enter your credentials to access your maritime journey
           </CardDescription>
         </CardHeader>
-        <CardContent>
+        <CardContent className="pt-6">
           {showSuccessMessage && (
-            <Alert className="mb-4 bg-green-50 text-green-800 border-green-200">
+            <Alert className="mb-4 bg-green-50 text-green-800 border-green-200 dark:bg-green-900/50 dark:text-green-200 dark:border-green-800">
               <AlertDescription>Account created successfully! Please sign in with your credentials.</AlertDescription>
             </Alert>
           )}
@@ -86,7 +86,7 @@ export default function SignIn() {
           <div className="grid grid-cols-2 gap-4 mb-4">
             <Button
               variant="outline"
-              className="w-full"
+              className="w-full border-gray-200 text-gray-700 hover:bg-gray-50 dark:border-gray-700 dark:text-gray-300 dark:hover:bg-gray-700/50"
               onClick={() => handleOAuthSignIn("google")}
               disabled={isLoading}
             >
@@ -113,7 +113,7 @@ export default function SignIn() {
             </Button>
             <Button
               variant="outline"
-              className="w-full"
+              className="w-full border-gray-200 text-gray-700 hover:bg-gray-50 dark:border-gray-700 dark:text-gray-300 dark:hover:bg-gray-700/50"
               onClick={() => handleOAuthSignIn("github")}
               disabled={isLoading}
             >
@@ -122,12 +122,12 @@ export default function SignIn() {
             </Button>
           </div>
 
-          <div className="relative mb-4">
+          <div className="relative my-6">
             <div className="absolute inset-0 flex items-center">
-              <span className="w-full border-t" />
+              <span className="w-full border-t border-gray-200 dark:border-gray-700" />
             </div>
             <div className="relative flex justify-center text-xs uppercase">
-              <span className="bg-white px-2 text-gray-500">Or continue with email</span>
+              <span className="bg-white dark:bg-gray-800 px-2 text-gray-500 dark:text-gray-400">Or continue with email</span>
             </div>
           </div>
 
@@ -139,7 +139,7 @@ export default function SignIn() {
           )}
           <form onSubmit={handleSubmit} className="space-y-4">
             <div className="space-y-2">
-              <Label htmlFor="email">Email</Label>
+              <Label htmlFor="email" className="text-gray-700 dark:text-gray-300">Email</Label>
               <Input
                 id="email"
                 type="email"
@@ -147,16 +147,18 @@ export default function SignIn() {
                 value={email}
                 onChange={(e) => setEmail(e.target.value)}
                 required
+                className="border-gray-200 dark:border-gray-700 bg-white dark:bg-gray-800"
               />
             </div>
             <div className="space-y-2">
-              <Label htmlFor="password">Password</Label>
+              <Label htmlFor="password" className="text-gray-700 dark:text-gray-300">Password</Label>
               <Input
                 id="password"
                 type="password"
                 value={password}
                 onChange={(e) => setPassword(e.target.value)}
                 required
+                className="border-gray-200 dark:border-gray-700 bg-white dark:bg-gray-800"
               />
             </div>
             <div className="flex items-center justify-between">
@@ -165,23 +167,26 @@ export default function SignIn() {
                   id="remember-me"
                   name="remember-me"
                   type="checkbox"
-                  className="h-4 w-4 rounded border-gray-300 text-blue-600 focus:ring-blue-500"
+                  className="h-4 w-4 rounded border-gray-300 text-gray-700 focus:ring-gray-500 dark:border-gray-600 dark:bg-gray-800 dark:text-gray-300"
                 />
-                <label htmlFor="remember-me" className="ml-2 block text-sm dark:text-gray-300">
+                <label htmlFor="remember-me" className="ml-2 block text-sm text-gray-700 dark:text-gray-300">
                   Remember me
                 </label>
               </div>
-             
             </div>
-            <Button type="submit" className="w-full bg-gray-600 hover:bg-gray-700" disabled={isLoading}>
+            <Button 
+              type="submit" 
+              className="w-full bg-gray-700 hover:bg-gray-800 text-white dark:bg-gray-600 dark:hover:bg-gray-700 transition-colors duration-200" 
+              disabled={isLoading}
+            >
               {isLoading ? "Boarding..." : "Set Sail with Email"}
             </Button>
           </form>
         </CardContent>
-        <CardFooter className="flex justify-center">
-          <p className="text-sm text-gray-600">
+        <CardFooter className="flex justify-center border-t border-gray-100 dark:border-gray-700">
+          <p className="text-sm text-gray-600 dark:text-gray-400">
             Don't have a ship yet?{" "}
-            <Link href="/signup" className="text-gray-600 hover:text-gray-500">
+            <Link href="/signup" className="text-gray-700 hover:text-gray-900 dark:text-gray-300 dark:hover:text-gray-100">
               Hoist the Colors
             </Link>
           </p>

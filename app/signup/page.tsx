@@ -71,19 +71,19 @@ export default function SignUp() {
   }
 
   return (
-    <div className="flex min-h-screen items-center justify-center bg-gradient-to-b from-slate-50 to-white dark:from-slate-900 dark:to-slate-950 px-4 py-12 sm:px-6 lg:px-8">
-      <Card className="w-full max-w-md border-gray-200 shadow-lg dark:border-gray-900 dark:shadow-none">
-        <CardHeader className="space-y-1 border-b border-gray-100 dark:border-gray-900">
-          <CardTitle className="text-2xl font-bold text-center text-gray-900 dark:text-gray-200">Hoist Your Colors</CardTitle>
-          <CardDescription className="text-center">
+    <div className="flex min-h-screen items-center justify-center bg-gradient-to-b from-gray-100 to-gray-200 dark:from-gray-800 dark:to-gray-900 px-4 py-12 sm:px-6 lg:px-8">
+      <Card className="w-full max-w-md border-gray-200 shadow-lg dark:border-gray-700 dark:shadow-none bg-white/90 dark:bg-gray-800/90 backdrop-blur-sm">
+        <CardHeader className="space-y-1 border-b border-gray-100 dark:border-gray-700">
+          <CardTitle className="text-2xl font-bold text-center text-gray-900 dark:text-gray-100">Hoist Your Colors</CardTitle>
+          <CardDescription className="text-center text-gray-600 dark:text-gray-400">
             Enter your information to join our maritime crew or use a social provider
           </CardDescription>
         </CardHeader>
-        <CardContent>
+        <CardContent className="pt-6">
           <div className="grid grid-cols-2 gap-4 mb-4">
             <Button
               variant="outline"
-              className="w-full border-gray-200 text-gray-700 hover:bg-gray-50 dark:border-gray-700 dark:text-gray-300 dark:hover:bg-gray-900"
+              className="w-full border-gray-200 text-gray-700 hover:bg-gray-50 dark:border-gray-700 dark:text-gray-300 dark:hover:bg-gray-700/50"
               onClick={() => handleOAuthSignIn("google")}
               disabled={isLoading}
             >
@@ -110,7 +110,7 @@ export default function SignUp() {
             </Button>
             <Button
               variant="outline"
-              className="w-full border-gray-200 text-gray-700 hover:bg-gray-50 dark:border-gray-700 dark:text-gray-300 dark:hover:bg-gray-900"
+              className="w-full border-gray-200 text-gray-700 hover:bg-gray-50 dark:border-gray-700 dark:text-gray-300 dark:hover:bg-gray-700/50"
               onClick={() => handleOAuthSignIn("github")}
               disabled={isLoading}
             >
@@ -119,12 +119,12 @@ export default function SignUp() {
             </Button>
           </div>
 
-          <div className="relative mb-4">
+          <div className="relative my-6">
             <div className="absolute inset-0 flex items-center">
-              <span className="w-full border-t border-slate-200 dark:border-slate-700" />
+              <span className="w-full border-t border-gray-200 dark:border-gray-700" />
             </div>
             <div className="relative flex justify-center text-xs uppercase">
-              <span className="bg-white dark:bg-slate-950 px-2 text-slate-500 dark:text-slate-400">Or continue with email</span>
+              <span className="bg-white dark:bg-gray-800 px-2 text-gray-500 dark:text-gray-400">Or continue with email</span>
             </div>
           </div>
 
@@ -136,11 +136,18 @@ export default function SignUp() {
           )}
           <form onSubmit={handleSubmit} className="space-y-4">
             <div className="space-y-2">
-              <Label htmlFor="name">Name</Label>
-              <Input id="name" placeholder="John Doe" value={name} onChange={(e) => setName(e.target.value)} required />
+              <Label htmlFor="name" className="text-gray-700 dark:text-gray-300">Name</Label>
+              <Input 
+                id="name" 
+                placeholder="John Doe" 
+                value={name} 
+                onChange={(e) => setName(e.target.value)} 
+                required 
+                className="border-gray-200 dark:border-gray-700 bg-white dark:bg-gray-800"
+              />
             </div>
             <div className="space-y-2">
-              <Label htmlFor="email">Email</Label>
+              <Label htmlFor="email" className="text-gray-700 dark:text-gray-300">Email</Label>
               <Input
                 id="email"
                 type="email"
@@ -148,37 +155,44 @@ export default function SignUp() {
                 value={email}
                 onChange={(e) => setEmail(e.target.value)}
                 required
+                className="border-gray-200 dark:border-gray-700 bg-white dark:bg-gray-800"
               />
             </div>
             <div className="space-y-2">
-              <Label htmlFor="password">Password</Label>
+              <Label htmlFor="password" className="text-gray-700 dark:text-gray-300">Password</Label>
               <Input
                 id="password"
                 type="password"
                 value={password}
                 onChange={(e) => setPassword(e.target.value)}
                 required
+                className="border-gray-200 dark:border-gray-700 bg-white dark:bg-gray-800"
               />
             </div>
             <div className="space-y-2">
-              <Label htmlFor="confirmPassword">Confirm Password</Label>
+              <Label htmlFor="confirmPassword" className="text-gray-700 dark:text-gray-300">Confirm Password</Label>
               <Input
                 id="confirmPassword"
                 type="password"
                 value={confirmPassword}
                 onChange={(e) => setConfirmPassword(e.target.value)}
                 required
+                className="border-gray-200 dark:border-gray-700 bg-white dark:bg-gray-800"
               />
             </div>
-            <Button type="submit" className="w-full bg-gray-600 hover:bg-gray-700 text-white" disabled={isLoading}>
+            <Button 
+              type="submit" 
+              className="w-full bg-gray-700 hover:bg-gray-800 text-white dark:bg-gray-600 dark:hover:bg-gray-700 transition-colors duration-200" 
+              disabled={isLoading}
+            >
               {isLoading ? "Hoisting Colors..." : "Join the Crew with Email"}
             </Button>
           </form>
         </CardContent>
-        <CardFooter className="flex justify-center">
-          <p className="text-sm text-slate-600 dark:text-slate-400">
+        <CardFooter className="flex justify-center border-t border-gray-100 dark:border-gray-700">
+          <p className="text-sm text-gray-600 dark:text-gray-400">
             Already have a ship?{" "}
-            <Link href="/signin" className="text-gray-600 hover:text-gray-500 dark:text-gray-400 dark:hover:text-gray-300">
+            <Link href="/signin" className="text-gray-700 hover:text-gray-900 dark:text-gray-300 dark:hover:text-gray-100">
               Board Ship
             </Link>
           </p>

@@ -410,7 +410,7 @@ export default function Home() {
       </section>
 
       {/* Trending Now Section */}
-      <section className="py-12 bg-gray-100 dark:bg-slate-900">
+      <section className="py-12 bg-gray-100 dark:bg-gray-900">
         <div className="container mx-auto px-4">
           <div className="flex items-center justify-between mb-8">
         <div className="flex items-center gap-3">
@@ -528,7 +528,7 @@ export default function Home() {
 
       {/* Rest of the sections remain unchanged */}
       {/* Media Categories */}
-      <section className="py-12 bg-gray-50 dark:bg-slate-950">
+      <section className="py-12 bg-gray-50 dark:bg-gray-900">
         <div className="container mx-auto px-4">
           <h2 className="text-2xl font-bold text-slate-900 dark:text-white mb-8 text-center">
             Explore Maritime Content
@@ -582,7 +582,7 @@ export default function Home() {
       </section>
 
       {/* Featured Videos Section */}
-      <section className="py-12 bg-white dark:bg-slate-900">
+      <section className="py-12 bg-white dark:bg-gray-900">
         <div className="container mx-auto px-4">
           <div className="flex items-center justify-between mb-6">
             <div className="flex items-center gap-2">
@@ -604,7 +604,7 @@ export default function Home() {
       </section>
 
       {/* Featured Sailors Section */}
-      <section className="py-12 bg-gradient-to-b from-gray-50 to-white dark:from-slate-950 dark:to-slate-900">
+      <section className="py-12 bg-gradient-to-b from-gray-50 to-white dark:from-gray-900 dark:to-gray-900">
         <div className="container mx-auto px-4">
           <div className="flex items-center justify-between mb-8">
             <div className="flex items-center gap-2">

@@ -31,11 +31,18 @@ export const authOptions = {
           throw new Error("Invalid password")
         }
 
+        // Update last login time
+        await usersCollection.updateOne(
+          { _id: user._id },
+          { $set: { lastLogin: new Date() } }
+        )
+
         return {
           id: user._id.toString(),
           name: user.name,
           email: user.email,
           role: user.role,
+          lastLogin: new Date(),
         }
       },
     }),
@@ -61,6 +68,7 @@ export const authOptions = {
       if (user) {
         token.id = user.id
         token.role = user.role
+        token.lastLogin = user.lastLogin
       }
       return token
     },
@@ -68,6 +76,7 @@ export const authOptions = {
       if (session.user) {
         session.user.id = token.id
         session.user.role = token.role
+        session.user.lastLogin = token.lastLogin
       }
       return session
     },
