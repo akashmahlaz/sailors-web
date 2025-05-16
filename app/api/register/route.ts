@@ -38,8 +38,18 @@ export async function POST(request: NextRequest) {
       userId: result.insertedId.toString(),
       name,
       email,
+      bio: "",
+      location: "",
+      profileImage: "",
+      coverImage: "",
+      role: "user",
       joinedAt: new Date(),
       updatedAt: new Date(),
+      socialLinks: {},
+      following: [],
+      followers: [],
+      interests: [],
+      expertise: [],
     })
 
     return NextResponse.json({

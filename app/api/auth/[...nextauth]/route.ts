@@ -64,13 +64,52 @@ export const authOptions = {
     error: "/signin",
   },
   callbacks: {
-    async jwt({ token, user }) {
-      if (user) {
-        token.id = user.id
-        token.role = user.role
-        token.lastLogin = user.lastLogin
+    async jwt({ token, user, account, profile }) {
+      // Upsert user in users collection for OAuth and credentials
+      if (user && user.email) {
+        const usersCollection = await getUsersCollection();
+        const existingUser = await usersCollection.findOne({ email: user.email });
+        let userId;
+        if (!existingUser) {
+          // Insert new user for OAuth sign-in
+          const result = await usersCollection.insertOne({
+            name: user.name || profile?.name || "Sailor",
+            email: user.email,
+            role: "user",
+            createdAt: new Date(),
+            oauth: account?.provider || null,
+          });
+          userId = result.insertedId.toString();
+        } else {
+          userId = existingUser._id.toString();
+        }
+        // Ensure user profile exists
+        const { createUserProfile, getUserProfileByUserId } = await import("@/lib/user-profiles");
+        const profileDoc = await getUserProfileByUserId(userId);
+        if (!profileDoc) {
+          await createUserProfile({
+            userId,
+            name: user.name || profile?.name || "Sailor",
+            email: user.email,
+            bio: "",
+            location: "",
+            profileImage: "",
+            coverImage: "",
+            role: "user",
+            joinedAt: new Date(),
+            updatedAt: new Date(),
+            socialLinks: {},
+            following: [],
+            followers: [],
+            interests: [],
+            expertise: [],
+          });
+        }
+        token.id = userId;
+        token.role = user.role || existingUser?.role || "user";
+        token.lastLogin = new Date();
       }
-      return token
+      return token;
     },
     async session({ session, token }) {
       if (session.user) {
