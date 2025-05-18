@@ -1,6 +1,8 @@
 import { type NextRequest, NextResponse } from "next/server"
 import clientPromise from "@/lib/mongodb"
 import { ObjectId } from "mongodb"
+import { getServerSession } from "next-auth/next"
+import { authOptions } from "@/app/api/auth/[...nextauth]/route"
 
 // Helper function to get the podcasts collection
 async function getPodcastsCollection() {
@@ -121,8 +123,26 @@ export async function DELETE(request: NextRequest, { params }: { params: { id: s
   try {
     const id = params.id
 
+    // Check if user is authenticated
+    const session = await getServerSession(authOptions)
+    if (!session || !session.user) {
+      return NextResponse.json({ error: "Unauthorized" }, { status: 401 })
+    }
+
     // Get podcasts collection
     const collection = await getPodcastsCollection()
+
+    // Find the podcast first to check ownership
+    const podcast = await collection.findOne({ _id: new ObjectId(id) })
+    if (!podcast) {
+      return NextResponse.json({ error: "Podcast not found" }, { status: 404 })
+    }
+
+    // Check if user owns the content or is an admin
+    const isOwner = podcast.userId === session.user.id
+    if (!isOwner && session.user.role !== 'admin') {
+      return NextResponse.json({ error: "You don't have permission to delete this podcast" }, { status: 403 })
+    }
 
     // Delete the podcast
     const result = await collection.deleteOne({ _id: new ObjectId(id) })
@@ -135,10 +155,7 @@ export async function DELETE(request: NextRequest, { params }: { params: { id: s
   } catch (error) {
     console.error("Error deleting podcast:", error)
     return NextResponse.json(
-      {
-        error: "Failed to delete podcast",
-        details: error instanceof Error ? error.message : "Unknown error",
-      },
+      { error: "Failed to delete podcast", details: error instanceof Error ? error.message : "Unknown error" },
       { status: 500 },
     )
   }

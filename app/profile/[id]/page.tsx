@@ -5,206 +5,87 @@ import { useSession } from "next-auth/react"
 import { useRouter } from "next/navigation"
 import { Alert, AlertDescription } from "@/components/ui/alert"
 import { AlertCircle } from "lucide-react"
-import ProfileHeader from "@/components/profile-header"
-import { Tabs, TabsContent } from "@/components/ui/tabs"
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card"
 import { Badge } from "@/components/ui/badge"
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar"
+import { Button } from "@/components/ui/button"
+import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs"
+import { Skeleton } from "@/components/ui/skeleton"
+import { formatDistanceToNow } from "date-fns"
+import Link from "next/link"
+import { Edit, FileText } from "lucide-react"
+
+interface Profile {
+  userId: string
+  name: string
+  email?: string
+  image?: string
+  profileImage?: string
+  coverImage?: string
+  bio: string
+  location: string
+  website: string
+  joinedAt: string
+  role: string
+  interests: string[]
+  expertise: string[]
+}
 
 export default function ProfilePage({ params }: { params: { id: string } }) {
   const { data: session, status } = useSession()
   const router = useRouter()
-  const [profile, setProfile] = useState<any>(null)
+  const [profile, setProfile] = useState<Profile | null>(null)
   const [loading, setLoading] = useState(true)
   const [error, setError] = useState<string | null>(null)
-  const [activeTab, setActiveTab] = useState("content")
-  const [userContent, setUserContent] = useState<any>({
-    videos: [],
-    photos: [],
-    audio: [],
-    blogs: [],
-    podcasts: [],
-    news: [],
-  })
-  const [followers, setFollowers] = useState<any[]>([])
-  const [following, setFollowing] = useState<any[]>([])
-
-  // Determine if viewing own profile
-  const isOwnProfile = session?.user?.id === params.id || (params.id === "me" && !!session?.user)
-  const profileId = params.id === "me" ? session?.user?.id : params.id
+  const [activeTab, setActiveTab] = useState("about")
 
   useEffect(() => {
-    // Only fetch once we have session resolved and profileId
-    if (status === "loading" || (params.id === "me" && status !== "authenticated")) {
-      return
+    if (status === "unauthenticated") {
+      router.push("/login")
     }
+  }, [status, router])
 
-    if (!profileId) {
-      if (params.id === "me") {
-        // If trying to view own profile but not logged in
-        router.push("/signin?callbackUrl=/profile/me")
-        return
-      }
-      setError("Profile ID not found")
-      setLoading(false)
-      return
+  useEffect(() => {
+    if (params.id) {
+      fetchProfile(params.id)
     }
+  }, [params.id])
 
-    fetchProfile()
-  }, [status, profileId, params.id])
-
-  const fetchProfile = async () => {
+  const fetchProfile = async (profileId: string) => {
     try {
       setLoading(true)
+      setError(null)
 
-      // For own profile, use session data as a starting point
-      if (isOwnProfile && session?.user) {
-        setProfile({
-          userId: session.user.id,
-          name: session.user.name,
-          email: session.user.email,
-          image: session.user.image,
-          // Add default values for other fields
-          bio: "",
-          location: "",
-          interests: [],
-          expertise: [],
-          profileImage: session.user.image,
-          coverImage: "",
-          joinedAt: new Date().toISOString(),
-          followers: [],
-          following: [],
-          role: session.user.role || "user",
-        })
-      }
-
-      // Fetch full profile data from API
       const response = await fetch(`/api/users/${profileId}`)
-
       if (!response.ok) {
         throw new Error("Failed to fetch profile")
       }
 
       const data = await response.json()
+      console.log('Profile data:', data)
       setProfile(data)
-
-      // If we get profile data, proceed to fetch content based on active tab
-      if (activeTab === "content") {
-        fetchUserContent(profileId)
-      } else if (activeTab === "followers") {
-        fetchFollowers(profileId)
-      } else if (activeTab === "following") {
-        fetchFollowing(profileId)
-      }
     } catch (err) {
       console.error("Error fetching profile:", err)
-      setError("Failed to load profile")
+      setError("Failed to load profile. Please try again.")
     } finally {
       setLoading(false)
     }
   }
 
-  useEffect(() => {
-    if (!loading && profile) {
-      if (activeTab === "content") {
-        fetchUserContent(profileId)
-      } else if (activeTab === "followers") {
-        fetchFollowers(profileId)
-      } else if (activeTab === "following") {
-        fetchFollowing(profileId)
-      }
-    }
-  }, [activeTab, loading, profile])
-
-  const fetchUserContent = async (userId: string) => {
-    try {
-      // Fetch videos
-      const videosResponse = await fetch(`/api/videos?userId=${userId}`)
-      const videos = await videosResponse.json()
-
-      // Fetch photos
-      const photosResponse = await fetch(`/api/photos?userId=${userId}`)
-      const photos = await photosResponse.json()
-
-      // Fetch audio
-      const audioResponse = await fetch(`/api/audio?userId=${userId}`)
-      const audio = await audioResponse.json()
-
-      // Fetch blogs
-      const blogsResponse = await fetch(`/api/blogs?userId=${userId}`)
-      const blogs = await blogsResponse.json()
-
-      // Fetch podcasts
-      const podcastsResponse = await fetch(`/api/podcasts?userId=${userId}`)
-      const podcasts = await podcastsResponse.json()
-
-      // Fetch news
-      const newsResponse = await fetch(`/api/news?userId=${userId}`)
-      const news = await newsResponse.json()
-
-      setUserContent({
-        videos: videos.videos || videos || [],
-        photos: photos.photos || photos || [],
-        audio: audio.audio || audio || [],
-        blogs: blogs.blogs || blogs || [],
-        podcasts: podcasts.podcasts || podcasts || [],
-        news: news.news || news || [],
-      })
-    } catch (err) {
-      console.error("Error fetching user content:", err)
-    }
+  // Get the profile image from either uploaded image or session
+  const getProfileImage = () => {
+    if (profile?.profileImage) return profile.profileImage
+    if (profile?.image) return profile.image
+    if (session?.user?.image) return session.user.image
+    return "/placeholder.svg"
   }
 
-  const fetchFollowers = async (userId: string) => {
-    try {
-      const response = await fetch(`/api/users/${userId}/followers`)
+  console.log('Session:', session)
+  console.log('Profile:', profile)
+  console.log('Is own profile:', session?.user?.id === profile?.userId)
 
-      if (!response.ok) {
-        throw new Error("Failed to fetch followers")
-      }
-
-      const data = await response.json()
-      setFollowers(data.followers || data || [])
-    } catch (err) {
-      console.error("Error fetching followers:", err)
-    }
-  }
-
-  const fetchFollowing = async (userId: string) => {
-    try {
-      const response = await fetch(`/api/users/${userId}/following`)
-
-      if (!response.ok) {
-        throw new Error("Failed to fetch following")
-      }
-
-      const data = await response.json()
-      setFollowing(data.following || data || [])
-    } catch (err) {
-      console.error("Error fetching following:", err)
-    }
-  }
-
-  const handleTabChange = (tab: string) => {
-    setActiveTab(tab)
-  }
-
-  if (status === "loading" || (params.id === "me" && status !== "authenticated")) {
-    return (
-      <div className="container mx-auto px-4 py-8 text-center">
-        <div className="animate-spin h-8 w-8 border-4 border-gray-600 border-t-transparent rounded-full mx-auto mb-4"></div>
-        <p>Loading profile...</p>
-      </div>
-    )
-  }
-
-  if (loading && !profile) {
-    return (
-      <div className="container mx-auto px-4 py-8 text-center">
-        <div className="animate-spin h-8 w-8 border-4 border-gray-600 border-t-transparent rounded-full mx-auto mb-4"></div>
-        <p>Loading profile...</p>
-      </div>
-    )
+  if (status === "loading" || loading) {
+    return <ProfileSkeleton />
   }
 
   if (error) {
@@ -229,70 +110,131 @@ export default function ProfilePage({ params }: { params: { id: string } }) {
     )
   }
 
-  return (
-    <div className="min-h-screen bg-gradient-to-b from-gray-50 to-gray-200 dark:from-gray-900 dark:to-gray-950">
-      <ProfileHeader
-        profile={profile}
-        isOwnProfile={isOwnProfile}
-        activeTab={activeTab}
-        onTabChange={handleTabChange}
-      />
+  const isOwnProfile = session?.user?.id === profile.userId
+  const username = profile.email ? `@${profile.email.split('@')[0]}` : ''
 
-      <div className="container px-4 py-8">
-        <Tabs value={activeTab} onValueChange={handleTabChange}>
-          <TabsContent value="content" className="mt-0">
-            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-              {renderContentSection("Videos", userContent.videos)}
-              {renderContentSection("Photos", userContent.photos)}
-              {renderContentSection("Audio", userContent.audio)}
-              {renderContentSection("Blog Posts", userContent.blogs)}
-              {renderContentSection("Podcasts", userContent.podcasts)}
-              {renderContentSection("News Articles", userContent.news)}
+  return (
+    <div className="min-h-screen bg-slate-50 dark:bg-slate-900">
+      {/* Cover Image */}
+      {profile.coverImage && (
+        <div className="h-48 md:h-64 w-full relative">
+          <img
+            src={profile.coverImage}
+            alt={`${profile.name}'s cover`}
+            className="w-full h-full object-cover"
+          />
+        </div>
+      )}
+
+      {/* Profile Header */}
+      <div className="bg-white dark:bg-slate-800 shadow-sm">
+        <div className="container mx-auto px-4 py-8">
+          <div className="flex flex-col md:flex-row items-start md:items-center gap-6">
+            {/* Profile Image */}
+            <div className="relative w-32 h-32 rounded-full overflow-hidden border-4 border-white dark:border-slate-700 shadow-lg">
+              <Avatar className="w-full h-full">
+                <AvatarImage src={getProfileImage()} alt={profile.name} />
+                <AvatarFallback>{profile.name.substring(0, 2).toUpperCase()}</AvatarFallback>
+              </Avatar>
             </div>
 
-            {Object.values(userContent).every((content: any) => content.length === 0) && (
-              <div className="text-center py-12">
-                <h3 className="text-lg font-medium text-gray-900 dark:text-gray-100 mb-2">No content yet</h3>
-                <p className="text-gray-500 dark:text-gray-400">
-                  {isOwnProfile
-                    ? "You haven't uploaded any content yet. Start sharing your voyage!"
-                    : `${profile.name} hasn't uploaded any content yet.`}
-                </p>
+            {/* Profile Info */}
+            <div className="flex-1">
+              <div className="flex flex-col md:flex-row md:items-center justify-between gap-4">
+                <div>
+                  <h1 className="text-2xl font-bold text-slate-900 dark:text-white">{profile.name}</h1>
+                  {username && <p className="text-slate-600 dark:text-slate-400">{username}</p>}
+                </div>
+                {isOwnProfile && (
+                  <div className="flex flex-wrap gap-2 mt-4 md:mt-0">
+                    <Button
+                      variant="outline"
+                      size="sm"
+                      className="flex items-center gap-2 border-slate-200 dark:border-slate-700 w-full md:w-auto"
+                      onClick={() => router.push("/profile/edit")}
+                    >
+                      <Edit className="h-4 w-4" />
+                      <span className="hidden sm:inline">Edit Profile</span>
+                      <span className="sm:hidden">Edit</span>
+                    </Button>
+                    <Button
+                      variant="outline"
+                      size="sm"
+                      className="flex items-center gap-2 border-slate-200 dark:border-slate-700 w-full md:w-auto"
+                      onClick={() => router.push("/content-management")}
+                    >
+                      <FileText className="h-4 w-4" />
+                      <span className="hidden sm:inline">Manage Content</span>
+                      <span className="sm:hidden">Content</span>
+                    </Button>
+                  </div>
+                )}
               </div>
-            )}
-          </TabsContent>
 
+              {/* Bio */}
+              <p className="mt-4 text-slate-600 dark:text-slate-400">{profile.bio || "No bio yet"}</p>
+
+              {/* Profile Stats */}
+              <div className="mt-6 flex flex-wrap gap-4">
+                <div className="flex items-center gap-2 text-slate-600 dark:text-slate-400">
+                  <span>Joined {formatDistanceToNow(new Date(profile.joinedAt), { addSuffix: true })}</span>
+                </div>
+                {profile.location && (
+                  <div className="flex items-center gap-2 text-slate-600 dark:text-slate-400">
+                    <span>{profile.location}</span>
+                  </div>
+                )}
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      {/* Profile Navigation */}
+      <div className="border-b border-slate-200 dark:border-slate-700">
+        <div className="container mx-auto px-4">
+          <Tabs value={activeTab} onValueChange={setActiveTab}>
+            <TabsList className="w-full justify-start overflow-x-auto">
+              <TabsTrigger value="about" className="whitespace-nowrap">About</TabsTrigger>
+            </TabsList>
+          </Tabs>
+        </div>
+      </div>
+
+      {/* Main Content */}
+      <div className="container mx-auto px-4 py-8">
+        <Tabs value={activeTab} onValueChange={setActiveTab}>
           <TabsContent value="about" className="mt-0">
-            <Card className="border-gray-200 shadow-lg shadow-gray-100 dark:border-gray-800 dark:shadow-none">
+            <Card>
               <CardHeader>
-                <CardTitle className="text-gray-900 dark:text-gray-100">About {profile.name}</CardTitle>
+                <CardTitle>About {profile.name}</CardTitle>
               </CardHeader>
               <CardContent className="space-y-6">
                 <div>
-                  <h3 className="text-sm font-medium text-gray-500 dark:text-gray-400 mb-2">Bio</h3>
-                  <p className="text-gray-900 dark:text-gray-100">{profile.bio || "No bio provided"}</p>
+                  <h3 className="text-sm font-medium text-slate-500 dark:text-slate-400 mb-2">Bio</h3>
+                  <p className="text-slate-900 dark:text-slate-100 break-words">{profile.bio || "No bio provided"}</p>
                 </div>
 
                 {profile.location && (
                   <div>
-                    <h3 className="text-sm font-medium text-gray-500 dark:text-gray-400 mb-2">Location</h3>
-                    <p className="text-gray-900 dark:text-gray-100">{profile.location}</p>
+                    <h3 className="text-sm font-medium text-slate-500 dark:text-slate-400 mb-2">Location</h3>
+                    <p className="text-slate-900 dark:text-slate-100 break-words">{profile.location}</p>
                   </div>
                 )}
 
                 <div>
-                  <h3 className="text-sm font-medium text-gray-500 dark:text-gray-400 mb-2">Joined</h3>
-                  <p className="text-gray-900 dark:text-gray-100">
-                    {new Date(profile.joinedAt || new Date()).toLocaleDateString()}
+                  <h3 className="text-sm font-medium text-slate-500 dark:text-slate-400 mb-2">Joined</h3>
+                  <p className="text-slate-900 dark:text-slate-100">
+                    {formatDistanceToNow(new Date(profile.joinedAt), { addSuffix: true })}
                   </p>
                 </div>
 
                 {profile.interests && profile.interests.length > 0 && (
                   <div>
-                    <h3 className="text-sm font-medium text-gray-500 dark:text-gray-400 mb-2">Interests</h3>
+                    <h3 className="text-sm font-medium text-slate-500 dark:text-slate-400 mb-2">Interests</h3>
                     <div className="flex flex-wrap gap-2">
                       {profile.interests.map((interest: string) => (
-                        <Badge key={interest} variant="outline">
+                        <Badge key={interest} variant="outline" className="whitespace-nowrap">
                           {interest}
                         </Badge>
                       ))}
@@ -302,10 +244,10 @@ export default function ProfilePage({ params }: { params: { id: string } }) {
 
                 {profile.expertise && profile.expertise.length > 0 && (
                   <div>
-                    <h3 className="text-sm font-medium text-gray-500 dark:text-gray-400 mb-2">Expertise</h3>
+                    <h3 className="text-sm font-medium text-slate-500 dark:text-slate-400 mb-2">Expertise</h3>
                     <div className="flex flex-wrap gap-2">
                       {profile.expertise.map((skill: string) => (
-                        <Badge key={skill} variant="outline">
+                        <Badge key={skill} variant="outline" className="whitespace-nowrap">
                           {skill}
                         </Badge>
                       ))}
@@ -315,149 +257,26 @@ export default function ProfilePage({ params }: { params: { id: string } }) {
               </CardContent>
             </Card>
           </TabsContent>
-
-          <TabsContent value="followers" className="mt-0">
-            <Card className="border-gray-200 shadow-lg shadow-gray-100 dark:border-gray-800 dark:shadow-none">
-              <CardHeader>
-                <CardTitle className="text-gray-900 dark:text-gray-100">Followers</CardTitle>
-                <CardDescription>People following {profile.name}</CardDescription>
-              </CardHeader>
-              <CardContent>
-                {followers.length === 0 ? (
-                  <div className="text-center py-6">
-                    <p className="text-gray-500 dark:text-gray-400">No followers yet</p>
-                  </div>
-                ) : (
-                  <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
-                    {followers.map((follower) => (
-                      <div
-                        key={follower._id || follower.id || Math.random().toString(36).substr(2, 9)}
-                        className="flex items-center gap-3 p-3 rounded-lg border border-gray-100 dark:border-gray-800 hover:bg-gray-50 dark:hover:bg-gray-900/50"
-                        onClick={() => router.push(`/profile/${follower.userId || follower._id}`)}
-                        role="button"
-                      >
-                        <Avatar className="h-10 w-10">
-                          <AvatarImage
-                            src={
-                              follower.profileImage ||
-                              follower.image ||
-                              "/placeholder.svg?height=40&width=40&query=profile"
-                            }
-                            alt={follower.name}
-                          />
-                          <AvatarFallback>{follower.name?.substring(0, 2).toUpperCase() || "US"}</AvatarFallback>
-                        </Avatar>
-                        <div>
-                          <p className="font-medium text-gray-900 dark:text-gray-100">{follower.name}</p>
-                          {follower.location && (
-                            <p className="text-xs text-gray-500 dark:text-gray-400">{follower.location}</p>
-                          )}
-                        </div>
-                      </div>
-                    ))}
-                  </div>
-                )}
-              </CardContent>
-            </Card>
-          </TabsContent>
-
-          <TabsContent value="following" className="mt-0">
-            <Card className="border-gray-200 shadow-lg shadow-gray-100 dark:border-gray-800 dark:shadow-none">
-              <CardHeader>
-                <CardTitle className="text-gray-900 dark:text-gray-100">Following</CardTitle>
-                <CardDescription>People {profile.name} follows</CardDescription>
-              </CardHeader>
-              <CardContent>
-                {following.length === 0 ? (
-                  <div className="text-center py-6">
-                    <p className="text-gray-500 dark:text-gray-400">Not following anyone yet</p>
-                  </div>
-                ) : (
-                  <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
-                    {following.map((followedUser) => (
-                      <div
-                        key={followedUser._id || followedUser.id || Math.random().toString(36).substr(2, 9)}
-                        className="flex items-center gap-3 p-3 rounded-lg border border-gray-100 dark:border-gray-800 hover:bg-gray-50 dark:hover:bg-gray-900/50"
-                        onClick={() => router.push(`/profile/${followedUser.userId || followedUser._id}`)}
-                        role="button"
-                      >
-                        <Avatar className="h-10 w-10">
-                          <AvatarImage 
-                            src={
-                              followedUser.profileImage ||
-                              followedUser.image ||
-                              "/placeholder.svg?height=40&width=40&query=profile"
-                            }
-                            alt={followedUser.name}
-                          />
-                          <AvatarFallback>{followedUser.name?.substring(0, 2).toUpperCase() || "US"}</AvatarFallback>
-                        </Avatar>
-                        <div>
-                          <p className="font-medium text-gray-900 dark:text-gray-100">{followedUser.name}</p>
-                          {followedUser.location && (
-                            <p className="text-xs text-gray-500 dark:text-gray-400">{followedUser.location}</p>
-                          )}
-                        </div>
-                      </div>
-                    ))}
-                  </div>
-                )}
-              </CardContent>
-            </Card>
-          </TabsContent>
         </Tabs>
       </div>
     </div>
   )
+}
 
-  function renderContentSection(title: string, items: any[]) {
-    if (!items || items.length === 0) return null
-
-    return (
-      <Card className="border-gray-200 shadow-md dark:border-gray-800 dark:shadow-none">
-        <CardHeader className="pb-2">
-          <CardTitle className="text-lg text-gray-900 dark:text-gray-100">{title}</CardTitle>
-          <CardDescription>
-            {items.length} item{items.length !== 1 ? "s" : ""}
-          </CardDescription>
-        </CardHeader>
-        <CardContent>
-          <div className="grid grid-cols-2 gap-2">
-            {items.slice(0, 4).map((item) => (
-              <div
-                key={item._id || item.id || Math.random().toString(36).substr(2, 9)}
-                className="aspect-square rounded-md bg-gray-100 dark:bg-gray-800 overflow-hidden"
-                onClick={() => {
-                  const contentType = title.toLowerCase().replace(" ", "")
-                  const contentId = item._id || item.id
-                  router.push(`/${contentType}/${contentId}`)
-                }}
-                role="button"
-              >
-                {item.thumbnailUrl || item.coverImage || item.thumbnail_url || item.url ? (
-                  <img
-                    src={item.thumbnailUrl || item.coverImage || item.thumbnail_url || item.url || "/placeholder.svg"}
-                    alt={item.title}
-                    className="h-full w-full object-cover"
-                  />
-                ) : (
-                  <div className="h-full w-full flex items-center justify-center p-2 text-center text-xs text-gray-500 dark:text-gray-400">
-                    {item.title || "Untitled"}
-                  </div>
-                )}
-              </div>
-            ))}
+function ProfileSkeleton() {
+  return (
+    <div className="min-h-screen bg-slate-50 dark:bg-slate-900">
+      <div className="h-48 md:h-64 w-full bg-slate-200 dark:bg-slate-800 animate-pulse" />
+      <div className="container px-4 relative">
+        <div className="flex flex-col md:flex-row gap-6 -mt-16 md:-mt-20">
+          <Skeleton className="h-32 w-32 rounded-full" />
+          <div className="flex-1 space-y-4">
+            <Skeleton className="h-8 w-48" />
+            <Skeleton className="h-4 w-32" />
+            <Skeleton className="h-4 w-64" />
           </div>
-
-          {items.length > 4 && (
-            <div className="mt-4 text-center">
-              <p className="text-sm text-gray-600 dark:text-gray-400 hover:underline cursor-pointer">
-                View all {items.length} {title.toLowerCase()}
-              </p>
-            </div>
-          )}
-        </CardContent>
-      </Card>
-    )
-  }
+        </div>
+      </div>
+    </div>
+  )
 }

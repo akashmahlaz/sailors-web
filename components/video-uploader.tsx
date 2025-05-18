@@ -219,7 +219,7 @@ export default function VideoUploader({ onUploadSuccess }: VideoUploaderProps) {
               description: description,
               thumbnailPublicId: thumbnailPublicId,
               thumbnailUrl: thumbnailUrl,
-              userId: session?.user?.email || "anonymous",
+              userId: session?.user?.id || "anonymous",
               userName: session?.user?.name || "Anonymous User",
               userImage: session?.user?.image || null,
             }),

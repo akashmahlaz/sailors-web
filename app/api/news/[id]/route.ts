@@ -1,6 +1,8 @@
 import { type NextRequest, NextResponse } from "next/server"
 import clientPromise from "@/lib/mongodb"
 import { ObjectId } from "mongodb"
+import { getServerSession } from "next-auth/next"
+import { authOptions } from "@/app/api/auth/[...nextauth]/route"
 
 // Helper function to get the news collection
 async function getNewsCollection() {
@@ -112,32 +114,39 @@ export async function DELETE(request: NextRequest, { params }: { params: { id: s
   try {
     const id = params.id
 
-    // Check if user is authenticated and is an admin
-    const { getServerSession } = await import("next-auth/next")
-    const { authOptions } = await import("@/app/api/auth/[...nextauth]/route")
+    // Check if user is authenticated
     const session = await getServerSession(authOptions)
-    if (!session || session.user?.role !== "admin") {
+    if (!session || !session.user) {
       return NextResponse.json({ error: "Unauthorized" }, { status: 401 })
     }
 
     // Get news collection
     const collection = await getNewsCollection()
 
-    // Delete the news article
+    // Find the news first to check ownership
+    const news = await collection.findOne({ _id: new ObjectId(id) })
+    if (!news) {
+      return NextResponse.json({ error: "News not found" }, { status: 404 })
+    }
+
+    // Check if user owns the content or is an admin
+    const isOwner = news.userId === session.user.id
+    if (!isOwner && session.user.role !== 'admin') {
+      return NextResponse.json({ error: "You don't have permission to delete this news" }, { status: 403 })
+    }
+
+    // Delete the news
     const result = await collection.deleteOne({ _id: new ObjectId(id) })
 
     if (result.deletedCount === 0) {
-      return NextResponse.json({ error: "News article not found" }, { status: 404 })
+      return NextResponse.json({ error: "News not found" }, { status: 404 })
     }
 
     return NextResponse.json({ success: true })
   } catch (error) {
-    console.error("Error deleting news article:", error)
+    console.error("Error deleting news:", error)
     return NextResponse.json(
-      {
-        error: "Failed to delete news article",
-        details: error instanceof Error ? error.message : "Unknown error",
-      },
+      { error: "Failed to delete news", details: error instanceof Error ? error.message : "Unknown error" },
       { status: 500 },
     )
   }

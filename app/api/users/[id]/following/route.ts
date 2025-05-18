@@ -1,9 +1,10 @@
-import { type NextRequest, NextResponse } from "next/server"
+import { NextRequest, NextResponse } from "next/server"
 import { getFollowing } from "@/lib/user-profiles"
 
 export async function GET(request: NextRequest, { params }: { params: { id: string } }) {
   try {
-    const userId = params.id
+    const resolvedParams = await Promise.resolve(params)
+    const userId = resolvedParams.id
 
     const following = await getFollowing(userId)
 
@@ -13,6 +14,9 @@ export async function GET(request: NextRequest, { params }: { params: { id: stri
     return NextResponse.json(safeFollowing)
   } catch (error) {
     console.error("Error fetching following:", error)
-    return NextResponse.json({ error: "Failed to fetch following" }, { status: 500 })
+    return NextResponse.json(
+      { error: "Failed to fetch following" },
+      { status: 500 }
+    )
   }
 }

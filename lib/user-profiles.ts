@@ -152,3 +152,31 @@ export async function getUserProfile(userId: string) {
   const collection = await getUserProfilesCollection()
   return collection.findOne({ userId })
 }
+
+export async function checkContentOwnership(userId: string, contentType: string, contentId: string) {
+  const collection = await getCollection(contentType)
+  const content = await collection.findOne({ 
+    _id: new ObjectId(contentId),
+    userId: userId 
+  })
+  return !!content
+}
+
+async function getCollection(contentType: string) {
+  switch (contentType) {
+    case 'videos':
+      return await getVideosCollection()
+    case 'photos':
+      return await getPhotosCollection()
+    case 'audio':
+      return await getAudioCollection()
+    case 'blogs':
+      return await getBlogsCollection()
+    case 'podcasts':
+      return await getPodcastsCollection()
+    case 'news':
+      return await getNewsCollection()
+    default:
+      throw new Error(`Invalid content type: ${contentType}`)
+  }
+}

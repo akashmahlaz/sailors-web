@@ -1,6 +1,8 @@
 import { type NextRequest, NextResponse } from "next/server"
 import clientPromise from "@/lib/mongodb"
 import { ObjectId } from "mongodb"
+import { getServerSession } from "next-auth/next"
+import { authOptions } from "@/app/api/auth/[...nextauth]/route"
 
 // Helper function to get the blogs collection
 async function getBlogsCollection() {
@@ -96,24 +98,39 @@ export async function DELETE(request: NextRequest, { params }: { params: { id: s
   try {
     const id = params.id
 
+    // Check if user is authenticated
+    const session = await getServerSession(authOptions)
+    if (!session || !session.user) {
+      return NextResponse.json({ error: "Unauthorized" }, { status: 401 })
+    }
+
     // Get blogs collection
     const collection = await getBlogsCollection()
 
-    // Delete the blog post
+    // Find the blog first to check ownership
+    const blog = await collection.findOne({ _id: new ObjectId(id) })
+    if (!blog) {
+      return NextResponse.json({ error: "Blog not found" }, { status: 404 })
+    }
+
+    // Check if user owns the content or is an admin
+    const isOwner = blog.userId === session.user.id
+    if (!isOwner && session.user.role !== 'admin') {
+      return NextResponse.json({ error: "You don't have permission to delete this blog" }, { status: 403 })
+    }
+
+    // Delete the blog
     const result = await collection.deleteOne({ _id: new ObjectId(id) })
 
     if (result.deletedCount === 0) {
-      return NextResponse.json({ error: "Blog post not found" }, { status: 404 })
+      return NextResponse.json({ error: "Blog not found" }, { status: 404 })
     }
 
     return NextResponse.json({ success: true })
   } catch (error) {
-    console.error("Error deleting blog post:", error)
+    console.error("Error deleting blog:", error)
     return NextResponse.json(
-      {
-        error: "Failed to delete blog post",
-        details: error instanceof Error ? error.message : "Unknown error",
-      },
+      { error: "Failed to delete blog", details: error instanceof Error ? error.message : "Unknown error" },
       { status: 500 },
     )
   }

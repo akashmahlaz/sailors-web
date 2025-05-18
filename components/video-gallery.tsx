@@ -22,7 +22,7 @@ interface Video {
   user_name: string
   user_image: string | null
   views: number
-  likes: number
+  likes: { userId: string; timestamp: string }[]
   comments: any[]
   created_at: string
 }
@@ -45,7 +45,7 @@ const VideoGallery = forwardRef<VideoGalleryRef, {}>((_, ref) => {
       }
 
       const data = await response.json()
-      setVideos(data)
+      setVideos(Array.isArray(data) ? data : data.videos || [])
     } catch (err) {
       console.error("Error fetching videos:", err)
       setError(err instanceof Error ? err.message : "Failed to load videos")
@@ -170,7 +170,7 @@ const VideoGallery = forwardRef<VideoGalleryRef, {}>((_, ref) => {
               <div className="flex items-center gap-2">
                 <div className="flex items-center">
                   <Heart className="h-3 w-3 mr-1" />
-                  {video.likes}
+                  {video.likes?.length || 0}
                 </div>
                 <div className="flex items-center">
                   <MessageSquare className="h-3 w-3 mr-1" />

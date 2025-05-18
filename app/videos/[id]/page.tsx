@@ -6,12 +6,13 @@ import { useSession } from "next-auth/react"
 import AdvancedVideoPlayer from "@/components/advanced-video-player"
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card"
 import { Skeleton } from "@/components/ui/skeleton"
-import { AlertCircle, ArrowLeft, Heart, MessageSquare, Send, User } from "lucide-react"
+import { AlertCircle, ArrowLeft, Heart, MessageSquare, Send, User, Loader2 } from "lucide-react"
 import { Button } from "@/components/ui/button"
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar"
 import { Textarea } from "@/components/ui/textarea"
 import { formatDistanceToNow } from "date-fns"
 import { Separator } from "@/components/ui/separator"
+import { toast } from "@/components/ui/use-toast"
 
 interface Video {
   id: string
@@ -24,7 +25,7 @@ interface Video {
   user_name: string
   user_image: string | null
   views: number
-  likes: number
+  likes: { userId: string; timestamp: string }[]
   comments: Comment[]
   created_at: string
 }
@@ -47,10 +48,12 @@ export default function VideoDetailPage() {
   const [relatedVideos, setRelatedVideos] = useState<Video[]>([])
   const [loading, setLoading] = useState(true)
   const [error, setError] = useState<string | null>(null)
+  const [liked, setLiked] = useState(false)
+  const [likesCount, setLikesCount] = useState(0)
   const [comment, setComment] = useState("")
   const [comments, setComments] = useState<Comment[]>([])
   const [commentsLoading, setCommentsLoading] = useState(false)
-  const [liked, setLiked] = useState(false)
+  const [isSubmitting, setIsSubmitting] = useState(false)
   const commentInputRef = useRef<HTMLTextAreaElement>(null)
 
   useEffect(() => {
@@ -64,11 +67,19 @@ export default function VideoDetailPage() {
         }
 
         const data = await response.json()
+        // Handle both array and object with videos property
+        const videosArray = Array.isArray(data) ? data : data.videos || []
 
         // Find the current video
-        const currentVideo = data.find((v: Video) => v.id === params.id)
+        const currentVideo = videosArray.find((v: Video) => v.id === params.id)
         if (currentVideo) {
           setVideo(currentVideo)
+          setLikesCount(currentVideo.likes?.length || 0)
+
+          // Check if user has liked the video
+          if (session?.user?.id && Array.isArray(currentVideo.likes)) {
+            setLiked(currentVideo.likes.some(like => like.userId === session.user.id))
+          }
 
           // Record view
           await fetch(`/api/videos/${currentVideo.id}/view`, {
@@ -76,7 +87,7 @@ export default function VideoDetailPage() {
           })
 
           // Get related videos (excluding current)
-          const related = data.filter((v: Video) => v.id !== currentVideo.id).slice(0, 6)
+          const related = videosArray.filter((v: Video) => v.id !== currentVideo.id).slice(0, 6)
           setRelatedVideos(related)
 
           // Fetch comments
@@ -93,7 +104,7 @@ export default function VideoDetailPage() {
     }
 
     fetchVideos()
-  }, [params.id])
+  }, [params.id, session?.user?.id])
 
   const fetchComments = async (videoId: string) => {
     try {
@@ -126,7 +137,14 @@ export default function VideoDetailPage() {
   }
 
   const handleLike = async () => {
-    if (!session || !video) return
+    if (!session || !video) {
+      toast({
+        title: "Sign in required",
+        description: "Please sign in to like videos",
+        variant: "destructive",
+      })
+      return
+    }
 
     try {
       const response = await fetch(`/api/videos/${video.id}/like`, {
@@ -145,23 +163,29 @@ export default function VideoDetailPage() {
 
       const data = await response.json()
       setLiked(data.liked)
-
-      // Update video likes count
-      setVideo((prev) => {
-        if (!prev) return null
-        return {
-          ...prev,
-          likes: data.liked ? prev.likes + 1 : Math.max(0, prev.likes - 1),
-        }
-      })
+      setLikesCount(data.likesCount)
     } catch (err) {
       console.error("Error liking video:", err)
+      toast({
+        title: "Error",
+        description: "Failed to update like",
+        variant: "destructive",
+      })
     }
   }
 
-  const handleCommentSubmit = async () => {
-    if (!session || !video || !comment.trim()) return
+  const handleCommentSubmit = async (e: React.FormEvent) => {
+    e.preventDefault()
+    if (!session || !video || !comment.trim()) {
+      toast({
+        title: "Sign in required",
+        description: "Please sign in to comment",
+        variant: "destructive",
+      })
+      return
+    }
 
+    setIsSubmitting(true)
     try {
       const response = await fetch(`/api/videos/${video.id}/comments`, {
         method: "POST",
@@ -192,8 +216,20 @@ export default function VideoDetailPage() {
       if (commentInputRef.current) {
         commentInputRef.current.focus()
       }
+
+      toast({
+        title: "Success",
+        description: "Comment added successfully",
+      })
     } catch (err) {
       console.error("Error adding comment:", err)
+      toast({
+        title: "Error",
+        description: "Failed to add comment",
+        variant: "destructive",
+      })
+    } finally {
+      setIsSubmitting(false)
     }
   }
 
@@ -247,10 +283,15 @@ export default function VideoDetailPage() {
               <CardDescription className="flex items-center justify-between">
                 <span>{formatDistanceToNow(new Date(video.created_at), { addSuffix: true })}</span>
                 <div className="flex items-center gap-4">
-                  <div className="flex items-center gap-1">
-                    <Heart className={`h-5 w-5 ${liked ? "fill-red-500 text-red-500" : ""}`} />
-                    <span>{video.likes}</span>
-                  </div>
+                  <Button
+                    variant="ghost"
+                    size="sm"
+                    className={`flex items-center gap-1 ${liked ? "text-red-500" : ""}`}
+                    onClick={handleLike}
+                  >
+                    <Heart className={`h-5 w-5 ${liked ? "fill-current" : ""}`} />
+                    <span>{likesCount}</span>
+                  </Button>
                   <div className="flex items-center gap-1">
                     <MessageSquare className="h-5 w-5" />
                     <span>{comments.length}</span>
@@ -274,13 +315,6 @@ export default function VideoDetailPage() {
               {video.description && (
                 <p className="text-sm text-muted-foreground whitespace-pre-line">{video.description}</p>
               )}
-
-              <div className="flex gap-2 mt-4">
-                <Button variant={liked ? "default" : "outline"} size="sm" onClick={handleLike} disabled={!session}>
-                  <Heart className={`h-4 w-4 mr-2 ${liked ? "fill-white" : ""}`} />
-                  {liked ? "Liked" : "Like"}
-                </Button>
-              </div>
             </CardContent>
           </Card>
 
@@ -305,11 +339,25 @@ export default function VideoDetailPage() {
                       onChange={(e) => setComment(e.target.value)}
                       className="resize-none"
                       rows={2}
+                      disabled={isSubmitting}
                     />
                     <div className="flex justify-end mt-2">
-                      <Button size="sm" onClick={handleCommentSubmit} disabled={!comment.trim()}>
-                        <Send className="h-4 w-4 mr-2" />
-                        Comment
+                      <Button
+                        size="sm"
+                        onClick={handleCommentSubmit}
+                        disabled={!comment.trim() || isSubmitting}
+                      >
+                        {isSubmitting ? (
+                          <>
+                            <Loader2 className="h-4 w-4 mr-2 animate-spin" />
+                            Posting...
+                          </>
+                        ) : (
+                          <>
+                            <Send className="h-4 w-4 mr-2" />
+                            Comment
+                          </>
+                        )}
                       </Button>
                     </div>
                   </div>

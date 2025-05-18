@@ -33,6 +33,11 @@ export async function POST(request: NextRequest) {
       return NextResponse.json({ error: "Missing required fields" }, { status: 400 })
     }
 
+    if (!userId) {
+      console.error("POST /api/videos - Missing user ID")
+      return NextResponse.json({ error: "User ID is required" }, { status: 400 })
+    }
+
     // Get videos collection
     console.log("POST /api/videos - Getting videos collection")
     const collection = await getVideosCollection()
@@ -47,11 +52,11 @@ export async function POST(request: NextRequest) {
       description: description || "",
       thumbnailPublicId,
       thumbnailUrl,
-      userId: userId || "anonymous",
+      userId,
       userName: userName || "Anonymous User",
       userImage: userImage || null,
       views: 0,
-      likes: 0,
+      likes: [], // Always initialize as an array for new videos
       comments: [],
       createdAt: new Date(),
     })
@@ -73,20 +78,30 @@ export async function POST(request: NextRequest) {
   }
 }
 
-export async function GET() {
+export async function GET(request: NextRequest) {
   try {
     console.log("GET /api/videos - Starting request")
+
+    const userId = request.nextUrl.searchParams.get("userId")
+    console.log("GET /api/videos - User ID:", userId)
 
     // Get videos collection
     console.log("GET /api/videos - Getting videos collection")
     const collection = await getVideosCollection()
 
-    // Get all videos, sorted by creation date (newest first)
+    // Build query based on userId
+    let query = {}
+    if (userId) {
+      query = { userId }
+    }
+    console.log("GET /api/videos - Query:", query)
+
+    // Get videos, sorted by creation date (newest first)
     console.log("GET /api/videos - Fetching videos")
-    const videos = await collection.find({}).sort({ createdAt: -1 }).toArray()
+    const videos = await collection.find(query).sort({ createdAt: -1 }).toArray()
+    console.log(`GET /api/videos - Found ${videos.length} videos`)
 
     // Transform MongoDB _id to id for client-side compatibility
-    console.log(`GET /api/videos - Found ${videos.length} videos`)
     const formattedVideos = videos.map((video) => ({
       id: video._id.toString(),
       public_id: video.publicId,
@@ -99,15 +114,16 @@ export async function GET() {
       user_name: video.userName,
       user_image: video.userImage,
       views: video.views || 0,
-      likes: video.likes || 0,
+      likes: Array.isArray(video.likes) ? video.likes : [],
       comments: video.comments || [],
       created_at: video.createdAt.toISOString(),
     }))
 
-    return NextResponse.json(formattedVideos)
+    console.log("GET /api/videos - Returning formatted videos")
+    return NextResponse.json({ videos: formattedVideos })
   } catch (error) {
     console.error("GET /api/videos - Error fetching videos:", error)
     // Return empty array with a 200 status instead of an error
-    return NextResponse.json([])
+    return NextResponse.json({ videos: [] })
   }
 }

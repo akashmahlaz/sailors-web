@@ -27,22 +27,18 @@ export async function POST(request: NextRequest, { params }: { params: { id: str
       // User already liked, so unlike
       await collection.updateOne(
         { _id: new ObjectId(videoId) },
-        {
-          $pull: { likes: { userId } },
-          $inc: { likeCount: -1 },
-        },
+        { $pull: { likes: { userId } } }
       )
-      return NextResponse.json({ liked: false, message: "Like removed" })
+      const updated = await collection.findOne({ _id: new ObjectId(videoId) })
+      return NextResponse.json({ liked: false, likesCount: updated.likes.length })
     } else {
       // User hasn't liked, so add like
       await collection.updateOne(
         { _id: new ObjectId(videoId) },
-        {
-          $push: { likes: { userId, timestamp: new Date() } },
-          $inc: { likeCount: 1 },
-        },
+        { $push: { likes: { userId, timestamp: new Date() } } }
       )
-      return NextResponse.json({ liked: true, message: "Like added" })
+      const updated = await collection.findOne({ _id: new ObjectId(videoId) })
+      return NextResponse.json({ liked: true, likesCount: updated.likes.length })
     }
   } catch (error) {
     console.error("Error updating like:", error)
