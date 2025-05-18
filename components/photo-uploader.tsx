@@ -10,11 +10,19 @@ import { Input } from "@/components/ui/input"
 import { Textarea } from "@/components/ui/textarea"
 import { CheckCircle, AlertCircle, Upload } from "lucide-react"
 
-interface PhotoUploaderProps {
-  onUploadSuccess?: () => void
+interface UploadedMedia {
+  url: string
+  publicId: string
+  resourceType: string
+  format: string
 }
 
-export default function PhotoUploader({ onUploadSuccess }: PhotoUploaderProps) {
+interface PhotoUploaderProps {
+  onUploadSuccess?: (media: UploadedMedia) => void
+  saveToGallery?: boolean
+}
+
+export default function PhotoUploader({ onUploadSuccess, saveToGallery = true }: PhotoUploaderProps) {
   const [file, setFile] = useState<File | null>(null)
   const [title, setTitle] = useState("")
   const [description, setDescription] = useState("")
@@ -112,36 +120,38 @@ export default function PhotoUploader({ onUploadSuccess }: PhotoUploaderProps) {
             throw new Error("Invalid response from Cloudinary")
           }
 
-          // Save photo metadata to our MongoDB database
-          console.log("Saving photo metadata to database...")
-          const saveResponse = await fetch("/api/photos", {
-            method: "POST",
-            headers: {
-              "Content-Type": "application/json",
-            },
-            body: JSON.stringify({
-              publicId: response.public_id,
-              url: response.secure_url,
-              title: title || file.name.replace(/\.[^/.]+$/, ""),
-              description,
-              tags: tags
-                .split(",")
-                .map((tag) => tag.trim())
-                .filter(Boolean),
-            }),
-          })
+          // Save photo metadata to our MongoDB database only if saveToGallery is true
+          if (saveToGallery) {
+            console.log("Saving photo metadata to database...")
+            const saveResponse = await fetch("/api/photos", {
+              method: "POST",
+              headers: {
+                "Content-Type": "application/json",
+              },
+              body: JSON.stringify({
+                publicId: response.public_id,
+                url: response.secure_url,
+                title: title || file.name.replace(/\.[^/.]+$/, ""),
+                description,
+                tags: tags
+                  .split(",")
+                  .map((tag) => tag.trim())
+                  .filter(Boolean),
+              }),
+            })
 
-          if (!saveResponse.ok) {
-            let errorMessage = "Failed to save photo metadata"
-            try {
-              const errorData = await saveResponse.json()
-              errorMessage = errorData.error || saveResponse.statusText
-            } catch (e) {
-              errorMessage = `Failed to save photo metadata: ${saveResponse.status} ${saveResponse.statusText}`
+            if (!saveResponse.ok) {
+              let errorMessage = "Failed to save photo metadata"
+              try {
+                const errorData = await saveResponse.json()
+                errorMessage = errorData.error || saveResponse.statusText
+              } catch (e) {
+                errorMessage = `Failed to save photo metadata: ${saveResponse.status} ${saveResponse.statusText}`
+              }
+              console.warn(errorMessage)
+            } else {
+              console.log("Photo metadata saved successfully")
             }
-            console.warn(errorMessage)
-          } else {
-            console.log("Photo metadata saved successfully")
           }
 
           setSuccess(true)
@@ -156,7 +166,12 @@ export default function PhotoUploader({ onUploadSuccess }: PhotoUploaderProps) {
 
           // Call the onUploadSuccess callback if provided
           if (onUploadSuccess) {
-            onUploadSuccess()
+            onUploadSuccess({
+              url: response.secure_url,
+              publicId: response.public_id,
+              resourceType: response.resource_type,
+              format: response.format,
+            })
           }
         } else {
           let errorMessage = "Upload failed"
@@ -188,8 +203,8 @@ export default function PhotoUploader({ onUploadSuccess }: PhotoUploaderProps) {
   return (
     <Card className="w-full max-w-md mx-auto">
       <CardHeader>
-        <CardTitle>Capture the Horizon</CardTitle>
-        <CardDescription>Upload your maritime moments</CardDescription>
+        <CardTitle>Upload Image </CardTitle>
+        <CardDescription>Upload the Quality image</CardDescription>
       </CardHeader>
       <CardContent>
         <div className="space-y-4">
@@ -221,7 +236,7 @@ export default function PhotoUploader({ onUploadSuccess }: PhotoUploaderProps) {
               id="photo-title"
               value={title}
               onChange={(e) => setTitle(e.target.value)}
-              placeholder="Enter a title for your photo"
+              placeholder="Enter a title for your photo(OPTIONAL)"
               disabled={uploading}
             />
           </div>
@@ -247,7 +262,7 @@ export default function PhotoUploader({ onUploadSuccess }: PhotoUploaderProps) {
               id="photo-tags"
               value={tags}
               onChange={(e) => setTags(e.target.value)}
-              placeholder="nature, landscape, vacation"
+              placeholder="nature, landscape, vacation (OPTIONAL)"
               disabled={uploading}
             />
           </div>

@@ -12,7 +12,7 @@ import { Textarea } from "@/components/ui/textarea"
 import { Label } from "@/components/ui/label"
 import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert"
 import { AlertCircle, CheckCircle, Upload, X } from "lucide-react"
-import CloudinaryUploader from "@/components/cloudinary-uploader"
+import PhotoUploader from "@/components/photo-uploader"
 
 interface UploadedMedia {
   url: string
@@ -270,16 +270,10 @@ export default function ProfileEditForm() {
                     <p className="text-sm text-slate-600 dark:text-slate-400 mb-2">
                       Upload a profile image (recommended size: 400x400)
                     </p>
-                    <CloudinaryUploader
+                    <PhotoUploader
                       onUploadSuccess={handleProfileImageUpload}
-                      uploadPreset={process.env.NEXT_PUBLIC_UPLOAD_PRESET || ""}
-                      resourceType="image"
-                    >
-                      <Button type="button" variant="outline" className="border-slate-200 dark:border-slate-900">
-                        <Upload className="h-4 w-4 mr-2" />
-                        Upload Profile Image
-                      </Button>
-                    </CloudinaryUploader>
+                      saveToGallery={false}
+                    />
                   </div>
                 )}
               </div>
@@ -314,16 +308,10 @@ export default function ProfileEditForm() {
                     <p className="text-sm text-slate-600 dark:text-slate-400 mb-2">
                       Upload a cover image (recommended size: 1500x500)
                     </p>
-                    <CloudinaryUploader
+                    <PhotoUploader
                       onUploadSuccess={handleCoverImageUpload}
-                      uploadPreset={process.env.NEXT_PUBLIC_UPLOAD_PRESET || ""}
-                      resourceType="image"
-                    >
-                      <Button type="button" variant="outline" className="border-slate-200 dark:border-slate-900">
-                        <Upload className="h-4 w-4 mr-2" />
-                        Upload Cover Image
-                      </Button>
-                    </CloudinaryUploader>
+                      saveToGallery={false}
+                    />
                   </div>
                 )}
               </div>
@@ -343,7 +331,7 @@ export default function ProfileEditForm() {
             <Button
               type="submit"
               disabled={saving}
-              className="bg-slate-600 hover:bg-slate-700 dark:bg-slate-700 dark:hover:bg-slate-600"
+              className="bg-slate-800 hover:bg-slate-900 dark:bg-slate-400 dark:hover:bg-slate-500 dark:text-black"
             >
               {saving ? "Saving..." : "Save Profile"}
             </Button>
