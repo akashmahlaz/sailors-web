@@ -177,14 +177,9 @@ export default function CloudinaryUploader({
           id="file-upload"
           type="file"
           accept={accept}
+          capture="environment"
           className="flex h-10 w-full rounded-md border border-input bg-background px-3 py-2 text-sm file:border-0 file:bg-transparent file:text-sm file:font-medium"
           onChange={handleFileChange}
-          onClick={(e) => {
-            // Only prevent form submission, not the file dialog
-            if (e.target instanceof HTMLInputElement && e.target.type === 'file') {
-              e.stopPropagation();
-            }
-          }}
           disabled={uploading}
         />
       </div>
