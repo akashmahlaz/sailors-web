@@ -44,16 +44,13 @@ import {
 interface AnalyticsData {
   totalUsers: number
   totalVideos: number
-  totalAudios: number
   totalPhotos: number
-  totalBlogs: number
-  totalSupportRequests: number
+  totalPlaylists: number
   contentGrowth: {
     date: string
     videos: number
-    audios: number
     photos: number
-    blogs: number
+    playlists: number
   }[]
   contentDistribution: {
     name: string
@@ -63,7 +60,6 @@ interface AnalyticsData {
   userActivity: {
     date: string
     signups: number
-    logins: number
     uploads: number
   }[]
   popularContent: {
@@ -115,51 +111,7 @@ export default function AdminAnalyticsPage() {
       }
     }
 
-    // For demo purposes, we'll create mock data
-    const createMockData = () => {
-      const mockData: AnalyticsData = {
-        totalUsers: 1247,
-        totalVideos: 532,
-        totalAudios: 328,
-        totalPhotos: 1893,
-        totalBlogs: 246,
-        totalSupportRequests: 38,
-        contentGrowth: Array.from({ length: 12 }, (_, i) => ({
-          date: `${i + 1}/2023`,
-          videos: Math.floor(Math.random() * 50) + 10,
-          audios: Math.floor(Math.random() * 30) + 5,
-          photos: Math.floor(Math.random() * 100) + 20,
-          blogs: Math.floor(Math.random() * 20) + 5,
-        })),
-        contentDistribution: [
-          { name: "Videos", value: 532, color: "#3b82f6" },
-          { name: "Audios", value: 328, color: "#10b981" },
-          { name: "Photos", value: 1893, color: "#f59e0b" },
-          { name: "Blogs", value: 246, color: "#8b5cf6" },
-        ],
-        userActivity: Array.from({ length: 30 }, (_, i) => ({
-          date: `${i + 1}/5/2023`,
-          signups: Math.floor(Math.random() * 15),
-          logins: Math.floor(Math.random() * 100) + 50,
-          uploads: Math.floor(Math.random() * 40) + 10,
-        })),
-        popularContent: [
-          { id: "1", title: "Sailing the Caribbean", type: "video", views: 12453, likes: 843, comments: 156 },
-          { id: "2", title: "Sea Shanty Collection", type: "audio", views: 8932, likes: 721, comments: 89 },
-          { id: "3", title: "Sunset at Sea", type: "photo", views: 7821, likes: 1243, comments: 67 },
-          { id: "4", title: "Life of a Sailor", type: "blog", views: 6543, likes: 532, comments: 124 },
-          { id: "5", title: "Storm Navigation", type: "video", views: 5932, likes: 421, comments: 78 },
-        ],
-      }
-      setAnalyticsData(mockData)
-      setLoading(false)
-    }
-
-    // Use mock data for now
-    createMockData()
-
-    // In a real app, you would fetch actual data
-    // fetchAnalytics()
+    fetchAnalytics()
   }, [timeRange, session, status])
 
   if (status === "loading") {
@@ -177,10 +129,31 @@ export default function AdminAnalyticsPage() {
     )
   }
 
+  if (loading) {
+    return (
+      <div className="container mx-auto px-4 py-8">
+        <div className="flex justify-between items-center mb-6">
+          <h1 className="text-3xl font-bold">Loading analytics...</h1>
+        </div>
+      </div>
+    )
+  }
+
+  if (error || !analyticsData) {
+    return (
+      <div className="container mx-auto px-4 py-8">
+        <Alert variant="destructive">
+          <AlertCircle className="h-4 w-4" />
+          <AlertDescription>{error || "Failed to load analytics data"}</AlertDescription>
+        </Alert>
+      </div>
+    )
+  }
+
   return (
-    <div className="container mx-auto px-4 py-8 bg-gradient-to-b from-slate-50 to-cyan-50 dark:from-slate-950 dark:to-cyan-950">
+    <div className="container mx-auto px-4 py-8">
       <div className="flex justify-between items-center mb-6">
-        <h1 className="text-3xl font-bold text-cyan-900 dark:text-cyan-100">Platform Analytics</h1>
+        <h1 className="text-3xl font-bold">Platform Analytics</h1>
         <div className="flex gap-4">
           <Select value={timeRange} onValueChange={setTimeRange}>
             <SelectTrigger className="w-[180px]">
@@ -195,151 +168,91 @@ export default function AdminAnalyticsPage() {
             </SelectContent>
           </Select>
           <Link href="/admin/content">
-            <Button className="bg-gray-600 hover:bg-gray-700 dark:bg-gray-200 dark:hover:bg-gray-400 dark:text-white">
-              Manage Content
-            </Button>
+            <Button>Manage Content</Button>
           </Link>
         </div>
       </div>
 
-      {loading ? (
-        <div className="flex justify-center items-center h-64">
-          <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-gray-700"></div>
-        </div>
-      ) : error ? (
-        <Alert variant="destructive" className="mb-6">
-          <AlertCircle className="h-4 w-4" />
-          <AlertDescription>{error}</AlertDescription>
-        </Alert>
-      ) : analyticsData ? (
-        <>
-          {/* Overview Cards */}
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-6 gap-4 mb-6">
-            <StatCard
-              title="Total Users"
-              value={analyticsData.totalUsers}
-              icon={<Users className="h-5 w-5 text-blue-600" />}
-              trend="+12% from last month"
-              color="blue"
-            />
-            <StatCard
-              title="Videos"
-              value={analyticsData.totalVideos}
-              icon={<Video className="h-5 w-5 text-indigo-600" />}
-              trend="+8% from last month"
-              color="indigo"
-            />
-            <StatCard
-              title="Audio Files"
-              value={analyticsData.totalAudios}
-              icon={<Music className="h-5 w-5 text-green-600" />}
-              trend="+5% from last month"
-              color="green"
-            />
-            <StatCard
-              title="Photos"
-              value={analyticsData.totalPhotos}
-              icon={<ImageIcon className="h-5 w-5 text-amber-600" />}
-              trend="+15% from last month"
-              color="amber"
-            />
-            <StatCard
-              title="Blog Posts"
-              value={analyticsData.totalBlogs}
-              icon={<FileText className="h-5 w-5 text-purple-600" />}
-              trend="+3% from last month"
-              color="purple"
-            />
-            <StatCard
-              title="Support Requests"
-              value={analyticsData.totalSupportRequests}
-              icon={<LifeBuoy className="h-5 w-5 text-red-600" />}
-              trend="-2% from last month"
-              color="red"
-            />
-          </div>
+      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4 mb-8">
+        <StatCard
+          title="Total Users"
+          value={analyticsData.totalUsers}
+          icon={<Users className="h-5 w-5" />}
+          trend="+12%"
+          color="blue"
+        />
+        <StatCard
+          title="Total Videos"
+          value={analyticsData.totalVideos}
+          icon={<Video className="h-5 w-5" />}
+          trend="+8%"
+          color="indigo"
+        />
+        <StatCard
+          title="Total Photos"
+          value={analyticsData.totalPhotos}
+          icon={<ImageIcon className="h-5 w-5" />}
+          trend="+15%"
+          color="amber"
+        />
+        <StatCard
+          title="Total Playlists"
+          value={analyticsData.totalPlaylists}
+          icon={<Music className="h-5 w-5" />}
+          trend="+5%"
+          color="purple"
+        />
+      </div>
 
-          {/* Charts */}
-          <div className="grid grid-cols-1 lg:grid-cols-2 gap-6 mb-6">
-            <Card className="border-cyan-200 shadow-lg shadow-cyan-100 dark:border-cyan-900 dark:shadow-none">
-              <CardHeader className="pb-2">
-                <CardTitle className="text-cyan-900 dark:text-cyan-100 flex items-center gap-2">
-                  <TrendingUp className="h-5 w-5 text-cyan-600" />
-                  Content Growth
-                </CardTitle>
-                <CardDescription>Monthly content uploads by type</CardDescription>
+      <Tabs defaultValue="overview" className="space-y-4">
+        <TabsList>
+          <TabsTrigger value="overview">Overview</TabsTrigger>
+          <TabsTrigger value="content">Content</TabsTrigger>
+          <TabsTrigger value="users">Users</TabsTrigger>
+        </TabsList>
+
+        <TabsContent value="overview" className="space-y-4">
+          <div className="grid grid-cols-1 lg:grid-cols-2 gap-4">
+            <Card>
+              <CardHeader>
+                <CardTitle>Content Growth</CardTitle>
+                <CardDescription>Content creation over time</CardDescription>
               </CardHeader>
               <CardContent>
-                <div className="h-80">
+                <div className="h-[300px]">
                   <ResponsiveContainer width="100%" height="100%">
-                    <BarChart data={analyticsData.contentGrowth} margin={{ top: 20, right: 30, left: 20, bottom: 5 }}>
+                    <LineChart data={analyticsData.contentGrowth}>
                       <CartesianGrid strokeDasharray="3 3" />
                       <XAxis dataKey="date" />
                       <YAxis />
                       <Tooltip />
                       <Legend />
-                      <Bar dataKey="videos" stackId="a" fill="#3b82f6" name="Videos" />
-                      <Bar dataKey="audios" stackId="a" fill="#10b981" name="Audios" />
-                      <Bar dataKey="photos" stackId="a" fill="#f59e0b" name="Photos" />
-                      <Bar dataKey="blogs" stackId="a" fill="#8b5cf6" name="Blogs" />
-                    </BarChart>
-                  </ResponsiveContainer>
-                </div>
-              </CardContent>
-            </Card>
-
-            <Card className="border-cyan-200 shadow-lg shadow-cyan-100 dark:border-cyan-900 dark:shadow-none">
-              <CardHeader className="pb-2">
-                <CardTitle className="text-cyan-900 dark:text-cyan-100 flex items-center gap-2">
-                  <Activity className="h-5 w-5 text-cyan-600" />
-                  User Activity
-                </CardTitle>
-                <CardDescription>Daily user engagement metrics</CardDescription>
-              </CardHeader>
-              <CardContent>
-                <div className="h-80">
-                  <ResponsiveContainer width="100%" height="100%">
-                    <LineChart
-                      data={analyticsData.userActivity.slice(-14)} // Show last 14 days
-                      margin={{ top: 20, right: 30, left: 20, bottom: 5 }}
-                    >
-                      <CartesianGrid strokeDasharray="3 3" />
-                      <XAxis dataKey="date" />
-                      <YAxis />
-                      <Tooltip />
-                      <Legend />
-                      <Line type="monotone" dataKey="signups" stroke="#3b82f6" name="New Users" />
-                      <Line type="monotone" dataKey="logins" stroke="#10b981" name="Logins" />
-                      <Line type="monotone" dataKey="uploads" stroke="#f59e0b" name="Content Uploads" />
+                      <Line type="monotone" dataKey="videos" stroke="#3b82f6" />
+                      <Line type="monotone" dataKey="photos" stroke="#f59e0b" />
+                      <Line type="monotone" dataKey="playlists" stroke="#8b5cf6" />
                     </LineChart>
                   </ResponsiveContainer>
                 </div>
               </CardContent>
             </Card>
-          </div>
 
-          <div className="grid grid-cols-1 lg:grid-cols-3 gap-6 mb-6">
-            <Card className="border-cyan-200 shadow-lg shadow-cyan-100 dark:border-cyan-900 dark:shadow-none">
-              <CardHeader className="pb-2">
-                <CardTitle className="text-cyan-900 dark:text-cyan-100 flex items-center gap-2">
-                  <BarChart3 className="h-5 w-5 text-cyan-600" />
-                  Content Distribution
-                </CardTitle>
-                <CardDescription>Breakdown of content types</CardDescription>
+            <Card>
+              <CardHeader>
+                <CardTitle>Content Distribution</CardTitle>
+                <CardDescription>Types of content on the platform</CardDescription>
               </CardHeader>
               <CardContent>
-                <div className="h-64">
+                <div className="h-[300px]">
                   <ResponsiveContainer width="100%" height="100%">
                     <PieChart>
                       <Pie
                         data={analyticsData.contentDistribution}
+                        dataKey="value"
+                        nameKey="name"
                         cx="50%"
                         cy="50%"
-                        labelLine={false}
-                        outerRadius={80}
-                        fill="#8884d8"
-                        dataKey="value"
-                        label={({ name, percent }) => `${name} ${(percent * 100).toFixed(0)}%`}
+                        outerRadius={100}
+                        label
                       >
                         {analyticsData.contentDistribution.map((entry, index) => (
                           <Cell key={`cell-${index}`} fill={entry.color} />
@@ -352,138 +265,63 @@ export default function AdminAnalyticsPage() {
                 </div>
               </CardContent>
             </Card>
-
-            <Card className="border-cyan-200 shadow-lg shadow-cyan-100 dark:border-cyan-900 dark:shadow-none lg:col-span-2">
-              <CardHeader className="pb-2">
-                <CardTitle className="text-cyan-900 dark:text-cyan-100 flex items-center gap-2">
-                  <TrendingUp className="h-5 w-5 text-cyan-600" />
-                  Popular Content
-                </CardTitle>
-                <CardDescription>Most viewed content across the platform</CardDescription>
-              </CardHeader>
-              <CardContent>
-                <div className="overflow-x-auto">
-                  <table className="w-full">
-                    <thead>
-                      <tr className="border-b border-cyan-100 dark:border-cyan-900">
-                        <th className="text-left py-3 px-4 font-medium text-cyan-900 dark:text-cyan-100">Title</th>
-                        <th className="text-left py-3 px-4 font-medium text-cyan-900 dark:text-cyan-100">Type</th>
-                        <th className="text-right py-3 px-4 font-medium text-cyan-900 dark:text-cyan-100">Views</th>
-                        <th className="text-right py-3 px-4 font-medium text-cyan-900 dark:text-cyan-100">Likes</th>
-                        <th className="text-right py-3 px-4 font-medium text-cyan-900 dark:text-cyan-100">Comments</th>
-                      </tr>
-                    </thead>
-                    <tbody>
-                      {analyticsData.popularContent.map((item) => (
-                        <tr key={item.id} className="border-b border-cyan-50 dark:border-cyan-950">
-                          <td className="py-3 px-4">{item.title}</td>
-                          <td className="py-3 px-4">
-                            <Badge variant="outline" className="capitalize">
-                              {item.type}
-                            </Badge>
-                          </td>
-                          <td className="py-3 px-4 text-right">{item.views.toLocaleString()}</td>
-                          <td className="py-3 px-4 text-right">{item.likes.toLocaleString()}</td>
-                          <td className="py-3 px-4 text-right">{item.comments.toLocaleString()}</td>
-                        </tr>
-                      ))}
-                    </tbody>
-                  </table>
-                </div>
-              </CardContent>
-            </Card>
           </div>
 
-          {/* Content Performance */}
-          <Card className="border-cyan-200 shadow-lg shadow-cyan-100 dark:border-cyan-900 dark:shadow-none mb-6">
-            <CardHeader className="pb-2">
-              <CardTitle className="text-cyan-900 dark:text-cyan-100 flex items-center gap-2">
-                <Calendar className="h-5 w-5 text-cyan-600" />
-                Content Performance
-              </CardTitle>
-              <CardDescription>Detailed metrics by content type</CardDescription>
+          <Card>
+            <CardHeader>
+              <CardTitle>User Activity</CardTitle>
+              <CardDescription>User signups and content uploads</CardDescription>
             </CardHeader>
             <CardContent>
-              <Tabs defaultValue="videos">
-                <TabsList className="grid grid-cols-4 mb-4">
-                  <TabsTrigger value="videos">Videos</TabsTrigger>
-                  <TabsTrigger value="audios">Audio</TabsTrigger>
-                  <TabsTrigger value="photos">Photos</TabsTrigger>
-                  <TabsTrigger value="blogs">Blogs</TabsTrigger>
-                </TabsList>
-                <TabsContent value="videos">
-                  <div className="h-80">
-                    <ResponsiveContainer width="100%" height="100%">
-                      <LineChart
-                        data={analyticsData.contentGrowth}
-                        margin={{ top: 20, right: 30, left: 20, bottom: 5 }}
-                      >
-                        <CartesianGrid strokeDasharray="3 3" />
-                        <XAxis dataKey="date" />
-                        <YAxis />
-                        <Tooltip />
-                        <Legend />
-                        <Line type="monotone" dataKey="videos" stroke="#3b82f6" name="Videos" />
-                      </LineChart>
-                    </ResponsiveContainer>
-                  </div>
-                </TabsContent>
-                <TabsContent value="audios">
-                  <div className="h-80">
-                    <ResponsiveContainer width="100%" height="100%">
-                      <LineChart
-                        data={analyticsData.contentGrowth}
-                        margin={{ top: 20, right: 30, left: 20, bottom: 5 }}
-                      >
-                        <CartesianGrid strokeDasharray="3 3" />
-                        <XAxis dataKey="date" />
-                        <YAxis />
-                        <Tooltip />
-                        <Legend />
-                        <Line type="monotone" dataKey="audios" stroke="#10b981" name="Audios" />
-                      </LineChart>
-                    </ResponsiveContainer>
-                  </div>
-                </TabsContent>
-                <TabsContent value="photos">
-                  <div className="h-80">
-                    <ResponsiveContainer width="100%" height="100%">
-                      <LineChart
-                        data={analyticsData.contentGrowth}
-                        margin={{ top: 20, right: 30, left: 20, bottom: 5 }}
-                      >
-                        <CartesianGrid strokeDasharray="3 3" />
-                        <XAxis dataKey="date" />
-                        <YAxis />
-                        <Tooltip />
-                        <Legend />
-                        <Line type="monotone" dataKey="photos" stroke="#f59e0b" name="Photos" />
-                      </LineChart>
-                    </ResponsiveContainer>
-                  </div>
-                </TabsContent>
-                <TabsContent value="blogs">
-                  <div className="h-80">
-                    <ResponsiveContainer width="100%" height="100%">
-                      <LineChart
-                        data={analyticsData.contentGrowth}
-                        margin={{ top: 20, right: 30, left: 20, bottom: 5 }}
-                      >
-                        <CartesianGrid strokeDasharray="3 3" />
-                        <XAxis dataKey="date" />
-                        <YAxis />
-                        <Tooltip />
-                        <Legend />
-                        <Line type="monotone" dataKey="blogs" stroke="#8b5cf6" name="Blogs" />
-                      </LineChart>
-                    </ResponsiveContainer>
-                  </div>
-                </TabsContent>
-              </Tabs>
+              <div className="h-[300px]">
+                <ResponsiveContainer width="100%" height="100%">
+                  <BarChart data={analyticsData.userActivity}>
+                    <CartesianGrid strokeDasharray="3 3" />
+                    <XAxis dataKey="date" />
+                    <YAxis />
+                    <Tooltip />
+                    <Legend />
+                    <Bar dataKey="signups" fill="#3b82f6" />
+                    <Bar dataKey="uploads" fill="#10b981" />
+                  </BarChart>
+                </ResponsiveContainer>
+              </div>
             </CardContent>
           </Card>
-        </>
-      ) : null}
+        </TabsContent>
+
+        <TabsContent value="content" className="space-y-4">
+          <Card>
+            <CardHeader>
+              <CardTitle>Popular Content</CardTitle>
+              <CardDescription>Most viewed content on the platform</CardDescription>
+            </CardHeader>
+            <CardContent>
+              <div className="space-y-4">
+                {analyticsData.popularContent.map((content) => (
+                  <div key={content.id} className="flex items-center justify-between p-4 border rounded-lg">
+                    <div>
+                      <h3 className="font-medium">{content.title}</h3>
+                      <p className="text-sm text-muted-foreground">{content.type}</p>
+                    </div>
+                    <div className="flex items-center gap-4">
+                      <div className="text-sm">
+                        <span className="font-medium">{content.views}</span> views
+                      </div>
+                      <div className="text-sm">
+                        <span className="font-medium">{content.likes}</span> likes
+                      </div>
+                      <div className="text-sm">
+                        <span className="font-medium">{content.comments}</span> comments
+                      </div>
+                    </div>
+                  </div>
+                ))}
+              </div>
+            </CardContent>
+          </Card>
+        </TabsContent>
+      </Tabs>
     </div>
   )
 }

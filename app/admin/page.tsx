@@ -46,11 +46,11 @@ export default function AdminPage() {
               <BarChart3 className="h-5 w-5 text-gray-600 dark:text-gray-400" />
               Analytics
             </CardTitle>
-            <CardDescription>Platform statistics</CardDescription>
+            <CardDescription>Platform insights</CardDescription>
           </CardHeader>
           <CardContent className="pt-6">
             <p className="mb-4 text-gray-700 dark:text-gray-300">
-              Access detailed analytics about user activity, content performance, and platform growth.
+              View detailed analytics and insights about platform usage, content, and user engagement.
             </p>
             <Link href="/admin/analytics">
               <Button className="bg-gray-700 hover:bg-gray-800 dark:bg-gray-800 dark:hover:bg-gray-700 text-white">
@@ -102,46 +102,6 @@ export default function AdminPage() {
       </div>
 
       <div className="grid grid-cols-1 md:grid-cols-3 gap-6 mb-8">
-        <Card className="border-gray-200 shadow-lg dark:border-gray-800 dark:shadow-none">
-          <CardHeader className="border-b border-gray-100 dark:border-gray-800 bg-gradient-to-r from-gray-50 to-white dark:from-gray-900 dark:to-gray-950">
-            <CardTitle className="text-gray-900 dark:text-gray-100 flex items-center gap-2">
-              <Bell className="h-5 w-5 text-gray-600 dark:text-gray-400" />
-              Notifications
-            </CardTitle>
-            <CardDescription>Admin alerts</CardDescription>
-          </CardHeader>
-          <CardContent className="pt-6">
-            <p className="mb-4 text-gray-700 dark:text-gray-300">
-              View and manage system notifications and alerts for important platform events.
-            </p>
-            <Link href="/admin/notifications">
-              <Button className="bg-gray-700 hover:bg-gray-800 dark:bg-gray-800 dark:hover:bg-gray-700 text-white">
-                View Notifications
-              </Button>
-            </Link>
-          </CardContent>
-        </Card>
-
-        <Card className="border-gray-200 shadow-lg dark:border-gray-800 dark:shadow-none">
-          <CardHeader className="border-b border-gray-100 dark:border-gray-800 bg-gradient-to-r from-gray-50 to-white dark:from-gray-900 dark:to-gray-950">
-            <CardTitle className="text-gray-900 dark:text-gray-100 flex items-center gap-2">
-              <ClipboardList className="h-5 w-5 text-gray-600 dark:text-gray-400" />
-              Activity Logs
-            </CardTitle>
-            <CardDescription>Admin actions</CardDescription>
-          </CardHeader>
-          <CardContent className="pt-6">
-            <p className="mb-4 text-gray-700 dark:text-gray-300">
-              View detailed logs of all administrative actions for accountability and auditing.
-            </p>
-            <Link href="/admin/activity-logs">
-              <Button className="bg-gray-700 hover:bg-gray-800 dark:bg-gray-800 dark:hover:bg-gray-700 text-white">
-                View Activity Logs
-              </Button>
-            </Link>
-          </CardContent>
-        </Card>
-
         <Card className="border-gray-200 shadow-lg dark:border-gray-800 dark:shadow-none">
           <CardHeader className="border-b border-gray-100 dark:border-gray-800 bg-gradient-to-r from-gray-50 to-white dark:from-gray-900 dark:to-gray-950">
             <CardTitle className="text-gray-900 dark:text-gray-100 flex items-center gap-2">

@@ -8,7 +8,9 @@ import {
   getBlogsCollection,
   getUsersCollection,
   getSupportRequestsCollection,
+  getPlaylistsCollection,
 } from "@/lib/mongodb-server"
+import { ObjectId } from "mongodb"
 
 export async function GET(request: NextRequest) {
   try {
@@ -18,12 +20,30 @@ export async function GET(request: NextRequest) {
       return NextResponse.json({ error: "Unauthorized" }, { status: 401 })
     }
 
-    // Get time range from query parameters
-    const searchParams = request.nextUrl.searchParams
-    const timeRange = searchParams.get("timeRange") || "30days"
+    const timeRange = request.nextUrl.searchParams.get("timeRange") || "30days"
+    const now = new Date()
+    let startDate = new Date()
 
-    // Calculate date filter based on time range
-    const dateFilter = getDateFilter(timeRange)
+    // Calculate start date based on timeRange
+    switch (timeRange) {
+      case "7days":
+        startDate.setDate(now.getDate() - 7)
+        break
+      case "30days":
+        startDate.setDate(now.getDate() - 30)
+        break
+      case "90days":
+        startDate.setDate(now.getDate() - 90)
+        break
+      case "year":
+        startDate.setFullYear(now.getFullYear() - 1)
+        break
+      case "all":
+        startDate = new Date(0) // Beginning of time
+        break
+      default:
+        startDate.setDate(now.getDate() - 30)
+    }
 
     // Get collections
     const videosCollection = await getVideosCollection()
@@ -32,33 +52,106 @@ export async function GET(request: NextRequest) {
     const blogsCollection = await getBlogsCollection()
     const usersCollection = await getUsersCollection()
     const supportRequestsCollection = await getSupportRequestsCollection()
+    const playlistsCollection = await getPlaylistsCollection()
 
-    // Get counts
-    const totalVideos = await videosCollection.countDocuments()
-    const totalAudios = await audiosCollection.countDocuments()
-    const totalPhotos = await photosCollection.countDocuments()
-    const totalBlogs = await blogsCollection.countDocuments()
-    const totalUsers = await usersCollection.countDocuments()
-    const totalSupportRequests = await supportRequestsCollection.countDocuments()
+    // Get total counts
+    const [totalUsers, totalVideos, totalAudios, totalPhotos, totalBlogs, totalSupportRequests, totalPlaylists] = await Promise.all([
+      usersCollection.countDocuments(),
+      videosCollection.countDocuments(),
+      audiosCollection.countDocuments(),
+      photosCollection.countDocuments(),
+      blogsCollection.countDocuments(),
+      supportRequestsCollection.countDocuments(),
+      playlistsCollection.countDocuments(),
+    ])
 
-    // For a real implementation, you would query the database for actual analytics data
-    // For this example, we'll return mock data
+    // Get content growth data
+    const contentGrowth = await Promise.all(
+      Array.from({ length: 12 }, async (_, i) => {
+        const date = new Date()
+        date.setMonth(date.getMonth() - i)
+        const startOfMonth = new Date(date.getFullYear(), date.getMonth(), 1)
+        const endOfMonth = new Date(date.getFullYear(), date.getMonth() + 1, 0)
 
-    // In a real implementation, you would aggregate data from your collections
-    // For example, to get content growth over time:
-    /*
-    const contentGrowth = await videosCollection.aggregate([
-      { $match: dateFilter },
-      { $group: {
-          _id: { $dateToString: { format: "%Y-%m", date: "$created_at" } },
-          count: { $sum: 1 }
+        const [videos, audios, photos, blogs, playlists] = await Promise.all([
+          videosCollection.countDocuments({
+            createdAt: { $gte: startOfMonth, $lte: endOfMonth },
+          }),
+          audiosCollection.countDocuments({
+            createdAt: { $gte: startOfMonth, $lte: endOfMonth },
+          }),
+          photosCollection.countDocuments({
+            createdAt: { $gte: startOfMonth, $lte: endOfMonth },
+          }),
+          blogsCollection.countDocuments({
+            createdAt: { $gte: startOfMonth, $lte: endOfMonth },
+          }),
+          playlistsCollection.countDocuments({
+            createdAt: { $gte: startOfMonth, $lte: endOfMonth },
+          }),
+        ])
+
+        return {
+          date: `${date.getMonth() + 1}/${date.getFullYear()}`,
+          videos,
+          audios,
+          photos,
+          blogs,
+          playlists,
         }
-      },
-      { $sort: { "_id": 1 } }
-    ]).toArray()
-    */
+      }),
+    ).then(results => results.reverse())
 
-    // Return analytics data
+    // Get content distribution
+    const contentDistribution = [
+      { name: "Videos", value: totalVideos, color: "#3b82f6" },
+      { name: "Audios", value: totalAudios, color: "#10b981" },
+      { name: "Photos", value: totalPhotos, color: "#f59e0b" },
+      { name: "Blogs", value: totalBlogs, color: "#8b5cf6" },
+      { name: "Playlists", value: totalPlaylists, color: "#8b5cf6" },
+    ]
+
+    // Get user activity data
+    const userActivity = await Promise.all(
+      Array.from({ length: 30 }, async (_, i) => {
+        const date = new Date()
+        date.setDate(date.getDate() - i)
+        const startOfDay = new Date(date.setHours(0, 0, 0, 0))
+        const endOfDay = new Date(date.setHours(23, 59, 59, 999))
+
+        const [signups, uploads] = await Promise.all([
+          usersCollection.countDocuments({
+            createdAt: { $gte: startOfDay, $lte: endOfDay },
+          }),
+          videosCollection.countDocuments({
+            createdAt: { $gte: startOfDay, $lte: endOfDay },
+          }),
+        ])
+
+        return {
+          date: `${date.getDate()}/${date.getMonth() + 1}/${date.getFullYear()}`,
+          signups,
+          uploads,
+        }
+      }),
+    ).then(results => results.reverse())
+
+    // Get popular content
+    const popularVideos = await videosCollection
+      .find({})
+      .sort({ views: -1 })
+      .limit(5)
+      .toArray()
+
+    const popularContent = popularVideos.map(video => ({
+      id: video._id.toString(),
+      title: video.title,
+      type: "video",
+      views: video.views || 0,
+      likes: video.likes?.length || 0,
+      comments: video.comments?.length || 0,
+    }))
+
     return NextResponse.json({
       totalUsers,
       totalVideos,
@@ -66,16 +159,11 @@ export async function GET(request: NextRequest) {
       totalPhotos,
       totalBlogs,
       totalSupportRequests,
-      // In a real implementation, these would be populated with actual data
-      contentGrowth: generateMockContentGrowth(),
-      contentDistribution: [
-        { name: "Videos", value: totalVideos, color: "#3b82f6" },
-        { name: "Audios", value: totalAudios, color: "#10b981" },
-        { name: "Photos", value: totalPhotos, color: "#f59e0b" },
-        { name: "Blogs", value: totalBlogs, color: "#8b5cf6" },
-      ],
-      userActivity: generateMockUserActivity(),
-      popularContent: generateMockPopularContent(),
+      totalPlaylists,
+      contentGrowth,
+      contentDistribution,
+      userActivity,
+      popularContent,
     })
   } catch (error) {
     console.error("Error fetching analytics:", error)
