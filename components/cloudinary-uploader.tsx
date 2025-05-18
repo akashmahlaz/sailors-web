@@ -179,6 +179,11 @@ export default function CloudinaryUploader({
           accept={accept}
           className="flex h-10 w-full rounded-md border border-input bg-background px-3 py-2 text-sm file:border-0 file:bg-transparent file:text-sm file:font-medium"
           onChange={handleFileChange}
+          onClick={(e) => {
+            // Prevent any default form submission
+            e.preventDefault();
+            e.stopPropagation();
+          }}
           disabled={uploading}
         />
       </div>
