@@ -1,84 +1,104 @@
 import Link from "next/link"
-import { Sailboat, Anchor, Compass, LifeBuoy, Mail, Github, Twitter, Facebook, Instagram, Youtube } from "lucide-react"
+import { Sailboat, Anchor, Compass, LifeBuoy, Mail, Github, Twitter, Facebook, Instagram, Youtube, MailIcon, Linkedin, Globe2Icon, Globe } from "lucide-react"
 
 export default function Footer() {
   const currentYear = new Date().getFullYear()
 
   return (
-    <footer className="bg-gray-300 text-gray-700 pt-16 pb-8 border-t border-gray-300 shadow-inner dark:bg-gray-900 dark:text-gray-200 dark:border-gray-700">
-      <div className="container mx-auto px-4">
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-10 mb-14">
-          {/* Logo and About */}
-          <div>
-            <div className="mr-4 flex flex-shrink-0 items-center">
-          <Link
-            href="/"
-            className="flex items-center text-xl font-bold text-gray-800 hover:text-gray-600 transition-colors dark:text-white dark:hover:text-gray-300"
-          >
-            {/* Logo image placeholder, replace src when image is provided */}
-            <img
-              src="/d4.jpg"
-              alt="Logo"
-              className="mr-2 h-10 w-10 object-contain rounded-sm bg-gray-100 dark:bg-gray-700 border border-gray-200 dark:border-gray-600 shadow-sm"
-              style={{ minWidth: 32, minHeight: 32 }}
-            />
-            <span className="hidden sm:inline">Sailor's Platform</span>
-          </Link>
-        </div>
-            <p className="text-gray-500 mb-5 text-sm leading-relaxed dark:text-gray-400">
+    <footer className="bg-gradient-to-b from-gray-50 via-gray-50 to-gray-100 dark:from-gray-900 dark:via-gray-900 dark:to-gray-800 text-gray-700 pt-20 pb-10 border-t border-gray-200 dark:border-gray-700">
+      <div className="container mx-auto px-6">
+        {/* Main Footer Content */}
+        <div className="grid grid-cols-1 md:grid-cols-3 gap-16 mb-16">
+          {/* Brand Section */}
+          <div className="space-y-8">
+            <div className="flex items-center space-x-4">
+              <Link
+                href="/"
+                className="flex items-center text-xl font-bold text-gray-800 hover:text-gray-600 transition-colors dark:text-white dark:hover:text-gray-300"
+              >
+                <img
+                  src="/d4.jpg"
+                  alt="Sailor's Platform Logo"
+                  className="h-14 w-14 object-contain rounded-xl bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700 shadow-md"
+                  style={{ minWidth: 56, minHeight: 56 }}
+                />
+                <span className="ml-4 hidden sm:inline text-2xl">Sailor's Platform</span>
+              </Link>
+            </div>
+            <p className="text-gray-600 dark:text-gray-400 text-base leading-relaxed max-w-md">
               Navigate the digital seas with your fellow sailors. Share stories, discover content, and connect with your maritime community.
             </p>
-            <div className="flex space-x-4 mt-2">
-              <Link href="#" className="text-gray-400 hover:text-gray-600 transition-colors focus:outline-none focus:ring-2 focus:ring-gray-400 rounded dark:hover:text-gray-300 dark:focus:ring-gray-600">
-                <Twitter className="h-5 w-5" />
+            <div className="flex items-center space-x-6">
+              <Link 
+                href="https://www.instagram.com/dileep_14june" 
+                className="text-gray-500 hover:text-gray-700 dark:text-gray-400 dark:hover:text-gray-300 transition-colors transform hover:scale-110"
+                aria-label="Instagram"
+              >
+                <Instagram className="h-6 w-6" />
               </Link>
-              <Link href="#" className="text-gray-400 hover:text-gray-600 transition-colors focus:outline-none focus:ring-2 focus:ring-gray-400 rounded dark:hover:text-gray-300 dark:focus:ring-gray-600">
-                <Facebook className="h-5 w-5" />
+              <Link 
+                href="mailto:cetusleader2009@gmail.com" 
+                className="text-gray-500 hover:text-gray-700 dark:text-gray-400 dark:hover:text-gray-300 transition-colors transform hover:scale-110"
+                aria-label="Email"
+              >
+                <MailIcon className="h-6 w-6" />
               </Link>
-              <Link href="#" className="text-gray-400 hover:text-gray-600 transition-colors focus:outline-none focus:ring-2 focus:ring-gray-400 rounded dark:hover:text-gray-300 dark:focus:ring-gray-600">
-                <Instagram className="h-5 w-5" />
+              <Link 
+                href="https://github.com/akashmahlax" 
+                className="text-gray-500 hover:text-gray-700 dark:text-gray-400 dark:hover:text-gray-300 transition-colors transform hover:scale-110"
+                aria-label="GitHub"
+              >
+                <Github className="h-6 w-6" />
               </Link>
-              <Link href="#" className="text-gray-400 hover:text-gray-600 transition-colors focus:outline-none focus:ring-2 focus:ring-gray-400 rounded dark:hover:text-gray-300 dark:focus:ring-gray-600">
-                <Youtube className="h-5 w-5" />
+              <Link 
+                href="https://www.linkedin.com/in/akashmahlax/" 
+                className="text-gray-500 hover:text-gray-700 dark:text-gray-400 dark:hover:text-gray-300 transition-colors transform hover:scale-110"
+                aria-label="LinkedIn"
+              >
+                <Linkedin className="h-6 w-6" />
               </Link>
-              <Link href="#" className="text-gray-400 hover:text-gray-600 transition-colors focus:outline-none focus:ring-2 focus:ring-gray-400 rounded dark:hover:text-gray-300 dark:focus:ring-gray-600">
-                <Github className="h-5 w-5" />
+              <Link 
+                href="https://portfolio-blue-rho-93.vercel.app/" 
+                className="text-gray-500 hover:text-gray-700 dark:text-gray-400 dark:hover:text-gray-300 transition-colors transform hover:scale-110"
+                aria-label="Portfolio"
+              >
+                <Globe className="h-6 w-6" />
               </Link>
             </div>
           </div>
 
           {/* Quick Links */}
           <div>
-            <h3 className="text-lg font-semibold mb-4 text-gray-700 tracking-wide dark:text-gray-200">Quick Links</h3>
-            <ul className="space-y-2">
+            <h3 className="text-xl font-semibold mb-8 text-gray-800 dark:text-gray-200 tracking-wide">Quick Links</h3>
+            <ul className="space-y-5">
               <li>
-                <Link href="/videos" className="text-gray-600 hover:text-gray-900 transition-colors flex items-center font-medium dark:text-gray-400 dark:hover:text-gray-200">
-                  <Anchor className="h-4 w-4 mr-2 text-gray-400 dark:text-gray-500" /> Videos
+                <Link href="/videos" className="text-gray-600 hover:text-gray-900 transition-colors flex items-center font-medium dark:text-gray-400 dark:hover:text-gray-200 group">
+                  <Anchor className="h-5 w-5 mr-3 text-gray-400 dark:text-gray-500 group-hover:text-gray-600 dark:group-hover:text-gray-300 transition-colors" />
+                  <span className="text-base">Videos</span>
                 </Link>
               </li>
               <li>
-                <Link href="/photos" className="text-gray-600 hover:text-gray-900 transition-colors flex items-center font-medium dark:text-gray-400 dark:hover:text-gray-200">
-                  <Anchor className="h-4 w-4 mr-2 text-gray-400 dark:text-gray-500" /> Photos
+                <Link href="/photos" className="text-gray-600 hover:text-gray-900 transition-colors flex items-center font-medium dark:text-gray-400 dark:hover:text-gray-200 group">
+                  <Anchor className="h-5 w-5 mr-3 text-gray-400 dark:text-gray-500 group-hover:text-gray-600 dark:group-hover:text-gray-300 transition-colors" />
+                  <span className="text-base">Photos</span>
                 </Link>
               </li>
               <li>
-                <Link href="/audio" className="text-gray-600 hover:text-gray-900 transition-colors flex items-center font-medium dark:text-gray-400 dark:hover:text-gray-200">
-                  <Anchor className="h-4 w-4 mr-2 text-gray-400 dark:text-gray-500" /> Audio
+                <Link href="/audio" className="text-gray-600 hover:text-gray-900 transition-colors flex items-center font-medium dark:text-gray-400 dark:hover:text-gray-200 group">
+                  <Anchor className="h-5 w-5 mr-3 text-gray-400 dark:text-gray-500 group-hover:text-gray-600 dark:group-hover:text-gray-300 transition-colors" />
+                  <span className="text-base">Audio</span>
                 </Link>
               </li>
               <li>
-                <Link href="/podcasts" className="text-gray-600 hover:text-gray-900 transition-colors flex items-center font-medium dark:text-gray-400 dark:hover:text-gray-200">
-                  <Anchor className="h-4 w-4 mr-2 text-gray-400 dark:text-gray-500" /> Podcasts
+                <Link href="/podcasts" className="text-gray-600 hover:text-gray-900 transition-colors flex items-center font-medium dark:text-gray-400 dark:hover:text-gray-200 group">
+                  <Anchor className="h-5 w-5 mr-3 text-gray-400 dark:text-gray-500 group-hover:text-gray-600 dark:group-hover:text-gray-300 transition-colors" />
+                  <span className="text-base">Podcasts</span>
                 </Link>
               </li>
               <li>
-                <Link href="/blog" className="text-gray-600 hover:text-gray-900 transition-colors flex items-center font-medium dark:text-gray-400 dark:hover:text-gray-200">
-                  <Anchor className="h-4 w-4 mr-2 text-gray-400 dark:text-gray-500" /> Blog
-                </Link>
-              </li>
-              <li>
-                <Link href="/news" className="text-gray-600 hover:text-gray-900 transition-colors flex items-center font-medium dark:text-gray-400 dark:hover:text-gray-200">
-                  <Anchor className="h-4 w-4 mr-2 text-gray-400 dark:text-gray-500" /> News
+                <Link href="/blog" className="text-gray-600 hover:text-gray-900 transition-colors flex items-center font-medium dark:text-gray-400 dark:hover:text-gray-200 group">
+                  <Anchor className="h-5 w-5 mr-3 text-gray-400 dark:text-gray-500 group-hover:text-gray-600 dark:group-hover:text-gray-300 transition-colors" />
+                  <span className="text-base">Blog</span>
                 </Link>
               </li>
             </ul>
@@ -86,67 +106,80 @@ export default function Footer() {
 
           {/* Support */}
           <div>
-            <h3 className="text-lg font-semibold mb-4 text-gray-700 tracking-wide dark:text-gray-200">Support</h3>
-            <ul className="space-y-2">
+            <h3 className="text-xl font-semibold mb-8 text-gray-800 dark:text-gray-200 tracking-wide">Support</h3>
+            <ul className="space-y-5">
               <li>
-                <Link href="/support" className="text-gray-600 hover:text-gray-900 transition-colors flex items-center font-medium dark:text-gray-400 dark:hover:text-gray-200">
-                  <LifeBuoy className="h-4 w-4 mr-2 text-gray-400 dark:text-gray-500" /> Help Center
+                <Link href="/support" className="text-gray-600 hover:text-gray-900 transition-colors flex items-center font-medium dark:text-gray-400 dark:hover:text-gray-200 group">
+                  <LifeBuoy className="h-5 w-5 mr-3 text-gray-400 dark:text-gray-500 group-hover:text-gray-600 dark:group-hover:text-gray-300 transition-colors" />
+                  <span className="text-base">Help Center</span>
                 </Link>
               </li>
               <li>
-                <Link href="/support/knowledge-base" className="text-gray-600 hover:text-gray-900 transition-colors flex items-center font-medium dark:text-gray-400 dark:hover:text-gray-200">
-                  <Compass className="h-4 w-4 mr-2 text-gray-400 dark:text-gray-500" /> Knowledge Base
+                <Link href="/support/knowledge-base" className="text-gray-600 hover:text-gray-900 transition-colors flex items-center font-medium dark:text-gray-400 dark:hover:text-gray-200 group">
+                  <Compass className="h-5 w-5 mr-3 text-gray-400 dark:text-gray-500 group-hover:text-gray-600 dark:group-hover:text-gray-300 transition-colors" />
+                  <span className="text-base">Knowledge Base</span>
                 </Link>
               </li>
               <li>
-                <Link href="/support" className="text-gray-600 hover:text-gray-900 transition-colors flex items-center font-medium dark:text-gray-400 dark:hover:text-gray-200">
-                  <Mail className="h-4 w-4 mr-2 text-gray-400 dark:text-gray-500" /> Contact Us
+                <Link href="mailto:cetusleader2009@gmail.com" className="text-gray-600 hover:text-gray-900 transition-colors flex items-center font-medium dark:text-gray-400 dark:hover:text-gray-200 group">
+                  <Mail className="h-5 w-5 mr-3 text-gray-400 dark:text-gray-500 group-hover:text-gray-600 dark:group-hover:text-gray-300 transition-colors" />
+                  <span className="text-base">Contact Us</span>
                 </Link>
               </li>
             </ul>
           </div>
 
-          {/* Newsletter */}
+          {/* Newsletter Section - Commented Out
           <div>
-            <h3 className="text-lg font-semibold mb-4 text-gray-700 tracking-wide dark:text-gray-200">Stay Updated</h3>
-            <p className="text-gray-500 mb-4 text-sm dark:text-gray-400">Subscribe to our newsletter for the latest updates and features.</p>
-            <form className="flex">
-              <input
-                type="email"
-                placeholder="Your email address"
-                className="bg-gray-200 border border-gray-300 rounded-l-md px-4 py-2 w-full focus:outline-none focus:ring-2 focus:ring-gray-400 text-gray-700 placeholder:text-gray-400 dark:bg-gray-800 dark:border-gray-600 dark:focus:ring-gray-500 dark:text-gray-200 dark:placeholder:text-gray-500"
-              />
-              <button
-                type="submit"
-                className="bg-gray-700 hover:bg-gray-800 text-white px-4 py-2 rounded-r-md font-semibold shadow transition-colors focus:outline-none focus:ring-2 focus:ring-gray-400 dark:bg-gray-600 dark:hover:bg-gray-500 dark:focus:ring-gray-500"
-              >
-                Subscribe
-              </button>
+            <h3 className="text-lg font-semibold mb-6 text-gray-800 dark:text-gray-200 tracking-wide">Stay Updated</h3>
+            <p className="text-gray-600 dark:text-gray-400 mb-4 text-sm">
+              Subscribe to our newsletter for the latest updates and features.
+            </p>
+            <form className="space-y-3">
+              <div className="flex flex-col sm:flex-row gap-2">
+                <input
+                  type="email"
+                  placeholder="Your email address"
+                  className="flex-1 bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700 rounded-md px-4 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-gray-400 dark:focus:ring-gray-600 text-gray-700 dark:text-gray-200 placeholder:text-gray-400 dark:placeholder:text-gray-500"
+                />
+                <button
+                  type="submit"
+                  className="bg-gray-800 hover:bg-gray-900 dark:bg-gray-700 dark:hover:bg-gray-600 text-white px-4 py-2 rounded-md text-sm font-medium shadow-sm transition-colors focus:outline-none focus:ring-2 focus:ring-gray-400 dark:focus:ring-gray-600"
+                >
+                  Subscribe
+                </button>
+              </div>
             </form>
           </div>
+          */}
         </div>
 
         {/* Bottom Bar */}
-        <div className="border-t border-gray-300 pt-8 mt-8 text-center md:flex md:justify-between md:text-left dark:border-gray-700">
-          <p className="text-gray-500 text-sm dark:text-gray-400">© {currentYear} Sailor's Platform. All rights reserved.</p>
-          <div className="mt-4 md:mt-0">
-            <ul className="flex justify-center md:justify-end space-x-6">
-              <li>
-                <Link href="/terms" className="text-gray-400 hover:text-gray-700 transition-colors text-sm dark:text-gray-500 dark:hover:text-gray-300">
-                  Terms
-                </Link>
-              </li>
-              <li>
-                <Link href="/privacy" className="text-gray-400 hover:text-gray-700 transition-colors text-sm dark:text-gray-500 dark:hover:text-gray-300">
-                  Privacy
-                </Link>
-              </li>
-              <li>
-                <Link href="/cookies" className="text-gray-400 hover:text-gray-700 transition-colors text-sm dark:text-gray-500 dark:hover:text-gray-300">
-                  Cookies
-                </Link>
-              </li>
-            </ul>
+        <div className="pt-10 border-t border-gray-200 dark:border-gray-700">
+          <div className="flex flex-col md:flex-row justify-between items-center space-y-4 md:space-y-0">
+            <p className="text-gray-500 dark:text-gray-400 text-sm font-medium">
+              © {currentYear} Sailor's Platform. All rights reserved.
+            </p>
+            <div className="flex items-center space-x-10">
+              <Link 
+                href="/terms" 
+                className="text-gray-500 hover:text-gray-700 dark:text-gray-400 dark:hover:text-gray-300 transition-colors text-sm font-medium hover:underline"
+              >
+                Terms
+              </Link>
+              <Link 
+                href="/privacy" 
+                className="text-gray-500 hover:text-gray-700 dark:text-gray-400 dark:hover:text-gray-300 transition-colors text-sm font-medium hover:underline"
+              >
+                Privacy
+              </Link>
+              <Link 
+                href="/cookies" 
+                className="text-gray-500 hover:text-gray-700 dark:text-gray-400 dark:hover:text-gray-300 transition-colors text-sm font-medium hover:underline"
+              >
+                Cookies
+              </Link>
+            </div>
           </div>
         </div>
       </div>
