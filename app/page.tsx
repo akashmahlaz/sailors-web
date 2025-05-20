@@ -314,7 +314,7 @@ export default function Home() {
                 </span>
               </motion.h1>
 
-              <motion.p className="text-lg  md:text-xl mb-8 text-gray-700 max-w-lg" variants={fadeIn}>
+              <motion.p className="text-lg  md:text-xl mb-8 text-white max-w-lg" variants={fadeIn}>
                 Connect with fellow sailors, share your maritime adventures, and explore a sea of content created by our
                 vibrant community.
               </motion.p>
