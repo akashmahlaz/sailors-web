@@ -297,8 +297,8 @@ export default function Home() {
               }}
             >
               <motion.div variants={fadeIn} className="mb-6">
-                <Badge className="px-3 py-1 text-sm bg-gray-800 text-white border-none">
-                  <Sparkles className="w-4 h-4 mr-1 text-gray-300" /> Maritime Community
+                <Badge className="px-3 py-1 border-white border text-sm bg-gray-800 text-white  ">
+                  <Sparkles className="w-4  h-4 mr-1 text-gray-300" /> Maritime Community
                 </Badge>
               </motion.div>
 
@@ -307,14 +307,14 @@ export default function Home() {
                 variants={fadeIn}
               >
                 <span className="relative">
-                  <span className="relative z-10">
+                  <span className="relative text-gray-300 z-10">
                     Discover the Sailor's World
                   </span>
                   {/* <span className="absolute bottom-2 left-0 w-full h-3 bg-gray-400 rounded-full -z-10"></span> */}
                 </span>
               </motion.h1>
 
-              <motion.p className="text-lg md:text-xl mb-8 text-gray-700 max-w-lg" variants={fadeIn}>
+              <motion.p className="text-lg  md:text-xl mb-8 text-gray-700 max-w-lg" variants={fadeIn}>
                 Connect with fellow sailors, share your maritime adventures, and explore a sea of content created by our
                 vibrant community.
               </motion.p>
