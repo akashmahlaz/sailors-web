@@ -33,6 +33,53 @@ const VideoGallery = forwardRef<VideoGalleryRef, {}>((_, ref) => {
   const [loading, setLoading] = useState(true)
   const [error, setError] = useState<string | null>(null)
   const [hoveredIndex, setHoveredIndex] = useState<number | null>(null)
+  const [videoThumbnails, setVideoThumbnails] = useState<{ [key: string]: string }>({})
+
+  const generateVideoThumbnail = (videoUrl: string, videoId: string) => {
+    const video = document.createElement('video')
+    video.src = videoUrl
+    video.crossOrigin = 'anonymous'
+    
+    // Try multiple timestamps to get the best thumbnail
+    const timestamps = [1, 2, 3] // Try at 1s, 2s, and 3s
+    let currentTimestampIndex = 0
+
+    const tryNextTimestamp = () => {
+      if (currentTimestampIndex < timestamps.length) {
+        video.currentTime = timestamps[currentTimestampIndex]
+        currentTimestampIndex++
+      }
+    }
+
+    video.addEventListener('loadeddata', () => {
+      tryNextTimestamp()
+    })
+
+    video.addEventListener('seeked', () => {
+      const canvas = document.createElement('canvas')
+      canvas.width = video.videoWidth
+      canvas.height = video.videoHeight
+      const ctx = canvas.getContext('2d')
+      if (ctx) {
+        ctx.drawImage(video, 0, 0, canvas.width, canvas.height)
+        const thumbnailUrl = canvas.toDataURL('image/jpeg', 0.8) // Better quality
+        setVideoThumbnails(prev => ({
+          ...prev,
+          [videoId]: thumbnailUrl
+        }))
+        tryNextTimestamp() // Try next timestamp
+      }
+    })
+
+    // Handle errors
+    video.addEventListener('error', (e) => {
+      console.error('Error generating thumbnail:', e)
+      setVideoThumbnails(prev => ({
+        ...prev,
+        [videoId]: '/placeholder.svg'
+      }))
+    })
+  }
 
   const fetchVideos = async () => {
     try {
@@ -45,7 +92,15 @@ const VideoGallery = forwardRef<VideoGalleryRef, {}>((_, ref) => {
       }
 
       const data = await response.json()
-      setVideos(Array.isArray(data) ? data : data.videos || [])
+      const videosData = Array.isArray(data) ? data : data.videos || []
+      setVideos(videosData)
+
+      // Generate thumbnails for each video
+      videosData.forEach(video => {
+        if (!video.thumbnail_url) {
+          generateVideoThumbnail(video.url, video.id)
+        }
+      })
     } catch (err) {
       console.error("Error fetching videos:", err)
       setError(err instanceof Error ? err.message : "Failed to load videos")
@@ -114,14 +169,11 @@ const VideoGallery = forwardRef<VideoGalleryRef, {}>((_, ref) => {
           onMouseEnter={() => setHoveredIndex(idx)}
           onMouseLeave={() => setHoveredIndex(null)}
         >
-          <div className="aspect-video bg-muted relative overflow-hidden group">
+          <div className="relative aspect-video">
             {hoveredIndex === idx ? (
               <video
                 src={video.url}
-                poster={
-                  video.thumbnail_url ||
-                  `https://res.cloudinary.com/${process.env.NEXT_PUBLIC_CLOUDINARY_CLOUD_NAME}/video/upload/so_0/${video.public_id}.jpg`
-                }
+                poster={video.thumbnail_url || videoThumbnails[video.id] || `/placeholder.svg`}
                 autoPlay
                 muted
                 loop
@@ -131,10 +183,7 @@ const VideoGallery = forwardRef<VideoGalleryRef, {}>((_, ref) => {
               />
             ) : (
               <img
-                src={
-                  video.thumbnail_url ||
-                  `https://res.cloudinary.com/${process.env.NEXT_PUBLIC_CLOUDINARY_CLOUD_NAME}/video/upload/so_0/${video.public_id}.jpg`
-                }
+                src={video.thumbnail_url || videoThumbnails[video.id] || `/placeholder.svg`}
                 alt={video.title}
                 className="w-full h-full object-cover transition-transform group-hover:scale-105"
               />
@@ -149,7 +198,7 @@ const VideoGallery = forwardRef<VideoGalleryRef, {}>((_, ref) => {
               {video.views.toLocaleString()}
             </div>
           </div>
-          <CardContent className="p-3">
+          <CardContent className="p-4">
             <h3 className="font-medium line-clamp-1">{video.title}</h3>
             <div className="flex items-center mt-2 text-sm text-muted-foreground">
               <div className="flex items-center">

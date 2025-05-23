@@ -55,6 +55,7 @@ export default function VideoDetailPage() {
   const [commentsLoading, setCommentsLoading] = useState(false)
   const [isSubmitting, setIsSubmitting] = useState(false)
   const commentInputRef = useRef<HTMLTextAreaElement>(null)
+  const [videoThumbnails, setVideoThumbnails] = useState<{ [key: string]: string }>({})
 
   useEffect(() => {
     const fetchVideos = async () => {
@@ -232,6 +233,64 @@ export default function VideoDetailPage() {
       setIsSubmitting(false)
     }
   }
+
+  // Generate video thumbnail
+  const generateVideoThumbnail = (videoUrl: string, videoId: string) => {
+    const video = document.createElement('video')
+    video.src = videoUrl
+    video.crossOrigin = 'anonymous'
+    
+    // Try multiple timestamps to get the best thumbnail
+    const timestamps = [1, 2, 3] // Try at 1s, 2s, and 3s
+    let currentTimestampIndex = 0
+
+    const tryNextTimestamp = () => {
+      if (currentTimestampIndex < timestamps.length) {
+        video.currentTime = timestamps[currentTimestampIndex]
+        currentTimestampIndex++
+      }
+    }
+
+    video.addEventListener('loadeddata', () => {
+      tryNextTimestamp()
+    })
+
+    video.addEventListener('seeked', () => {
+      const canvas = document.createElement('canvas')
+      canvas.width = video.videoWidth
+      canvas.height = video.videoHeight
+      const ctx = canvas.getContext('2d')
+      if (ctx) {
+        ctx.drawImage(video, 0, 0, canvas.width, canvas.height)
+        const thumbnailUrl = canvas.toDataURL('image/jpeg', 0.8) // Better quality
+        setVideoThumbnails(prev => ({
+          ...prev,
+          [videoId]: thumbnailUrl
+        }))
+        tryNextTimestamp() // Try next timestamp
+      }
+    })
+
+    // Handle errors
+    video.addEventListener('error', (e) => {
+      console.error('Error generating thumbnail:', e)
+      setVideoThumbnails(prev => ({
+        ...prev,
+        [videoId]: '/placeholder.svg'
+      }))
+    })
+  }
+
+  // Generate thumbnails for related videos
+  useEffect(() => {
+    if (relatedVideos.length > 0) {
+      relatedVideos.forEach(video => {
+        if (!video.thumbnail_url) {
+          generateVideoThumbnail(video.url, video.id)
+        }
+      })
+    }
+  }, [relatedVideos])
 
   if (loading) {
     return (
@@ -427,10 +486,7 @@ export default function VideoDetailPage() {
                 >
                   <div className="relative aspect-video w-40 min-w-[160px] bg-muted rounded overflow-hidden">
                     <img
-                      src={
-                        video.thumbnail_url ||
-                        `https://res.cloudinary.com/${process.env.NEXT_PUBLIC_CLOUDINARY_CLOUD_NAME}/video/upload/so_0/${video.public_id}.jpg`
-                      }
+                      src={video.thumbnail_url || videoThumbnails[video.id] || `/placeholder.svg`}
                       alt={video.title}
                       className="w-full h-full object-cover"
                     />
@@ -453,12 +509,7 @@ export default function VideoDetailPage() {
                   </div>
                   <div className="flex-1 min-w-0">
                     <h3 className="font-medium text-sm line-clamp-2">{video.title}</h3>
-                    <p className="text-xs text-muted-foreground mt-1">{video.user_name}</p>
-                    <div className="flex items-center gap-2 text-xs text-muted-foreground mt-1">
-                      <span>{video.views} views</span>
-                      <span>•</span>
-                      <span>{formatDistanceToNow(new Date(video.created_at), { addSuffix: true })}</span>
-                    </div>
+                    <p className="text-xs text-muted-foreground mt-1">{video.views.toLocaleString()} views</p>
                   </div>
                 </div>
               ))}

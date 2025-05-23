@@ -67,6 +67,7 @@ export default function PodcastDetailPage() {
   const [activeTab, setActiveTab] = useState<string>("episodes")
   const [debugInfo, setDebugInfo] = useState<string>("")
   const [likedPodcast, setLikedPodcast] = useState(false)
+  const [videoThumbnail, setVideoThumbnail] = useState<string | null>(null)
 
   const fetchPodcastAndEpisodes = async () => {
     try {
@@ -126,9 +127,38 @@ export default function PodcastDetailPage() {
     }
   }
 
+  const generateVideoThumbnail = (videoUrl: string) => {
+    const video = document.createElement('video');
+    video.src = videoUrl;
+    video.crossOrigin = 'anonymous';
+    
+    video.addEventListener('loadeddata', () => {
+      // Seek to 1 second to get a good thumbnail
+      video.currentTime = 1;
+    });
+
+    video.addEventListener('seeked', () => {
+      const canvas = document.createElement('canvas');
+      canvas.width = video.videoWidth;
+      canvas.height = video.videoHeight;
+      const ctx = canvas.getContext('2d');
+      if (ctx) {
+        ctx.drawImage(video, 0, 0, canvas.width, canvas.height);
+        const thumbnailUrl = canvas.toDataURL('image/jpeg');
+        setVideoThumbnail(thumbnailUrl);
+      }
+    });
+  };
+
   useEffect(() => {
     fetchPodcastAndEpisodes()
   }, [params.id])
+
+  useEffect(() => {
+    if (podcast?.video_url) {
+      generateVideoThumbnail(podcast.video_url);
+    }
+  }, [podcast?.video_url]);
 
   const handleEpisodeSelect = (episode: Episode) => {
     setSelectedEpisode(episode)
@@ -250,113 +280,83 @@ export default function PodcastDetailPage() {
   }
 
   return (
-    <main className="container mx-auto py-8 px-4">
+    <main className="container mx-auto py-4 md:py-8 px-4">
       <Button variant="ghost" className="mb-4" onClick={() => router.push("/podcasts")}>
         <ArrowLeft className="mr-2 h-4 w-4" /> Back to Podcasts
       </Button>
 
-      <div className="grid gap-8 md:grid-cols-12">
+      <div className="grid gap-4 md:gap-8">
         {/* Podcast Header */}
-        <div className="md:col-span-12">
-          <Card className="overflow-hidden border-0 shadow-lg">
-            <div className="relative">
-              {/* Cover Image or Gradient Background */}
-              <div className="w-full h-48 md:h-64 bg-gradient-to-r from-gray-800 to-gray-900 relative overflow-hidden">
-                {podcast.cover_image_url && (
-                  <img
-                    src={podcast.cover_image_url || "/placeholder.svg"}
-                    alt={podcast.title}
-                    className="w-full h-full object-cover opacity-50"
-                  />
-                )}
-                <div className="absolute inset-0 bg-gradient-to-t from-black/80 to-transparent"></div>
-              </div>
+        <Card className="overflow-hidden border-0 shadow-lg">
+          <div className="relative">
+            {/* Cover Image or Gradient Background */}
+            <div className="w-full h-32 md:h-64 bg-gradient-to-r from-gray-800 to-gray-900 relative overflow-hidden">
+              {podcast.cover_image_url && (
+                <img
+                  src={podcast.cover_image_url || "/placeholder.svg"}
+                  alt={podcast.title}
+                  className="w-full h-full object-cover opacity-50"
+                />
+              )}
+              <div className="absolute inset-0 bg-gradient-to-t from-black/80 to-transparent"></div>
+            </div>
 
-              {/* Podcast Info Overlay */}
-              <div className="absolute bottom-0 left-0 right-0 p-6 text-white">
-                <div className="flex items-start gap-6">
-                  {/* Thumbnail */}
-                  <div className="hidden md:block relative w-32 h-32 rounded-lg overflow-hidden border-4 border-white shadow-lg bg-gray-200">
-                    {podcast.thumbnail_url ? (
-                      <img
-                        src={podcast.thumbnail_url || "/placeholder.svg"}
-                        alt={podcast.title}
-                        className="w-full h-full object-cover"
-                      />
-                    ) : podcast.photo_url ? (
-                      <img
-                        src={podcast.photo_url || "/placeholder.svg"}
-                        alt={podcast.title}
-                        className="w-full h-full object-cover"
-                      />
-                    ) : (
-                      <div className="w-full h-full flex items-center justify-center bg-gray-800">
-                        <Mic className="h-12 w-12 text-white" />
-                      </div>
-                    )}
+            {/* Podcast Info */}
+            <div className="absolute bottom-0 left-0 right-0 p-4 md:p-6">
+              <div className="flex flex-col md:flex-row items-start md:items-end gap-4">
+                {/* Thumbnail */}
+                <div className="w-24 h-24 md:w-32 md:h-32 rounded-lg overflow-hidden border-4 border-white shadow-lg bg-gray-200 flex-shrink-0">
+                  {podcast.thumbnail_url ? (
+                    <img
+                      src={podcast.thumbnail_url || "/placeholder.svg"}
+                      alt={podcast.title}
+                      className="w-full h-full object-cover"
+                    />
+                  ) : podcast.photo_url ? (
+                    <img
+                      src={podcast.photo_url || "/placeholder.svg"}
+                      alt={podcast.title}
+                      className="w-full h-full object-cover"
+                    />
+                  ) : (
+                    <div className="w-full h-full flex items-center justify-center bg-gray-800">
+                      <Mic className="h-8 md:h-12 w-8 md:w-12 text-white" />
+                    </div>
+                  )}
 
-                    {/* Video indicator */}
-                    {podcast.video_url && (
-                      <div className="absolute bottom-1 right-1 bg-red-600 text-white p-1 rounded-full">
-                        <Play className="h-3 w-3" />
-                      </div>
-                    )}
+                  {/* Video indicator */}
+                  {podcast.video_url && (
+                    <div className="absolute bottom-1 right-1 bg-red-600 text-white p-1 rounded-full">
+                      <Play className="h-3 w-3" />
+                    </div>
+                  )}
+                </div>
+
+                {/* Title and Info */}
+                <div className="flex-1 min-w-0">
+                  <div className="flex flex-wrap gap-2 mb-2">
+                    {podcast.categories.map((category) => (
+                      <Badge key={category} variant="secondary" className="bg-white/20 text-white border-none">
+                        {category}
+                      </Badge>
+                    ))}
                   </div>
-
-                  {/* Title and Info */}
-                  <div className="flex-1">
-                    <div className="flex flex-wrap gap-2 mb-2">
-                      {podcast.categories.map((category) => (
-                        <Badge key={category} variant="secondary" className="bg-white/20 text-white border-none">
-                          {category}
-                        </Badge>
-                      ))}
-                    </div>
-                    <h1 className="text-2xl md:text-3xl font-bold">{podcast.title}</h1>
-                    <div className="flex items-center gap-2 mt-2">
-                      <Avatar className="h-6 w-6">
-                        <AvatarImage src={podcast.host_image || "/placeholder.svg"} />
-                        <AvatarFallback>{podcast.host[0]}</AvatarFallback>
-                      </Avatar>
-                      <span>Hosted by {podcast.host}</span>
-                    </div>
+                  <h1 className="text-xl md:text-3xl font-bold text-white mb-2">{podcast.title}</h1>
+                  <div className="flex items-center gap-2 text-white/80">
+                    <Avatar className="h-6 w-6">
+                      <AvatarImage src={podcast.host_image || "/placeholder.svg"} />
+                      <AvatarFallback>{podcast.host[0]}</AvatarFallback>
+                    </Avatar>
+                    <span>Hosted by {podcast.host}</span>
                   </div>
                 </div>
               </div>
             </div>
+          </div>
 
-            {/* Mobile Thumbnail */}
-            <div className="md:hidden flex justify-center -mt-16 mb-4 px-4">
-              <div className="relative w-32 h-32 rounded-lg overflow-hidden border-4 border-white shadow-lg bg-gray-200">
-                {podcast.thumbnail_url ? (
-                  <img
-                    src={podcast.thumbnail_url || "/placeholder.svg"}
-                    alt={podcast.title}
-                    className="w-full h-full object-cover"
-                  />
-                ) : podcast.photo_url ? (
-                  <img
-                    src={podcast.photo_url || "/placeholder.svg"}
-                    alt={podcast.title}
-                    className="w-full h-full object-cover"
-                  />
-                ) : (
-                  <div className="w-full h-full flex items-center justify-center bg-gray-800">
-                    <Mic className="h-12 w-12 text-white" />
-                  </div>
-                )}
-
-                {/* Video indicator */}
-                {podcast.video_url && (
-                  <div className="absolute bottom-1 right-1 bg-red-600 text-white p-1 rounded-full">
-                    <Play className="h-3 w-3" />
-                  </div>
-                )}
-              </div>
-            </div>
-
-            {/* Action Bar */}
-            <div className="px-6 py-4 flex items-center justify-between border-t border-gray-100">
+          {/* Action Bar */}
+          <div className="p-4 md:p-6 bg-white dark:bg-gray-900">
+            <div className="flex flex-col md:flex-row justify-between items-start md:items-center gap-4">
               <div className="flex items-center gap-4">
                 <div className="flex items-center gap-1">
                   <Headphones className="h-4 w-4 text-gray-500" />
@@ -381,12 +381,13 @@ export default function PodcastDetailPage() {
                 </Button>
               </div>
             </div>
-          </Card>
-        </div>
+          </div>
+        </Card>
 
-        {/* Media Section - Show video first if available */}
-        {podcast.video_url && (
-          <div className="md:col-span-12">
+        {/* Media Section */}
+        <div className="grid gap-4 md:gap-8">
+          {/* Video Section */}
+          {podcast.video_url && (
             <Card>
               <CardHeader>
                 <CardTitle className="flex items-center">
@@ -399,18 +400,17 @@ export default function PodcastDetailPage() {
                   <video
                     src={podcast.video_url}
                     controls
-                    poster={podcast.thumbnail_url || podcast.photo_url}
+                    poster={videoThumbnail || podcast.thumbnail_url || podcast.photo_url}
                     className="w-full h-full"
+                    preload="metadata"
                   />
                 </div>
               </CardContent>
             </Card>
-          </div>
-        )}
+          )}
 
-        {/* Audio Section - Show after video */}
-        {podcast.audio_url && (
-          <div className="md:col-span-12">
+          {/* Audio Section */}
+          {podcast.audio_url && (
             <Card>
               <CardHeader>
                 <CardTitle className="flex items-center">
@@ -422,11 +422,9 @@ export default function PodcastDetailPage() {
                 <audio src={podcast.audio_url} controls className="w-full" />
               </CardContent>
             </Card>
-          </div>
-        )}
+          )}
 
-        {/* Description */}
-        <div className="md:col-span-12">
+          {/* Description */}
           <Card>
             <CardHeader>
               <CardTitle>About this Podcast</CardTitle>
@@ -435,10 +433,8 @@ export default function PodcastDetailPage() {
               <p className="whitespace-pre-line">{podcast.description}</p>
             </CardContent>
           </Card>
-        </div>
 
-        {/* Episodes and Info Tabs */}
-        <div className="md:col-span-12">
+          {/* Episodes and Info Tabs */}
           <Tabs defaultValue="episodes" value={activeTab} onValueChange={setActiveTab}>
             <TabsList className="grid w-full grid-cols-2">
               <TabsTrigger value="episodes">Episodes</TabsTrigger>
@@ -462,7 +458,7 @@ export default function PodcastDetailPage() {
 
               {selectedEpisode && (
                 <Card className="border-blue-100 shadow-md">
-                  <CardContent className="p-6">
+                  <CardContent className="p-4 md:p-6">
                     <PodcastPlayer
                       episode={selectedEpisode}
                       onNext={episodes.length > 1 ? handleNext : undefined}
@@ -472,86 +468,66 @@ export default function PodcastDetailPage() {
                 </Card>
               )}
 
-              <Card>
-                <CardHeader>
-                  <CardTitle>All Episodes</CardTitle>
-                  <CardDescription>{episodes.length} episodes available</CardDescription>
-                </CardHeader>
-                <CardContent>
-                  {episodes.length === 0 ? (
-                    <div className="text-center py-8 text-muted-foreground">
-                      No episodes yet. Add your first episode!
-                    </div>
-                  ) : (
-                    <div className="space-y-3">
-                      {episodes.map((episode) => (
-                        <div
-                          key={episode.id}
-                          className={`p-3 rounded-md flex items-center gap-3 cursor-pointer hover:bg-gray-50 transition-colors ${
-                            selectedEpisode?.id === episode.id
-                              ? "bg-blue-50 border border-blue-100"
-                              : "border border-gray-100"
-                          }`}
-                          onClick={() => handleEpisodeSelect(episode)}
-                        >
-                          {/* Episode Thumbnail or Number */}
-                          <div className="relative h-16 w-16 rounded-md overflow-hidden flex-shrink-0">
-                            {episode.thumbnail_url ? (
-                              <img
-                                src={episode.thumbnail_url || "/placeholder.svg"}
-                                alt={episode.title}
-                                className="w-full h-full object-cover"
-                              />
-                            ) : (
-                              <div className="h-full w-full bg-gray-200 flex items-center justify-center">
-                                <span className="font-medium text-gray-800">
-                                  S{episode.season}E{episode.episode_number}
-                                </span>
-                              </div>
-                            )}
-
-                            {/* Video indicator */}
-                            {episode.video_url && (
-                              <div className="absolute bottom-1 right-1 bg-red-600 text-white p-1 rounded-full">
-                                <Play className="h-3 w-3" />
-                              </div>
-                            )}
-                          </div>
-
-                          {/* Episode Info */}
-                          <div className="flex-1 min-w-0">
-                            <p className="font-medium truncate">{episode.title}</p>
-                            <p className="text-xs text-gray-500 truncate">{episode.description}</p>
-                            <div className="flex items-center gap-3 mt-1">
-                              <span className="text-xs text-gray-500 flex items-center">
-                                <Clock className="h-3 w-3 mr-1" />
-                                {Math.floor(episode.duration / 60)} min
-                              </span>
-                              <span className="text-xs text-gray-500 flex items-center">
-                                <Calendar className="h-3 w-3 mr-1" />
-                                {formatDistanceToNow(new Date(episode.created_at), { addSuffix: true })}
-                              </span>
-                              <span className="text-xs text-gray-500 flex items-center">
-                                <Eye className="h-3 w-3 mr-1" />
-                                {episode.views || 0}
+              <div className="space-y-4">
+                {episodes.map((episode) => (
+                  <Card key={episode.id} className="hover:shadow-md transition-shadow">
+                    <CardContent className="p-4">
+                      <div className="flex items-start gap-4">
+                        <div className="relative h-16 w-16 rounded-md overflow-hidden flex-shrink-0">
+                          {episode.thumbnail_url ? (
+                            <img
+                              src={episode.thumbnail_url || "/placeholder.svg"}
+                              alt={episode.title}
+                              className="w-full h-full object-cover"
+                            />
+                          ) : (
+                            <div className="h-full w-full bg-gray-200 flex items-center justify-center">
+                              <span className="font-medium text-gray-800">
+                                S{episode.season}E{episode.episode_number}
                               </span>
                             </div>
-                          </div>
+                          )}
 
-                          {/* Play Button */}
-                          <Button
-                            variant="ghost"
-                            size="icon"
-                            className="h-8 w-8 rounded-full bg-gray-100 text-gray-700 hover:bg-gray-200"
-                          >
-                            <Play className="h-4 w-4" />
-                          </Button>
+                          {/* Video indicator */}
+                          {episode.video_url && (
+                            <div className="absolute bottom-1 right-1 bg-red-600 text-white p-1 rounded-full">
+                              <Play className="h-3 w-3" />
+                            </div>
+                          )}
                         </div>
-                      ))}
-                    </div>
-                  )}
-                </CardContent>
-              </Card>
+
+                        <div className="flex-1 min-w-0">
+                          <p className="font-medium truncate">{episode.title}</p>
+                          <p className="text-xs text-gray-500 truncate">{episode.description}</p>
+                          <div className="flex flex-wrap items-center gap-3 mt-1">
+                            <span className="text-xs text-gray-500 flex items-center">
+                              <Clock className="h-3 w-3 mr-1" />
+                              {Math.floor(episode.duration / 60)} min
+                            </span>
+                            <span className="text-xs text-gray-500 flex items-center">
+                              <Calendar className="h-3 w-3 mr-1" />
+                              {formatDistanceToNow(new Date(episode.created_at), { addSuffix: true })}
+                            </span>
+                            <span className="text-xs text-gray-500 flex items-center">
+                              <Eye className="h-3 w-3 mr-1" />
+                              {episode.views || 0}
+                            </span>
+                          </div>
+                        </div>
+
+                        <Button
+                          variant="ghost"
+                          size="icon"
+                          className="h-8 w-8 rounded-full bg-gray-100 text-gray-700 hover:bg-gray-200"
+                          onClick={() => handleEpisodeSelect(episode)}
+                        >
+                          <Play className="h-4 w-4" />
+                        </Button>
+                      </div>
+                    </CardContent>
+                  </Card>
+                ))}
+              </div>
             </TabsContent>
 
             <TabsContent value="details">
@@ -652,10 +628,11 @@ export default function PodcastDetailPage() {
                       {podcast.video_url && (
                         <div className="space-y-1">
                           <div className="aspect-square rounded-md overflow-hidden border border-gray-200 relative">
-                            <img
-                              src={podcast.thumbnail_url || podcast.photo_url || "/placeholder.svg"}
-                              alt="Video"
+                            <video
+                              src={podcast.video_url}
+                              poster={videoThumbnail || podcast.thumbnail_url || podcast.photo_url}
                               className="w-full h-full object-cover"
+                              preload="metadata"
                             />
                             <div className="absolute inset-0 flex items-center justify-center bg-black/30">
                               <Play className="h-10 w-10 text-white" />

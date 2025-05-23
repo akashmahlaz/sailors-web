@@ -81,6 +81,8 @@ export default function AdvancedVideoPlayer({
   const [isPictureInPicture, setIsPictureInPicture] = useState(false)
   const [showQualityMenu, setShowQualityMenu] = useState(false)
   const [showCaptionsMenu, setShowCaptionsMenu] = useState(false)
+  const [videoThumbnail, setVideoThumbnail] = useState<string | null>(null)
+  const [isGeneratingThumbnail, setIsGeneratingThumbnail] = useState(false)
 
   // Like state
   const { data: session } = useSession()
@@ -433,6 +435,52 @@ export default function AdvancedVideoPlayer({
     }
   }
 
+  // Generate video thumbnail
+  const generateVideoThumbnail = () => {
+    if (!videoRef.current || isGeneratingThumbnail) return
+
+    setIsGeneratingThumbnail(true)
+    const video = videoRef.current
+    const timestamps = [1, 2, 3] // Try at 1s, 2s, and 3s
+    let currentTimestampIndex = 0
+
+    const tryNextTimestamp = () => {
+      if (currentTimestampIndex < timestamps.length) {
+        video.currentTime = timestamps[currentTimestampIndex]
+        currentTimestampIndex++
+      }
+    }
+
+    const handleSeeked = () => {
+      const canvas = document.createElement('canvas')
+      canvas.width = video.videoWidth
+      canvas.height = video.videoHeight
+      const ctx = canvas.getContext('2d')
+      if (ctx) {
+        ctx.drawImage(video, 0, 0, canvas.width, canvas.height)
+        const thumbnailUrl = canvas.toDataURL('image/jpeg', 0.8)
+        setVideoThumbnail(thumbnailUrl)
+        tryNextTimestamp()
+      }
+    }
+
+    video.addEventListener('seeked', handleSeeked)
+    tryNextTimestamp()
+
+    // Cleanup
+    return () => {
+      video.removeEventListener('seeked', handleSeeked)
+      setIsGeneratingThumbnail(false)
+    }
+  }
+
+  // Generate thumbnail when video is loaded
+  useEffect(() => {
+    if (videoRef.current && !video.thumbnail_url) {
+      generateVideoThumbnail()
+    }
+  }, [video.url])
+
   return (
     <div
       ref={containerRef}
@@ -445,12 +493,25 @@ export default function AdvancedVideoPlayer({
         ref={videoRef}
         src={video.url}
         className="w-full h-full object-contain"
-        poster={video.thumbnail_url || `https://res.cloudinary.com/${process.env.NEXT_PUBLIC_CLOUDINARY_CLOUD_NAME}/video/upload/so_0/${video.public_id}.jpg`}
+        poster={video.thumbnail_url || videoThumbnail || `/placeholder.svg`}
         onClick={togglePlay}
         controls={false}
         preload="metadata"
         crossOrigin="anonymous"
         playsInline
+        onLoadedMetadata={() => {
+          if (videoRef.current) {
+            setDuration(videoRef.current.duration)
+            setIsLoaded(true)
+          }
+        }}
+        onTimeUpdate={() => {
+          if (videoRef.current) {
+            setCurrentTime(videoRef.current.currentTime)
+          }
+        }}
+        onWaiting={() => setIsBuffering(true)}
+        onPlaying={() => setIsBuffering(false)}
       />
 
       {!isLoaded && (
@@ -476,6 +537,7 @@ export default function AdvancedVideoPlayer({
             className="w-full h-full object-cover"
             muted
             playsInline
+            currentTime={previewTime}
           />
           <div className="absolute bottom-0 left-0 right-0 bg-black/50 text-white text-xs p-1 text-center">
             {formatTime(previewTime)}

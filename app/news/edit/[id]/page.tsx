@@ -99,7 +99,7 @@ export default function EditNewsPage({ params }: { params: { id: string } }) {
     return (
       <div className="flex items-center justify-center min-h-screen">
         <div className="text-red-500">{error}</div>
-      </div>
+            </div>
     )
   }
 
@@ -197,7 +197,7 @@ export default function EditNewsPage({ params }: { params: { id: string } }) {
                 ) : (
                   "Save Changes"
                 )}
-              </Button>
+      </Button>
             </div>
           </form>
         </CardContent>
