@@ -212,7 +212,7 @@ export default function AudioUploader({ onUploadSuccess }: AudioUploaderProps) {
   return (
     <Card className="w-full max-w-md mx-auto bg-gray-50 dark:bg-gray-900 border-gray-200 dark:border-gray-800">
       <CardHeader>
-        <CardTitle className="text-gray-800 dark:text-gray-100">Record Sea Shanties</CardTitle>
+        <CardTitle className="text-gray-800 dark:text-gray-100">Your Voice</CardTitle>
         <CardDescription className="text-gray-500 dark:text-gray-400">Upload your maritime melodies and custom album art (thumbnail optional)</CardDescription>
       </CardHeader>
       <CardContent>

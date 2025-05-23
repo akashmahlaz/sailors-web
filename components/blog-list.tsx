@@ -193,7 +193,7 @@ export default function BlogList() {
 
         {blogs.length === 0 && !error ? (
           <div className="text-center py-8 text-gray-400 dark:text-gray-500">
-            No stories yet. Be the first to share your maritime adventures!
+            No stories yet. Be the first to share your maritime Blog!
           </div>
         ) : (
           <div className="space-y-6">

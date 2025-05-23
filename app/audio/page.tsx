@@ -23,7 +23,7 @@ export default function AudioPage() {
     <div className="container mx-auto py-8 px-2 sm:px-4">
       <div className="mb-8 flex flex-col sm:flex-row sm:items-center justify-between gap-4">
         <div>
-          <h1 className="text-3xl font-bold text-gray-800 dark:text-gray-100">Sea Sounds</h1>
+          <h1 className="text-3xl font-bold text-gray-800 dark:text-gray-100">Sounds</h1>
           <p className="text-gray-500 dark:text-gray-400 mt-1">Record and share your maritime melodies</p>
         </div>
         <Button
@@ -32,11 +32,11 @@ export default function AudioPage() {
         >
           {showUploader ? (
             <>
-              <X className="mr-2 h-4 w-4" /> Cancel Upload
+              <X className="mr-2 h-4 w-4" /> Cancel
             </>
           ) : (
             <>
-              <Plus className="mr-2 h-4 w-4" /> Record Shanty
+              <Plus className="mr-2 h-4 w-4" /> Share 
             </>
           )}
         </Button>

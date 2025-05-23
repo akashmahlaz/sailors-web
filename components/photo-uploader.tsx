@@ -284,16 +284,16 @@ export default function PhotoUploader({ onUploadSuccess, saveToGallery = true }:
           {success && (
             <div className="flex items-center gap-2 text-green-600 text-sm">
               <CheckCircle className="h-4 w-4" />
-              <span>Maritime moment captured successfully!</span>
+              <span>Photo captured successfully!</span>
             </div>
           )}
 
           <Button onClick={uploadPhoto} disabled={uploading || !file} className="w-full bg-gray-700 hover:bg-gray-900 dark:bg-white dark:hover:bg-gray-700 dark:hover:text-white">
             {uploading ? (
-              "Charting Course..."
+              "Uploading..."
             ) : (
               <>
-                <Upload className="mr-2 h-4 w-4" /> Chart the View
+                <Upload className="mr-2 h-4 w-4" /> Upload Photo
               </>
             )}
           </Button>

@@ -32,11 +32,11 @@ export default function VideosPage() {
         >
           {showUploader ? (
             <>
-              <X className="mr-2 h-4 w-4" /> Cancel Upload
+              <X className="mr-2 h-4 w-4" /> Cancel
             </>
           ) : (
             <>
-              <Plus className="mr-2 h-4 w-4" /> Capture Voyage
+              <Plus className="mr-2 h-4 w-4" /> Share Video       
             </>
           )}
         </Button>

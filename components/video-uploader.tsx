@@ -418,13 +418,13 @@ export default function VideoUploader({ onUploadSuccess }: VideoUploaderProps) {
         {uploading && (
           <div className="space-y-2">
             <Progress value={uploadProgress} className="h-2" />
-            <p className="text-xs text-center text-muted-foreground">Uploading... {uploadProgress}%</p>
+            <p className="text-xs text-center text-muted-foreground">Sharing... {uploadProgress}%</p>
           </div>
         )}
       </CardContent>
       <CardFooter>
         <Button className="w-full" onClick={handleUpload} disabled={!file || uploading}>
-          {uploading ? "Uploading..." : "Upload Video"}
+          {uploading ? "Sharing..." : "Share"}
         </Button>
       </CardFooter>
     </Card>

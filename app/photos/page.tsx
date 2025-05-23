@@ -23,7 +23,7 @@ export default function PhotosPage() {
     <div className="container mx-auto py-8 px-4">
       <div className="mb-8 flex flex-col md:flex-row md:items-center justify-between gap-4">
         <div>
-          <h1 className="text-3xl font-bold text-cyan-900">Sea Snaps</h1>
+          <h1 className="text-3xl font-bold text-cyan-900">Snaps</h1>
           <p className="text-muted-foreground mt-1">Capture and share your maritime moments</p>
         </div>
         <Button
@@ -32,11 +32,11 @@ export default function PhotosPage() {
         >
           {showUploader ? (
             <>
-              <X className="mr-2 h-4 w-4" /> Cancel Upload
+              <X className="mr-2 h-4 w-4" /> Cancel
             </>
           ) : (
             <>
-              <Plus className="mr-2 h-4 w-4" /> Capture Moment
+              <Plus className="mr-2 h-4 w-4" /> Share Moment
             </>
           )}
         </Button>
