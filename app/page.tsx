@@ -628,7 +628,7 @@ export default function Home() {
             {featuredSailors.length > 0
               ? featuredSailors.map((sailor, index) => (
                   <Link
-                    href={`/profile/${sailor._id || sailor.id || sailor.userId}`}
+                    href={`/sailors/${sailor._id || sailor.id || sailor.userId}`}
                     key={sailor._id || sailor.id || sailor.userId || index}
                     className="group"
                   >
@@ -661,13 +661,6 @@ export default function Home() {
                       <p className="text-xs text-slate-500 dark:text-slate-400 mb-1">
                         {sailor.role || sailor.title || "Sailor"}
                       </p>
-                      <Badge
-                        variant="outline"
-                        className="text-xs font-normal px-2 border-gray-200 dark:border-gray-700"
-                      >
-                        <Ship className="h-3 w-3 mr-1" />
-                        {Math.floor(Math.random() * 100) + 10} Voyages
-                      </Badge>
                     </div>
                   </Link>
                 ))

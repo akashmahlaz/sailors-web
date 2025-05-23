@@ -11,6 +11,12 @@ async function getNewsCollection() {
   return db.collection("news")
 }
 
+// Helper function to check if user is admin
+async function isAdmin() {
+  const session = await getServerSession(authOptions)
+  return session?.user?.role === "admin"
+}
+
 // Update the GET method to include media items in the response
 export async function GET(request: NextRequest, { params }: { params: { id: string } }) {
   try {
@@ -63,6 +69,11 @@ export async function GET(request: NextRequest, { params }: { params: { id: stri
 // Update the PUT method to handle media items
 export async function PUT(request: NextRequest, { params }: { params: { id: string } }) {
   try {
+    // Check if user is admin
+    if (!(await isAdmin())) {
+      return NextResponse.json({ error: "Only admins can edit news" }, { status: 403 })
+    }
+
     const id = params.id
     const { title, content, summary, coverImageUrl, author, category, tags, isBreaking, mediaItems } =
       await request.json()
@@ -112,13 +123,12 @@ export async function PUT(request: NextRequest, { params }: { params: { id: stri
 
 export async function DELETE(request: NextRequest, { params }: { params: { id: string } }) {
   try {
-    const id = params.id
-
-    // Check if user is authenticated
-    const session = await getServerSession(authOptions)
-    if (!session || !session.user) {
-      return NextResponse.json({ error: "Unauthorized" }, { status: 401 })
+    // Check if user is admin
+    if (!(await isAdmin())) {
+      return NextResponse.json({ error: "Only admins can delete news" }, { status: 403 })
     }
+
+    const id = params.id
 
     // Get news collection
     const collection = await getNewsCollection()
@@ -127,12 +137,6 @@ export async function DELETE(request: NextRequest, { params }: { params: { id: s
     const news = await collection.findOne({ _id: new ObjectId(id) })
     if (!news) {
       return NextResponse.json({ error: "News not found" }, { status: 404 })
-    }
-
-    // Check if user owns the content or is an admin
-    const isOwner = news.userId === session.user.id
-    if (!isOwner && session.user.role !== 'admin') {
-      return NextResponse.json({ error: "You don't have permission to delete this news" }, { status: 403 })
     }
 
     // Delete the news

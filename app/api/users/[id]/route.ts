@@ -17,10 +17,8 @@ export async function GET(request: NextRequest, context: { params: { id: string 
       return NextResponse.json({ error: "Profile not found" }, { status: 404 })
     }
 
-    // Remove sensitive information
-    const { email, ...safeProfile } = profile
-
-    return NextResponse.json(safeProfile)
+    // Return the full profile including email
+    return NextResponse.json(profile)
   } catch (error) {
     console.error("Error fetching user profile:", error)
     return NextResponse.json({ error: "Failed to fetch user profile" }, { status: 500 })

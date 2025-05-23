@@ -9,6 +9,7 @@ import { Input } from "@/components/ui/input"
 import { Textarea } from "@/components/ui/textarea"
 import { AlertCircle, CheckCircle, Save } from "lucide-react"
 import { Progress } from "@/components/ui/progress"
+import { useSession } from "next-auth/react"
 
 interface BlogEditorProps {
   initialBlog?: {
@@ -22,6 +23,7 @@ interface BlogEditorProps {
 }
 
 export default function BlogEditor({ initialBlog, onSave }: BlogEditorProps) {
+  const { data: session } = useSession()
   const [title, setTitle] = useState(initialBlog?.title || "")
   const [content, setContent] = useState(initialBlog?.content || "")
   const [tags, setTags] = useState(initialBlog?.tags?.join(", ") || "")
@@ -136,6 +138,8 @@ export default function BlogEditor({ initialBlog, onSave }: BlogEditorProps) {
         title,
         content,
         coverImageUrl,
+        author: session?.user?.name || "Anonymous",
+        author_id: session?.user?.id,
         tags: tags
           .split(",")
           .map((tag) => tag.trim())
@@ -167,7 +171,7 @@ export default function BlogEditor({ initialBlog, onSave }: BlogEditorProps) {
       }
     } catch (err) {
       console.error("Save error:", err)
-      setError(err instanceof Error ? err.message : "Failed to save blog post")
+      setError(err instanceof Error ? err.message : "Failed to save blog ")
     } finally {
       setSaving(false)
     }
@@ -176,7 +180,7 @@ export default function BlogEditor({ initialBlog, onSave }: BlogEditorProps) {
   return (
     <Card className="w-full">
       <CardHeader>
-        <CardTitle>{initialBlog ? "Edit Captain's Log" : "Create New Captain's Log"}</CardTitle>
+        <CardTitle>{initialBlog ? "Edit Blog" : "Publish New Blog"}</CardTitle>
         <CardDescription>Share your maritime tales and adventures</CardDescription>
       </CardHeader>
       <CardContent className="space-y-6">
@@ -188,7 +192,7 @@ export default function BlogEditor({ initialBlog, onSave }: BlogEditorProps) {
             id="blog-title"
             value={title}
             onChange={(e) => setTitle(e.target.value)}
-            placeholder="Enter a title for your blog post"
+            placeholder="Enter a title for your blog "
           />
         </div>
 
@@ -264,17 +268,24 @@ export default function BlogEditor({ initialBlog, onSave }: BlogEditorProps) {
         {success && (
           <div className="flex items-center gap-2 text-green-600 text-sm">
             <CheckCircle className="h-4 w-4" />
-            <span>Captain's log saved successfully!</span>
+            <span>Blog published successfully!</span>
           </div>
         )}
       </CardContent>
       <CardFooter>
-        <Button onClick={saveBlog} disabled={saving} className="ml-auto bg-cyan-600 hover:bg-cyan-700">
+        <Button 
+          onClick={(e) => {
+            e.preventDefault();
+            saveBlog();
+          }} 
+          disabled={saving} 
+          className="ml-auto bg-slate-600 hover:bg-slate-700"
+        >
           {saving ? (
-            "Charting Course..."
+            "Saving..."
           ) : (
             <>
-              <Save className="mr-2 h-4 w-4" /> {initialBlog ? "Update" : "Publish"} Captain's Log
+              <Save className="mr-2 h-4 w-4" /> {initialBlog ? "Update" : "Publish"} Blog
             </>
           )}
         </Button>

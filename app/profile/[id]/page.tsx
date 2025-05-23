@@ -56,14 +56,21 @@ export default function ProfilePage({ params }: { params: { id: string } }) {
       setLoading(true)
       setError(null)
 
+      // First try to fetch from /api/users/[id]
       const response = await fetch(`/api/users/${profileId}`)
       if (!response.ok) {
-        throw new Error("Failed to fetch profile")
+        // If not found by ID, try fetching from the users list
+        const usersRes = await fetch("/api/users")
+        if (!usersRes.ok) throw new Error("Failed to fetch profile")
+        const users = await usersRes.json()
+        const profileData = users.find((u: any) => u._id === profileId)
+        if (!profileData) throw new Error("Profile not found")
+        setProfile(profileData)
+      } else {
+        const data = await response.json()
+        console.log('Profile data:', data)
+        setProfile(data)
       }
-
-      const data = await response.json()
-      console.log('Profile data:', data)
-      setProfile(data)
     } catch (err) {
       console.error("Error fetching profile:", err)
       setError("Failed to load profile. Please try again.")

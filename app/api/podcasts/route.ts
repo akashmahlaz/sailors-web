@@ -21,8 +21,8 @@ export async function POST(request: NextRequest) {
       return NextResponse.json({ error: "Podcast title is required" }, { status: 400 })
     }
 
-    if (!audioUrl) {
-      return NextResponse.json({ error: "Audio file is required" }, { status: 400 })
+    if (!audioUrl && !videoUrl) {
+      return NextResponse.json({ error: "Either audio or video file is required" }, { status: 400 })
     }
 
     // Get podcasts collection

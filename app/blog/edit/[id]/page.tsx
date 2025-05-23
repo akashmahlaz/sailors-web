@@ -7,6 +7,7 @@ import { Button } from "@/components/ui/button"
 import { Skeleton } from "@/components/ui/skeleton"
 import { AlertCircle, ArrowLeft } from "lucide-react"
 import { Card, CardContent } from "@/components/ui/card"
+import { useSession } from "next-auth/react"
 
 interface Blog {
   id: string
@@ -14,11 +15,13 @@ interface Blog {
   content: string
   cover_image_url?: string
   tags: string[]
+  author_id: string
 }
 
 export default function EditBlogPage() {
   const params = useParams()
   const router = useRouter()
+  const { data: session } = useSession()
   const [blog, setBlog] = useState<Blog | null>(null)
   const [loading, setLoading] = useState(true)
   const [error, setError] = useState<string | null>(null)
@@ -35,6 +38,14 @@ export default function EditBlogPage() {
 
         const data = await response.json()
         setBlog(data)
+
+        // Check if user has permission to edit
+        const isOwner = data.author_id === session?.user?.id
+        const isAdmin = session?.user?.role === 'admin'
+        if (!isOwner && !isAdmin) {
+          router.push('/blog')
+          return
+        }
       } catch (err) {
         console.error("Error fetching blog:", err)
         setError(err instanceof Error ? err.message : "Failed to load blog post")
@@ -43,8 +54,10 @@ export default function EditBlogPage() {
       }
     }
 
-    fetchBlog()
-  }, [params.id])
+    if (session) {
+      fetchBlog()
+    }
+  }, [params.id, session, router])
 
   const handleSave = () => {
     // Redirect to the blog post page after saving

@@ -64,8 +64,8 @@ export default function PodcastCreator({ onSave }: PodcastCreatorProps) {
       return
     }
 
-    if (!audioUrl) {
-      setError("Audio file is required")
+    if (!audioUrl && !videoUrl) {
+      setError("Either audio or video file is required")
       return
     }
 

@@ -13,7 +13,7 @@ async function getBlogsCollection() {
 
 export async function GET(request: NextRequest, { params }: { params: { id: string } }) {
   try {
-    const id = await params.id
+    const id = params.id
 
     // Get blogs collection
     const collection = await getBlogsCollection()
@@ -32,6 +32,7 @@ export async function GET(request: NextRequest, { params }: { params: { id: stri
       content: blog.content,
       cover_image_url: blog.coverImageUrl,
       author: blog.author,
+      author_id: blog.author_id,
       tags: blog.tags,
       created_at: blog.createdAt.toISOString(),
       updated_at: blog.updatedAt.toISOString(),
@@ -53,6 +54,12 @@ export async function GET(request: NextRequest, { params }: { params: { id: stri
 export async function PUT(request: NextRequest, { params }: { params: { id: string } }) {
   try {
     const id = params.id
+    const session = await getServerSession(authOptions)
+    
+    if (!session) {
+      return NextResponse.json({ error: "Unauthorized" }, { status: 401 })
+    }
+
     const { title, content, coverImageUrl, author, tags } = await request.json()
 
     if (!title || !content) {
@@ -61,6 +68,19 @@ export async function PUT(request: NextRequest, { params }: { params: { id: stri
 
     // Get blogs collection
     const collection = await getBlogsCollection()
+
+    // Find the blog first to check ownership
+    const blog = await collection.findOne({ _id: new ObjectId(id) })
+    if (!blog) {
+      return NextResponse.json({ error: "Blog not found" }, { status: 404 })
+    }
+
+    // Check if user owns the content or is an admin
+    const isOwner = blog.author_id === session.user.id
+    const isAdmin = session.user.role === 'admin'
+    if (!isOwner && !isAdmin) {
+      return NextResponse.json({ error: "You don't have permission to edit this blog" }, { status: 403 })
+    }
 
     // Update the blog post
     const result = await collection.updateOne(
@@ -97,10 +117,9 @@ export async function PUT(request: NextRequest, { params }: { params: { id: stri
 export async function DELETE(request: NextRequest, { params }: { params: { id: string } }) {
   try {
     const id = params.id
-
-    // Check if user is authenticated
     const session = await getServerSession(authOptions)
-    if (!session || !session.user) {
+    
+    if (!session) {
       return NextResponse.json({ error: "Unauthorized" }, { status: 401 })
     }
 
@@ -114,8 +133,9 @@ export async function DELETE(request: NextRequest, { params }: { params: { id: s
     }
 
     // Check if user owns the content or is an admin
-    const isOwner = blog.userId === session.user.id
-    if (!isOwner && session.user.role !== 'admin') {
+    const isOwner = blog.author_id === session.user.id
+    const isAdmin = session.user.role === 'admin'
+    if (!isOwner && !isAdmin) {
       return NextResponse.json({ error: "You don't have permission to delete this blog" }, { status: 403 })
     }
 

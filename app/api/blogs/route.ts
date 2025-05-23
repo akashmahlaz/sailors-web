@@ -1,8 +1,16 @@
 import { type NextRequest, NextResponse } from "next/server"
 import { getBlogsCollection } from "@/lib/mongodb-server"
+import { getServerSession } from "next-auth/next"
+import { authOptions } from "@/app/api/auth/[...nextauth]/route"
 
 export async function POST(request: NextRequest) {
   try {
+    // Check if user is authenticated
+    const session = await getServerSession(authOptions)
+    if (!session) {
+      return NextResponse.json({ error: "Unauthorized" }, { status: 401 })
+    }
+
     const { title, content, coverImageUrl, author, tags } = await request.json()
 
     if (!title || !content) {
@@ -18,6 +26,7 @@ export async function POST(request: NextRequest) {
       content,
       coverImageUrl: coverImageUrl || null,
       author: author || "Anonymous",
+      author_id: session.user.id, // Store the author's ID
       tags: tags || [],
       createdAt: new Date(),
       updatedAt: new Date(),
@@ -54,6 +63,7 @@ export async function GET() {
       content: blog.content,
       cover_image_url: blog.coverImageUrl,
       author: blog.author,
+      author_id: blog.author_id,
       tags: blog.tags,
       created_at: blog.createdAt.toISOString(),
       updated_at: blog.updatedAt.toISOString(),

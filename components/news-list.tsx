@@ -58,6 +58,7 @@ const NEWS_CATEGORIES = [
 
 export default function NewsList() {
   const { data: session } = useSession()
+  const isAdmin = session?.user?.role === "admin"
   const [news, setNews] = useState<NewsArticle[]>([])
   const [loading, setLoading] = useState(true)
   const [error, setError] = useState<string | null>(null)

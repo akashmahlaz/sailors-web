@@ -8,6 +8,7 @@ import { Badge } from "@/components/ui/badge"
 import { Skeleton } from "@/components/ui/skeleton"
 import { AlertCircle, ArrowLeft, Calendar, User, Edit, Trash2, Eye } from "lucide-react"
 import Link from "next/link"
+import { useSession } from "next-auth/react"
 
 interface NewsArticle {
   id: string
@@ -28,6 +29,7 @@ interface NewsArticle {
 export default function NewsDetailPage() {
   const params = useParams()
   const router = useRouter()
+  const { data: session } = useSession()
   const [article, setArticle] = useState<NewsArticle | null>(null)
   const [loading, setLoading] = useState(true)
   const [error, setError] = useState<string | null>(null)
@@ -141,16 +143,18 @@ export default function NewsDetailPage() {
         <Button variant="ghost" onClick={() => router.push("/news")}>
           <ArrowLeft className="mr-2 h-4 w-4" /> Back to News
         </Button>
-        <div className="flex gap-2">
-          <Link href={`/news/edit/${article.id}`}>
-            <Button variant="outline" size="sm">
-              <Edit className="mr-2 h-4 w-4" /> Edit
+        {session?.user?.role === 'admin' && (
+          <div className="flex gap-2">
+            <Link href={`/news/edit/${article.id}`}>
+              <Button variant="outline" size="sm">
+                <Edit className="mr-2 h-4 w-4" /> Edit
+              </Button>
+            </Link>
+            <Button variant="destructive" size="sm" onClick={deleteArticle} disabled={deleting}>
+              <Trash2 className="mr-2 h-4 w-4" /> {deleting ? "Deleting..." : "Delete"}
             </Button>
-          </Link>
-          <Button variant="destructive" size="sm" onClick={deleteArticle} disabled={deleting}>
-            <Trash2 className="mr-2 h-4 w-4" /> {deleting ? "Deleting..." : "Delete"}
-          </Button>
-        </div>
+          </div>
+        )}
       </div>
 
       <div className="max-w-4xl mx-auto">

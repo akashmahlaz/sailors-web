@@ -8,6 +8,7 @@ import { Badge } from "@/components/ui/badge"
 import { Skeleton } from "@/components/ui/skeleton"
 import { AlertCircle, ArrowLeft, Calendar, User, Edit, Trash2 } from "lucide-react"
 import Link from "next/link"
+import { useSession } from "next-auth/react"
 
 interface Blog {
   id: string
@@ -23,6 +24,7 @@ interface Blog {
 export default function BlogDetailPage() {
   const params = useParams()
   const router = useRouter()
+  const { data: session } = useSession()
   const [blog, setBlog] = useState<Blog | null>(null)
   const [loading, setLoading] = useState(true)
   const [error, setError] = useState<string | null>(null)
@@ -131,16 +133,18 @@ export default function BlogDetailPage() {
         <Button variant="ghost" className="text-gray-700 dark:text-gray-300" onClick={() => router.push("/blog")}> 
           <ArrowLeft className="mr-2 h-4 w-4" /> Back to Blog
         </Button>
-        <div className="flex gap-2">
-          <Link href={`/blog/edit/${blog.id}`}>
-            <Button variant="outline" size="sm" className="border-gray-300 dark:border-gray-700 text-gray-700 dark:text-gray-300">
-              <Edit className="mr-2 h-4 w-4" /> Edit
+        {session?.user?.role === 'admin' && (
+          <div className="flex gap-2">
+            <Link href={`/blog/edit/${blog.id}`}>
+              <Button variant="outline" size="sm" className="border-gray-300 dark:border-gray-700 text-gray-700 dark:text-gray-300">
+                <Edit className="mr-2 h-4 w-4" /> Edit
+              </Button>
+            </Link>
+            <Button variant="destructive" size="sm" onClick={deleteBlog} disabled={deleting}>
+              <Trash2 className="mr-2 h-4 w-4" /> {deleting ? "Deleting..." : "Delete"}
             </Button>
-          </Link>
-          <Button variant="destructive" size="sm" onClick={deleteBlog} disabled={deleting}>
-            <Trash2 className="mr-2 h-4 w-4" /> {deleting ? "Deleting..." : "Delete"}
-          </Button>
-        </div>
+          </div>
+        )}
       </div>
 
       {blog.cover_image_url && (
