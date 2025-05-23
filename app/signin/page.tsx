@@ -71,7 +71,7 @@ export default function SignIn() {
     <div className="flex min-h-screen items-center justify-center bg-gradient-to-b from-gray-100 to-gray-200 dark:from-gray-800 dark:to-gray-900 px-4 py-12 sm:px-6 lg:px-8">
       <Card className="w-full max-w-md border-gray-200 shadow-lg dark:border-gray-700 dark:shadow-none bg-white/90 dark:bg-gray-800/90 backdrop-blur-sm">
         <CardHeader className="space-y-1 border-b border-gray-100 dark:border-gray-700">
-          <CardTitle className="text-2xl font-bold text-center text-gray-900 dark:text-gray-100">Board Your Ship</CardTitle>
+          <CardTitle className="text-2xl font-bold text-center text-gray-900 dark:text-gray-100">Sign in to Sailor's Platform</CardTitle>
           <CardDescription className="text-center text-gray-600 dark:text-gray-400">
             Enter your credentials to access your maritime journey
           </CardDescription>
@@ -179,15 +179,15 @@ export default function SignIn() {
               className="w-full bg-gray-700 hover:bg-gray-800 text-white dark:bg-gray-600 dark:hover:bg-gray-700 transition-colors duration-200" 
               disabled={isLoading}
             >
-              {isLoading ? "Boarding..." : "Set Sail with Email"}
+              {isLoading ? "Signing In..." : "Sign in with Email"}
             </Button>
           </form>
         </CardContent>
         <CardFooter className="flex justify-center border-t border-gray-100 dark:border-gray-700">
           <p className="text-sm text-gray-600 dark:text-gray-400">
-            Don't have a ship yet?{" "}
+            Don't have a Account yet?{" "}
             <Link href="/signup" className="text-gray-700 hover:text-gray-900 dark:text-gray-300 dark:hover:text-gray-100">
-              Hoist the Colors
+              Sign up
             </Link>
           </p>
         </CardFooter>

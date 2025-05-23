@@ -8,6 +8,7 @@ import { useSession } from "next-auth/react"
 import { motion } from "framer-motion"
 import { Button } from "@/components/ui/button"
 import { Card, CardContent } from "@/components/ui/card"
+import Image from "next/image"
 import { Badge } from "@/components/ui/badge"
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar"
 import {
@@ -263,14 +264,14 @@ export default function Home() {
 
   return (
     <div className="flex flex-col min-h-screen">
-      {/* Light Gray Hero Section */}
-      <section className="relative bg-gradient-to-b from-gray-700 to-gray-200 overflow-hidden">
+      {/* Hero Section */}
+      <section className="relative bg-gradient-to-b from-slate-800 to-slate-600 overflow-hidden">
         {/* Subtle Pattern Overlay */}
         <div className="absolute inset-0 opacity-5">
           <svg width="100%" height="100%" xmlns="http://www.w3.org/2000/svg">
             <defs>
               <pattern id="grid" width="40" height="40" patternUnits="userSpaceOnUse">
-                <path d="M 0 10 L 40 10 M 10 0 L 10 40" stroke="black" strokeWidth="0.5" fill="none" />
+                <path d="M 0 10 L 40 10 M 10 0 L 10 40" stroke="white" strokeWidth="0.5" fill="none" />
               </pattern>
             </defs>
             <rect width="100%" height="100%" fill="url(#grid)" />
@@ -278,8 +279,8 @@ export default function Home() {
         </div>
 
         {/* Decorative Elements */}
-        <div className="absolute top-20 right-10 w-64 h-64 bg-gradient-to-br from-gray-400/40 to-gray-500/20 rounded-full blur-3xl"></div>
-        <div className="absolute bottom-10 left-10 w-40 h-40 bg-gradient-to-tr from-gray-400/40 to-gray-500/20 rounded-full blur-3xl"></div>
+        <div className="absolute top-20 right-10 w-64 h-64 bg-gradient-to-br from-slate-400/40 to-slate-500/20 rounded-full blur-3xl"></div>
+        <div className="absolute bottom-10 left-10 w-40 h-40 bg-gradient-to-tr from-slate-400/40 to-slate-500/20 rounded-full blur-3xl"></div>
 
         <div className="container mx-auto px-4 py-16 md:py-24 relative z-10">
           <div className="grid grid-cols-1 lg:grid-cols-2 gap-12 items-center">
@@ -297,44 +298,43 @@ export default function Home() {
               }}
             >
               <motion.div variants={fadeIn} className="mb-6">
-                <Badge className="px-3 py-1 border-white border text-sm bg-gray-800 text-white  ">
-                  <Sparkles className="w-4  h-4 mr-1 text-gray-300" /> Maritime Community
+                <Badge className="px-3 py-1 border-white border text-sm bg-slate-700/80 text-white backdrop-blur-sm hover:bg-slate-600/80 transition-colors">
+                  <Sparkles className="w-4 h-4 mr-1 text-slate-200" /> Maritime Community
                 </Badge>
               </motion.div>
 
               <motion.h1
-                className="text-4xl sm:text-5xl md:text-6xl font-bold mb-6 text-gray-900 leading-tight"
+                className="text-4xl sm:text-5xl md:text-6xl font-bold mb-6 text-white leading-tight"
                 variants={fadeIn}
               >
                 <span className="relative">
-                  <span className="relative text-gray-300 z-10">
+                  <span className="relative text-white z-10">
                     Discover the Sailor's World
                   </span>
-                  {/* <span className="absolute bottom-2 left-0 w-full h-3 bg-gray-400 rounded-full -z-10"></span> */}
                 </span>
               </motion.h1>
 
-              <motion.p className="text-lg  md:text-xl mb-8 text-white max-w-lg" variants={fadeIn}>
+              <motion.p className="text-lg md:text-xl mb-8 text-slate-200 max-w-lg" variants={fadeIn}>
                 Connect with fellow sailors, share your maritime adventures, and explore a sea of content created by our
                 vibrant community.
               </motion.p>
 
               <motion.div className="flex flex-wrap gap-4" variants={fadeIn}>
                 <Link href="/videos">
-                  <Button size="lg" className="bg-gray-300 hover:bg-gray-200 text-gray-900 border border-gray-400 dark:bg-gray-800 dark:hover:bg-gray-700 dark:text-gray-100 dark:border-gray-600 transition-colors">
-                    Explore Content <Compass className="ml-2 h-5 w-5 text-gray-600 dark:text-gray-300" />
+                  <Button size="lg" className="bg-white text-slate-800 hover:bg-slate-50 border border-slate-200 dark:bg-slate-700 dark:hover:bg-slate-600 dark:text-white dark:border-slate-600 transition-colors">
+                    Explore Content <Compass className="ml-2 h-5 w-5 text-slate-600 dark:text-slate-300" />
                   </Button>
                 </Link>
                 {!isAuthenticated ? (
                   <Link href="/signup">
-                    <Button size="lg" variant="outline" className="rounded-xl border-gray-400 bg-gray-300 text-gray-700 hover:bg-gray-200 hover:text-gray-900 hover:border-gray-500 border transition-colors dark:bg-gray-900 dark:text-gray-100 dark:border-gray-600 dark:hover:bg-gray-800 dark:hover:text-white dark:hover:border-gray-400">
-                      Join the Crew <Anchor className="ml-2 h-5 w-5 text-gray-600 dark:text-gray-300" />
+                    <Button size="lg" variant="outline" className="rounded-xl border-slate-200 bg-slate-700/80 text-white hover:bg-slate-600/80 hover:text-white border transition-colors dark:border-white dark:bg-transparent">
+                      Join Us Now <Anchor className="ml-2 h-5 w-5 text-slate-200" />
                     </Button>
                   </Link>
                 ) : (
                   <Link href="/community">
-                    <Button size="lg" variant="outline" className=" border-gray-400 bg-gray-300 text-gray-700 hover:bg-gray-200 hover:text-gray-900 hover:border-gray-500 border transition-colors dark:bg-gray-800 dark:text-gray-100 dark:border-gray-600 dark:hover:bg-gray-700 dark:hover:text-white dark:hover:border-gray-400">
-                      Community <UserCircle2 className="ml-2 h-5 w-5 text-gray-600 dark:text-gray-300" />
+                    <Button size="lg" variant="outline" className="border-slate-200 bg-slate-700/80 text-white hover:bg-slate-600/80 hover:text-white border transition-colors dark:border-white dark:bg-transparent">
+                      Community <UserCircle2 className="ml-2 h-5 w-5 text-slate-200" />
                     </Button>
                   </Link>
                 )}
@@ -354,10 +354,13 @@ export default function Home() {
 
                 {/* Main image container */}
                 <div className="relative z-10 bg-white rounded-xl overflow-hidden shadow-lg border border-gray-200">
-                  <img
+                  <Image
+                    width={720}
+                    height={480}
                     src="/d3.jpg"
                     alt="Sailor's Community"
                     className="w-full h-full object-cover"
+                    priority
                   />
 
                   {/* Overlay with gradient */}
@@ -392,7 +395,7 @@ export default function Home() {
         </div>
 
         {/* Bottom wave */}
-        <div className="absolute bg-gray-300 bottom-0 left-0 right-0">
+        <div className="absolute bg-slate-600 bottom-0 left-0 right-0">
           <svg
             viewBox="0 0 1440 120"
             fill="none"
@@ -402,15 +405,15 @@ export default function Home() {
           >
             <path
               d="M0 120L48 105C96 90 192 60 288 55C384 50 480 70 576 75C672 80 768 70 864 65C960 60 1056 60 1152 65C1248 70 1344 80 1392 85L1440 90V120H1392C1344 120 1248 120 1152 120C1056 120 960 120 864 120C768 120 672 120 576 120C480 120 384 120 288 120C192 120 96 120 48 120H0Z"
-              fill="white"
-              className=" dark:fill-slate-900"
+              fill="rgb(226 232 240)"
+              className="dark:fill-slate-900"
             />
           </svg>
         </div>
       </section>
 
       {/* Trending Now Section */}
-      <section className="py-12 bg-gray-200 dark:bg-gray-900">
+      <section className="py-12 bg-slate-200 dark:bg-slate-900">
         <div className="container mx-auto px-4">
           <div className="flex items-center justify-between mb-8">
         <div className="flex items-center gap-3">
