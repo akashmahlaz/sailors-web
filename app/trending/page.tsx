@@ -5,7 +5,7 @@ import { TrendingUp, Film, ImageIcon, Mic, ArrowLeft, Search, SortAsc, SortDesc 
 import { Card, CardContent } from "@/components/ui/card"
 import { Badge } from "@/components/ui/badge"
 import { Button } from "@/components/ui/button"
-import { useEffect, useState } from "react"
+import { useEffect, useState, useRef } from "react"
 
 const TYPE_OPTIONS = [
   { label: "All", value: "all" },
@@ -26,10 +26,22 @@ export default function TrendingPage() {
   const [type, setType] = useState("all")
   const [sort, setSort] = useState("views")
   const [search, setSearch] = useState("")
+  const [trendingVideoThumbnails, setTrendingVideoThumbnails] = useState<{ [key: string]: string }>({})
+  const videoRefs = useRef<(HTMLVideoElement | null)[]>([])
+  const [trendingHover, setTrendingHover] = useState<number | null>(null)
 
   useEffect(() => {
     fetchTrending()
   }, [])
+
+  // Generate thumbnails for trending videos
+  useEffect(() => {
+    trending.forEach((item, index) => {
+      if (item.type === 'video' && !item.thumbnail_url) {
+        generateVideoThumbnail(item.url, item.id, index);
+      }
+    });
+  }, [trending]); // Re-run when trending changes
 
   async function fetchTrending() {
     setIsLoading(true)
@@ -81,6 +93,69 @@ export default function TrendingPage() {
     }
   }
 
+   // Generate video thumbnail function
+   const generateVideoThumbnail = (videoUrl: string, videoId: string, index: number) => {
+    const video = document.createElement('video');
+    video.src = videoUrl;
+    video.crossOrigin = 'anonymous';
+
+    // Try multiple timestamps
+    const timestamps = [1, 2, 3];
+    let currentTimestampIndex = 0;
+
+    const tryNextTimestamp = () => {
+      if (currentTimestampIndex < timestamps.length) {
+        video.currentTime = timestamps[currentTimestampIndex];
+        currentTimestampIndex++;
+      } else {
+        // All timestamps tried, use placeholder if no thumbnail generated
+         setTrendingVideoThumbnails(prev => ({
+           ...prev,
+           [videoId]: '/placeholder.svg'
+         }));
+      }
+    };
+
+    video.addEventListener('loadeddata', () => {
+      tryNextTimestamp();
+    });
+
+    video.addEventListener('seeked', () => {
+      const canvas = document.createElement('canvas');
+      canvas.width = video.videoWidth;
+      canvas.height = video.videoHeight;
+      const ctx = canvas.getContext('2d');
+      if (ctx) {
+        ctx.drawImage(video, 0, 0, canvas.width, canvas.height);
+        const thumbnailUrl = canvas.toDataURL('image/jpeg', 0.8);
+        setTrendingVideoThumbnails(prev => ({
+          ...prev,
+          [videoId]: thumbnailUrl
+        }));
+         video.remove(); // Clean up the video element
+      }
+    });
+
+    video.addEventListener('error', (e) => {
+      console.error('Error generating thumbnail for video:', videoId, e);
+       setTrendingVideoThumbnails(prev => ({
+         ...prev,
+         [videoId]: '/placeholder.svg'
+       }));
+       video.remove(); // Clean up the video element
+    });
+
+    // Handle play/pause on hover for the video element inside the Card
+     const cardVideoElement = videoRefs.current[index];
+     if (cardVideoElement) {
+        cardVideoElement.onmouseenter = () => cardVideoElement.play();
+        cardVideoElement.onmouseleave = () => {
+           cardVideoElement.pause();
+           cardVideoElement.currentTime = 0;
+        };
+     }
+  };
+
   // Filtering, sorting, searching
   let filtered = trending
   if (type !== "all") filtered = filtered.filter((item) => item.type === type)
@@ -120,7 +195,7 @@ export default function TrendingPage() {
             ))}
           </div>
         </div>
-        <div className="flex flex-col md:flex-row md:items-center md:justify-between gap-4 mb-6">
+        <div className="flex flex-col md:flex-row md:justify-between gap-4 mb-8">
           <div className="flex items-center gap-2">
             <div className="relative">
               <input
@@ -166,27 +241,40 @@ export default function TrendingPage() {
               <Card key={item.id || index} className="overflow-hidden border-none shadow-md hover:shadow-lg transition-all group">
                 <Link href={`/${item.type}s/${item.id}`}>
                   <div className="relative aspect-video overflow-hidden bg-slate-200 dark:bg-slate-800">
-                    <img
-                      src={
-                        item.thumbnail_url ||
-                        item.coverImage ||
-                        item.url ||
-                        (item.type === "video"
-                          ? `https://res.cloudinary.com/${process.env.NEXT_PUBLIC_CLOUDINARY_CLOUD_NAME}/video/upload/so_0/${item.public_id}.jpg`
-                          : "/diverse-media-landscape.png")
-                      }
-                      alt={item.title || "Media thumbnail"}
-                      className="w-full h-full object-cover transition-transform group-hover:scale-105"
-                    />
+                    {item.type === "video" ? (
+                       <video
+                         ref={el => videoRefs.current[index] = el}
+                         src={item.url}
+                         poster={item.thumbnail_url || trendingVideoThumbnails[item.id] || `/placeholder.svg`}
+                         autoPlay={trendingHover === index} // Autoplay only when hovered
+                         muted
+                         loop
+                         playsInline
+                         className="w-full h-full object-cover"
+                         style={{ zIndex: 10 }}
+                       />
+                    ) : (
+                      <img
+                        src={
+                          item.thumbnail_url ||
+                          item.coverImage ||
+                          item.url ||
+                          (item.type === "video"
+                            ? trendingVideoThumbnails[item.id] || `/placeholder.svg`
+                            : "/diverse-media-landscape.png")
+                        }
+                        alt={item.title || "Media thumbnail"}
+                        className="w-full h-full object-cover transition-transform group-hover:scale-105"
+                      />
+                    )}
                     <div className="absolute inset-0 bg-gradient-to-t from-black/70 to-transparent opacity-60"></div>
-                    <div className="absolute top-2 left-2">
-                      <Badge className="bg-black/50 text-white border-0 backdrop-blur-sm">
+                    
+                      <Badge className="absolute top-2 left-2 bg-black/50 text-white border-0 backdrop-blur-sm">
                         {item.type === "video" && <Film className="h-3 w-3 mr-1" />}
                         {item.type === "photo" && <ImageIcon className="h-3 w-3 mr-1" />}
                         {item.type === "podcast" && <Mic className="h-3 w-3 mr-1" />} Trending
                       </Badge>
                     </div>
-                  </div>
                 </Link>
                 <CardContent className="p-4">
                   <Link href={`/${item.type}s/${item.id}`}>

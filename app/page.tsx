@@ -58,10 +58,139 @@ export default function Home() {
   const [isLoading, setIsLoading] = useState(true)
   const [fetchError, setFetchError] = useState<string | null>(null)
   const [trendingHover, setTrendingHover] = useState<number | null>(null)
+  const [trendingVideoThumbnails, setTrendingVideoThumbnails] = useState<{ [key: string]: string }>({})
+  const [isGeneratingThumbnails, setIsGeneratingThumbnails] = useState(false)
 
   useEffect(() => {
     fetchLatestContent()
   }, [])
+
+  // Generate video thumbnail function
+  const generateVideoThumbnail = async (videoUrl: string, videoId: string): Promise<string> => {
+    return new Promise((resolve, reject) => {
+      const video = document.createElement('video')
+      video.src = videoUrl
+      video.crossOrigin = 'anonymous'
+      
+      // Try multiple timestamps to get the best thumbnail
+      const timestamps = [1, 2, 3, 4, 5, 6] // Try at 1s, 2s, 3s, 4s, 5s, and 6s
+      let currentTimestampIndex = 0
+      let bestThumbnail: string | null = null
+      let bestBrightness = 0
+
+      const tryNextTimestamp = () => {
+        if (currentTimestampIndex < timestamps.length) {
+          video.currentTime = timestamps[currentTimestampIndex]
+          currentTimestampIndex++
+        } else {
+          // All timestamps tried, use the best thumbnail or fallback to placeholder
+          const finalThumbnail = bestThumbnail || '/placeholder.svg'
+          setTrendingVideoThumbnails(prev => ({
+            ...prev,
+            [videoId]: finalThumbnail
+          }))
+          resolve(finalThumbnail)
+        }
+      }
+
+      const calculateBrightness = (imageData: ImageData): number => {
+        let total = 0
+        for (let i = 0; i < imageData.data.length; i += 4) {
+          // Calculate relative luminance using the formula: 0.299R + 0.587G + 0.114B
+          const r = imageData.data[i]
+          const g = imageData.data[i + 1]
+          const b = imageData.data[i + 2]
+          total += (0.299 * r + 0.587 * g + 0.114 * b)
+        }
+        return total / (imageData.data.length / 4)
+      }
+
+      video.addEventListener('loadeddata', () => {
+        tryNextTimestamp()
+      })
+
+      video.addEventListener('seeked', () => {
+        const canvas = document.createElement('canvas')
+        canvas.width = video.videoWidth
+        canvas.height = video.videoHeight
+        const ctx = canvas.getContext('2d')
+        if (ctx) {
+          ctx.drawImage(video, 0, 0, canvas.width, canvas.height)
+          const imageData = ctx.getImageData(0, 0, canvas.width, canvas.height)
+          const brightness = calculateBrightness(imageData)
+          
+          // If this frame is brighter than the previous best, update the best thumbnail
+          if (brightness > bestBrightness) {
+            bestBrightness = brightness
+            bestThumbnail = canvas.toDataURL('image/jpeg', 0.9) // Higher quality
+          }
+          
+          tryNextTimestamp() // Try next timestamp
+        }
+      })
+
+      // Handle errors
+      video.addEventListener('error', (e) => {
+        console.error('Error generating thumbnail:', e)
+        const fallbackThumbnail = bestThumbnail || '/placeholder.svg'
+        setTrendingVideoThumbnails(prev => ({
+          ...prev,
+          [videoId]: fallbackThumbnail
+        }))
+        reject(e)
+      })
+    })
+  }
+
+  // Create trending content for homepage
+  const fetchTrendingContent = async () => {
+    setIsGeneratingThumbnails(true)
+    try {
+      // Use the latest fetched videos, photos, podcasts
+      const videos = await Promise.all(latestVideos.slice(0, 3).map(async (item: any) => {
+        let thumbnailUrl = item.thumbnail_url
+        
+        // Generate thumbnail if not available
+        if (!thumbnailUrl) {
+          try {
+            thumbnailUrl = await generateVideoThumbnail(item.url, item._id || item.id)
+          } catch (error) {
+            console.error('Error generating thumbnail:', error)
+            thumbnailUrl = '/placeholder.svg'
+          }
+        }
+        
+        return {
+          ...item,
+          type: "video",
+          views: Math.floor(Math.random() * 5000) + 1000,
+          id: item._id || item.id,
+          thumbnail_url: thumbnailUrl
+        }
+      }))
+      
+      const photos = latestPhotos.slice(0, 2).map((item: any) => ({
+        ...item,
+        type: "photo",
+        views: Math.floor(Math.random() * 3000) + 800,
+        id: item._id || item.id,
+      }))
+      
+      const podcasts = latestPodcasts.slice(0, 1).map((item: any) => ({
+        ...item,
+        type: "podcast",
+        views: Math.floor(Math.random() * 2000) + 500,
+        id: item._id || item.id,
+      }))
+      
+      // Combine and shuffle
+      const trending = [...videos, ...photos, ...podcasts]
+      const shuffled = trending.sort(() => 0.5 - Math.random()).slice(0, 5)
+      setTrendingContent(shuffled)
+    } finally {
+      setIsGeneratingThumbnails(false)
+    }
+  }
 
   // Fetch trending content for homepage trending section
   useEffect(() => {
@@ -223,33 +352,6 @@ export default function Home() {
     } finally {
       setIsLoading(false)
     }
-  }
-
-  // Create trending content for homepage
-  const fetchTrendingContent = () => {
-    // Use the latest fetched videos, photos, podcasts
-    const videos = latestVideos.slice(0, 3).map((item: any) => ({
-      ...item,
-      type: "video",
-      views: Math.floor(Math.random() * 5000) + 1000,
-      id: item._id || item.id,
-    }))
-    const photos = latestPhotos.slice(0, 2).map((item: any) => ({
-      ...item,
-      type: "photo",
-      views: Math.floor(Math.random() * 3000) + 800,
-      id: item._id || item.id,
-    }))
-    const podcasts = latestPodcasts.slice(0, 1).map((item: any) => ({
-      ...item,
-      type: "podcast",
-      views: Math.floor(Math.random() * 2000) + 500,
-      id: item._id || item.id,
-    }))
-    // Combine and shuffle
-    const trending = [...videos, ...photos, ...podcasts]
-    const shuffled = trending.sort(() => 0.5 - Math.random()).slice(0, 5)
-    setTrendingContent(shuffled)
   }
 
   const getInitials = (name: string) => {
@@ -444,7 +546,7 @@ export default function Home() {
 
           {trendingContent.length === 0 ? (
         <div className="text-center py-8 text-muted-foreground">
-          {isLoading ? "Loading trending content..." : "No trending content available"}
+          {isLoading || isGeneratingThumbnails ? "Loading trending content..." : "No trending content available"}
         </div>
           ) : (
         <div className="grid grid-cols-1 md:grid-cols-3 lg:grid-cols-5 gap-6">
@@ -462,10 +564,7 @@ export default function Home() {
               {item.type === "video" && trendingHover === index ? (
             <video
               src={item.url}
-              poster={
-                item.thumbnail_url ||
-                `https://res.cloudinary.com/${process.env.NEXT_PUBLIC_CLOUDINARY_CLOUD_NAME}/video/upload/so_0/${item.public_id}.jpg`
-              }
+              poster={item.thumbnail_url}
               autoPlay
               muted
               loop
@@ -476,12 +575,9 @@ export default function Home() {
               ) : (
             <img
               src={
-                item.thumbnail_url ||
-                item.coverImage ||
-                item.url ||
-                (item.type === "video"
-              ? `https://res.cloudinary.com/${process.env.NEXT_PUBLIC_CLOUDINARY_CLOUD_NAME}/video/upload/so_0/${item.public_id}.jpg`
-              : "/diverse-media-landscape.png")
+                item.type === "video" 
+                  ? item.thumbnail_url
+                  : (item.coverImage || item.url || "/diverse-media-landscape.png")
               }
               alt={item.title || "Media thumbnail"}
               className="w-full h-full object-cover transition-transform group-hover:scale-105"

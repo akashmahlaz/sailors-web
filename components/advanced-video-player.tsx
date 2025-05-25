@@ -66,23 +66,11 @@ export default function AdvancedVideoPlayer({
   const [duration, setDuration] = useState(0)
   const [isFullscreen, setIsFullscreen] = useState(false)
   const [showControls, setShowControls] = useState(true)
-  const [playbackRate, setPlaybackRate] = useState(1)
   const [isBuffering, setIsBuffering] = useState(false)
-  const [showVolumeSlider, setShowVolumeSlider] = useState(false)
-  const [isHoveringVolume, setIsHoveringVolume] = useState(false)
-  const controlsTimeoutRef = useRef<NodeJS.Timeout | null>(null)
   const [isLoaded, setIsLoaded] = useState(false)
-  const touchStartTimeRef = useRef<number>(0)
-  const touchStartXRef = useRef<number>(0)
-  const [isDragging, setIsDragging] = useState(false)
-  const [showPreview, setShowPreview] = useState(false)
-  const [previewTime, setPreviewTime] = useState(0)
-  const [previewPosition, setPreviewPosition] = useState(0)
-  const [isPictureInPicture, setIsPictureInPicture] = useState(false)
-  const [showQualityMenu, setShowQualityMenu] = useState(false)
-  const [showCaptionsMenu, setShowCaptionsMenu] = useState(false)
   const [videoThumbnail, setVideoThumbnail] = useState<string | null>(null)
   const [isGeneratingThumbnail, setIsGeneratingThumbnail] = useState(false)
+  const controlsTimeoutRef = useRef<NodeJS.Timeout | null>(null)
 
   // Like state
   const { data: session } = useSession()
@@ -107,15 +95,31 @@ export default function AdvancedVideoPlayer({
   }, [video.id, session?.user?.id])
 
   const handleLike = async () => {
-    if (!session?.user?.id) return
-    const res = await fetch(`/api/videos/${video.id}/like`, {
-      method: "POST",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({ userId: session.user.id }),
-    })
-    if (res.ok) {
-      const data = await res.json()
-      setLikeState({ liked: data.liked, likesCount: data.likesCount })
+    if (!session?.user?.id) {
+      toast({
+        title: "Sign in required",
+        description: "Please sign in to like videos",
+        variant: "destructive",
+      })
+      return
+    }
+    try {
+      const res = await fetch(`/api/videos/${video.id}/like`, {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ userId: session.user.id }),
+      })
+      if (res.ok) {
+        const data = await res.json()
+        setLikeState({ liked: data.liked, likesCount: data.likesCount })
+      }
+    } catch(err) {
+       console.error("Error liking video:", err)
+       toast({
+         title: "Error",
+         description: "Failed to update like",
+         variant: "destructive",
+       })
     }
   }
 
@@ -228,16 +232,7 @@ export default function AdvancedVideoPlayer({
     if (isPlaying) {
       videoRef.current.pause()
     } else {
-      try {
-        const playPromise = videoRef.current.play()
-        if (playPromise !== undefined) {
-          playPromise.catch((error) => {
-            console.error("Playback error:", error)
-          })
-        }
-      } catch (error) {
-        console.error("Error during play:", error)
-      }
+      videoRef.current.play()
     }
   }
 
@@ -262,27 +257,6 @@ export default function AdvancedVideoPlayer({
     videoRef.current.currentTime = value[0]
   }
 
-  const handleSeekStart = () => {
-    setIsDragging(true)
-    setShowPreview(true)
-  }
-
-  const handleSeekEnd = () => {
-    setIsDragging(false)
-    setShowPreview(false)
-  }
-
-  const handleSeekMove = (value: number[]) => {
-    if (!videoRef.current) return
-    const time = value[0]
-    setPreviewTime(time)
-    
-    // Calculate preview position
-    const rect = videoRef.current.getBoundingClientRect()
-    const percentage = time / duration
-    setPreviewPosition(percentage * rect.width)
-  }
-
   const toggleFullscreen = () => {
     if (!containerRef.current) return
 
@@ -302,7 +276,7 @@ export default function AdvancedVideoPlayer({
       clearTimeout(controlsTimeoutRef.current)
     }
 
-    if (isPlaying && !isDragging) {
+    if (isPlaying) {
       controlsTimeoutRef.current = setTimeout(() => {
         setShowControls(false)
       }, 3000)
@@ -310,129 +284,15 @@ export default function AdvancedVideoPlayer({
   }
 
   const handleMouseLeave = () => {
-    if (isPlaying && !isDragging) {
+    if (isPlaying) {
       setShowControls(false)
     }
   }
 
-  const changePlaybackRate = (rate: number) => {
-    if (!videoRef.current) return
-    videoRef.current.playbackRate = rate
-    setPlaybackRate(rate)
-  }
-
   const formatTime = (seconds: number) => {
-    const hours = Math.floor(seconds / 3600)
-    const minutes = Math.floor((seconds % 3600) / 60)
+    const minutes = Math.floor(seconds / 60)
     const secs = Math.floor(seconds % 60)
-
-    if (hours > 0) {
-      return `${hours}:${minutes.toString().padStart(2, "0")}:${secs.toString().padStart(2, "0")}`
-    }
     return `${minutes}:${secs.toString().padStart(2, "0")}`
-  }
-
-  const downloadVideo = () => {
-    const a = document.createElement("a")
-    a.href = video.url
-    a.download = `${video.title || "video"}.mp4`
-    document.body.appendChild(a)
-    a.click()
-    document.body.removeChild(a)
-  }
-
-  const handleTouchStart = (e: React.TouchEvent) => {
-    touchStartTimeRef.current = Date.now()
-    touchStartXRef.current = e.touches[0].clientX
-    setShowControls(true)
-  }
-
-  const handleTouchEnd = (e: React.TouchEvent) => {
-    const touchEndTime = Date.now()
-    const touchEndX = e.changedTouches[0].clientX
-    const touchDuration = touchEndTime - touchStartTimeRef.current
-    const touchDistance = Math.abs(touchEndX - touchStartXRef.current)
-
-    if (touchDuration < 200 && touchDistance < 10) {
-      togglePlay()
-    }
-
-    if (isPlaying) {
-      if (controlsTimeoutRef.current) {
-        clearTimeout(controlsTimeoutRef.current)
-      }
-      controlsTimeoutRef.current = setTimeout(() => {
-        setShowControls(false)
-      }, 3000)
-    }
-  }
-
-  const handleTouchMove = () => {
-    setShowControls(true)
-    if (controlsTimeoutRef.current) {
-      clearTimeout(controlsTimeoutRef.current)
-    }
-  }
-
-  const skipForward = () => {
-    if (!videoRef.current) return
-    videoRef.current.currentTime = Math.min(videoRef.current.currentTime + 10, duration)
-  }
-
-  const skipBackward = () => {
-    if (!videoRef.current) return
-    videoRef.current.currentTime = Math.max(videoRef.current.currentTime - 10, 0)
-  }
-
-  const togglePictureInPicture = async () => {
-    if (!videoRef.current) return
-
-    try {
-      if (document.pictureInPictureElement) {
-        await document.exitPictureInPicture()
-        setIsPictureInPicture(false)
-      } else {
-        await videoRef.current.requestPictureInPicture()
-        setIsPictureInPicture(true)
-      }
-    } catch (error) {
-      console.error("Error toggling Picture-in-Picture:", error)
-    }
-  }
-
-  const handlePictureInPictureChange = () => {
-    setIsPictureInPicture(!!document.pictureInPictureElement)
-  }
-
-  useEffect(() => {
-    document.addEventListener("enterpictureinpicture", handlePictureInPictureChange)
-    document.addEventListener("leavepictureinpicture", handlePictureInPictureChange)
-
-    return () => {
-      document.removeEventListener("enterpictureinpicture", handlePictureInPictureChange)
-      document.removeEventListener("leavepictureinpicture", handlePictureInPictureChange)
-    }
-  }, [])
-
-  const handleShare = async () => {
-    const shareUrl = window.location.href
-    if (navigator.share) {
-      try {
-        await navigator.share({
-          title: video.title,
-          text: video.title,
-          url: shareUrl,
-        })
-      } catch (err) {
-        // User cancelled or error
-      }
-    } else {
-      await navigator.clipboard.writeText(shareUrl)
-      toast({
-        title: "Link copied",
-        description: "Video link copied to clipboard",
-      })
-    }
   }
 
   // Generate video thumbnail
@@ -486,7 +346,7 @@ export default function AdvancedVideoPlayer({
       ref={containerRef}
       className="relative w-full bg-black aspect-video select-none"
       onMouseMove={handleMouseMove}
-      onTouchStart={handleTouchStart}
+      onMouseLeave={handleMouseLeave}
     >
       {/* Video */}
       <video
@@ -514,6 +374,7 @@ export default function AdvancedVideoPlayer({
         onPlaying={() => setIsBuffering(false)}
       />
 
+      {/* Loading and buffering states */}
       {!isLoaded && (
         <div className="absolute inset-0 flex items-center justify-center bg-black/50">
           <div className="animate-spin rounded-full h-12 w-12 border-t-2 border-b-2 border-white"></div>
@@ -526,25 +387,6 @@ export default function AdvancedVideoPlayer({
         </div>
       )}
 
-      {/* Preview thumbnail */}
-      {showPreview && (
-        <div
-          className="absolute bottom-16 left-0 w-32 h-20 bg-black rounded overflow-hidden pointer-events-none"
-          style={{ left: `${previewPosition - 64}px` }}
-        >
-          <video
-            src={video.url}
-            className="w-full h-full object-cover"
-            muted
-            playsInline
-            currentTime={previewTime}
-          />
-          <div className="absolute bottom-0 left-0 right-0 bg-black/50 text-white text-xs p-1 text-center">
-            {formatTime(previewTime)}
-          </div>
-        </div>
-      )}
-
       {/* Video Controls */}
       <div
         className={cn(
@@ -552,36 +394,27 @@ export default function AdvancedVideoPlayer({
           showControls ? "opacity-100" : "opacity-0"
         )}
       >
-        {/* Top Bar (mobile/desktop) */}
-        <div className="flex justify-between items-center px-2 pt-2 md:px-4 md:pt-4 pointer-events-auto">
-          {/* Left: (optional) back/close button */}
-          <div></div>
-          {/* Right: icons */}
-          <div className="flex gap-2 md:gap-3">
-            <Button variant="ghost" size="icon" className="text-white bg-black/40 hover:bg-black/60" tabIndex={-1}><PictureInPicture className="h-5 w-5" /></Button>
-            <Button variant="ghost" size="icon" className="text-white bg-black/40 hover:bg-black/60" tabIndex={-1}><Captions className="h-5 w-5" /></Button>
-            <Button variant="ghost" size="icon" className="text-white bg-black/40 hover:bg-black/60" tabIndex={-1}><Settings className="h-5 w-5" /></Button>
-            <Button variant="ghost" size="icon" className="text-white bg-black/40 hover:bg-black/60" onClick={toggleFullscreen}>
-              {isFullscreen ? <Minimize className="h-5 w-5" /> : <Maximize className="h-5 w-5" />}
-            </Button>
-          </div>
-        </div>
-        {/* Center Controls (mobile only, fade on desktop) */}
+        {/* Center Play/Pause Button */}
         <div className="flex-1 flex items-center justify-center pointer-events-auto">
-          <div className="flex items-center gap-8 md:gap-4">
-            <Button variant="ghost" size="icon" className="text-white bg-black/40 hover:bg-black/60 md:hidden" tabIndex={-1}><svg width="32" height="32" fill="none"><path d="M20 8l-8 8 8 8" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/></svg></Button>
-            <Button variant="ghost" size="icon" className="text-white bg-black/60 hover:bg-black/80 !h-16 !w-16 md:!h-10 md:!w-10" onClick={togglePlay} tabIndex={-1}>
-              {isPlaying ? <Pause className="h-8 w-8 md:h-5 md:w-5" /> : <Play className="h-8 w-8 md:h-5 md:w-5" />}
+          <Button
+            variant="ghost"
+            size="icon"
+            className="text-white bg-black/60 hover:bg-black/80 !h-16 !w-16"
+            onClick={togglePlay}
+          >
+            {isPlaying ? <Pause className="h-8 w-8" /> : <Play className="h-8 w-8" />}
             </Button>
-            <Button variant="ghost" size="icon" className="text-white bg-black/40 hover:bg-black/60 md:hidden" tabIndex={-1}><svg width="32" height="32" fill="none"><path d="M12 8l8 8-8 8" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/></svg></Button>
-          </div>
         </div>
+
         {/* Bottom Controls */}
-        <div className="w-full flex flex-col gap-1 pb-2 md:pb-4 pointer-events-auto">
+        <div className="w-full flex flex-col gap-1 pb-2 pointer-events-auto">
           {/* Progress Bar */}
-          <div className="relative w-full h-2 md:h-2 flex items-center">
+          <div className="relative w-full h-2 flex items-center">
             <div className="absolute left-0 top-0 h-1 w-full bg-white/20 rounded-full" />
-            <div className="absolute left-0 top-0 h-1 bg-red-600 rounded-full" style={{ width: `${(currentTime / (duration || 1)) * 100}%` }} />
+            <div
+              className="absolute left-0 top-0 h-1 bg-red-600 rounded-full"
+              style={{ width: `${(currentTime / (duration || 1)) * 100}%` }}
+            />
             <Slider
               value={[currentTime]}
               min={0}
@@ -591,87 +424,51 @@ export default function AdvancedVideoPlayer({
               className="w-full h-2 opacity-0 hover:opacity-100 focus:opacity-100 transition-opacity absolute left-0 top-0 z-10"
             />
           </div>
+
           {/* Controls Row */}
-          <div className="flex items-center justify-between px-2 md:px-4 gap-2 md:gap-4">
+          <div className="flex items-center justify-between px-2 gap-2">
             {/* Left: Play, Volume, Time */}
-            <div className="flex items-center gap-2 md:gap-4">
+            <div className="flex items-center gap-2">
               <Button variant="ghost" size="icon" className="text-white" onClick={togglePlay}>
                 {isPlaying ? <Pause className="h-5 w-5" /> : <Play className="h-5 w-5" />}
               </Button>
-              <div className="flex items-center gap-1 relative">
+              <div className="flex items-center gap-1">
                 <Button variant="ghost" size="icon" className="text-white" onClick={toggleMute}>
                   {isMuted ? <VolumeX className="h-5 w-5" /> : <Volume2 className="h-5 w-5" />}
                 </Button>
-                <div className="hidden md:block w-20">
-                  <Slider value={[isMuted ? 0 : volume]} min={0} max={1} step={0.01} onValueChange={handleVolumeChange} />
+                <div className="w-20">
+                  <Slider
+                    value={[isMuted ? 0 : volume]}
+                    min={0}
+                    max={1}
+                    step={0.01}
+                    onValueChange={handleVolumeChange}
+                  />
                 </div>
               </div>
               <span className="text-xs text-white tabular-nums">
                 {formatTime(currentTime)} / {formatTime(duration)}
               </span>
             </div>
-            {/* Right: CC, Settings, PiP, Fullscreen, Share */}
-            <div className="flex items-center gap-2 md:gap-3">
-              <Button variant="ghost" size="icon" className="text-white" tabIndex={-1}><Captions className="h-5 w-5" /></Button>
-              <Button variant="ghost" size="icon" className="text-white" tabIndex={-1}><Settings className="h-5 w-5" /></Button>
-              <Button variant="ghost" size="icon" className="text-white" tabIndex={-1}><PictureInPicture className="h-5 w-5" /></Button>
+
+            {/* Right: Fullscreen and Like */}
+            <div className="flex items-center gap-2">
+              <Button
+                variant="ghost"
+                size="icon"
+                className={`text-white ${likeState.liked ? "text-red-500" : ""}`}
+                onClick={handleLike}
+                aria-label={likeState.liked ? "Unlike" : "Like"}
+                disabled={!session?.user?.id}
+              >
+                <Heart className={likeState.liked ? "fill-current" : ""} />
+              </Button>
               <Button variant="ghost" size="icon" className="text-white" onClick={toggleFullscreen}>
                 {isFullscreen ? <Minimize className="h-5 w-5" /> : <Maximize className="h-5 w-5" />}
-              </Button>
-              <Button variant="ghost" size="icon" className="text-white" onClick={handleShare}>
-                <Share2 className="h-5 w-5" />
               </Button>
             </div>
           </div>
         </div>
-      </div>
-
-      {/* Mobile Landscape Mode Button */}
-      <div className="absolute top-2 right-2 sm:hidden">
-        <TooltipProvider>
-          <Tooltip>
-            <TooltipTrigger asChild>
-              <Button
-                variant="ghost"
-                size="icon"
-                className="text-white h-8 w-8 bg-black/50 hover:bg-black/70"
-                onClick={() => {
-                  toast({
-                    title: "Landscape mode",
-                    description: "Please rotate your device manually.",
-                  })
-                }}
-              >
-                <RotateCw className="h-4 w-4" />
-              </Button>
-            </TooltipTrigger>
-            <TooltipContent>Rotate to landscape</TooltipContent>
-          </Tooltip>
-        </TooltipProvider>
-      </div>
-
-      {/* Double-tap indicators */}
-      <div className="absolute inset-0 pointer-events-none">
-        <div className="absolute left-0 top-0 bottom-0 w-1/2 flex items-center justify-center opacity-0 transition-opacity duration-200 group-hover:opacity-100">
-          <div className="text-white text-4xl font-bold">-10s</div>
-        </div>
-        <div className="absolute right-0 top-0 bottom-0 w-1/2 flex items-center justify-center opacity-0 transition-opacity duration-200 group-hover:opacity-100">
-          <div className="text-white text-4xl font-bold">+10s</div>
-        </div>
-      </div>
-
-      {/* Like Button */}
-      <div className="flex items-center gap-2 mt-4">
-        <Button
-          variant={likeState.liked ? "default" : "outline"}
-          size="icon"
-          onClick={handleLike}
-          aria-label={likeState.liked ? "Unlike" : "Like"}
-          disabled={!session?.user?.id}
-        >
-          <Heart className={likeState.liked ? "text-red-500 fill-red-500" : ""} />
-        </Button>
-        <span className="text-sm text-gray-600 dark:text-gray-300">{likeState.likesCount} Likes</span>
       </div>
     </div>
   )

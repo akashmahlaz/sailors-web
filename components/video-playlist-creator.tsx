@@ -11,7 +11,7 @@ import { Input } from "@/components/ui/input"
 import { Textarea } from "@/components/ui/textarea"
 import { Checkbox } from "@/components/ui/checkbox"
 import { Label } from "@/components/ui/label"
-import { Loader2, Plus, Save, X } from "lucide-react"
+import { Loader2, Plus, Save, X, Check } from "lucide-react"
 import { toast } from "@/components/ui/use-toast"
 
 interface Video {
@@ -34,6 +34,7 @@ export default function VideoPlaylistCreator() {
   const [selectedVideos, setSelectedVideos] = useState<string[]>([])
   const [loading, setLoading] = useState(false)
   const [submitting, setSubmitting] = useState(false)
+  const [playlistCreatorVideoThumbnails, setPlaylistCreatorVideoThumbnails] = useState<{ [key: string]: string }>({})
 
   useEffect(() => {
     const fetchVideos = async () => {
@@ -42,7 +43,16 @@ export default function VideoPlaylistCreator() {
         const response = await fetch("/api/videos")
         if (!response.ok) throw new Error("Failed to fetch videos")
         const data = await response.json()
-        setVideos(data)
+         const videosData = Array.isArray(data) ? data : data.videos || [];
+        setVideos(videosData)
+
+         // Generate thumbnails for videos
+         videosData.forEach((video: Video) => {
+          if (!video.thumbnail_url) {
+            generateVideoThumbnail(video.url, video.id);
+          }
+        });
+
       } catch (error) {
         console.error("Error fetching videos:", error)
         toast({
@@ -62,28 +72,27 @@ export default function VideoPlaylistCreator() {
     setSelectedVideos((prev) => (prev.includes(videoId) ? prev.filter((id) => id !== videoId) : [...prev, videoId]))
   }
 
-  const handleSubmit = async (e: React.FormEvent) => {
+  const handleCreatePlaylist = async (e: React.FormEvent) => {
     e.preventDefault()
     if (!title.trim()) {
       toast({
-        title: "Error",
-        description: "Please enter a playlist title",
+        title: "Title required",
+        description: "Please enter a title for the playlist.",
         variant: "destructive",
       })
       return
     }
-
     if (selectedVideos.length === 0) {
-      toast({
-        title: "Error",
-        description: "Please select at least one video",
+       toast({
+        title: "Select videos",
+        description: "Please select at least one video for the playlist.",
         variant: "destructive",
       })
       return
     }
 
+    setSubmitting(true)
     try {
-      setSubmitting(true)
       const response = await fetch("/api/playlists", {
         method: "POST",
         headers: {
@@ -94,20 +103,20 @@ export default function VideoPlaylistCreator() {
           description,
           isPublic,
           videoIds: selectedVideos,
-          userId: session?.user?.id,
-          userName: session?.user?.name,
-          userImage: session?.user?.image,
+          userId: session?.user?.id, // Assuming user ID is available in session
         }),
       })
 
-      if (!response.ok) throw new Error("Failed to create playlist")
+      if (!response.ok) {
+        throw new Error("Failed to create playlist")
+      }
 
-      const data = await response.json()
+      const newPlaylist = await response.json()
       toast({
         title: "Success",
-        description: "Playlist created successfully",
+        description: "Playlist created successfully!",
       })
-      router.push(`/playlists/${data.id}`)
+      router.push(`/playlists/${newPlaylist._id}`)
     } catch (error) {
       console.error("Error creating playlist:", error)
       toast({
@@ -120,41 +129,95 @@ export default function VideoPlaylistCreator() {
     }
   }
 
+   // Generate video thumbnail function
+   const generateVideoThumbnail = (videoUrl: string, videoId: string) => {
+    const video = document.createElement('video');
+    video.src = videoUrl;
+    video.crossOrigin = 'anonymous';
+
+    // Try multiple timestamps
+    const timestamps = [1, 2, 3];
+    let currentTimestampIndex = 0;
+
+    const tryNextTimestamp = () => {
+      if (currentTimestampIndex < timestamps.length) {
+        video.currentTime = timestamps[currentTimestampIndex];
+        currentTimestampIndex++;
+      } else {
+        // All timestamps tried, use placeholder if no thumbnail generated
+         setPlaylistCreatorVideoThumbnails(prev => ({
+           ...prev,
+           [videoId]: '/placeholder.svg'
+         }));
+      }
+    };
+
+    video.addEventListener('loadeddata', () => {
+      tryNextTimestamp();
+    });
+
+    video.addEventListener('seeked', () => {
+      const canvas = document.createElement('canvas');
+      canvas.width = video.videoWidth;
+      canvas.height = video.videoHeight;
+      const ctx = canvas.getContext('2d');
+      if (ctx) {
+        ctx.drawImage(video, 0, 0, canvas.width, canvas.height);
+        const thumbnailUrl = canvas.toDataURL('image/jpeg', 0.8);
+        setPlaylistCreatorVideoThumbnails(prev => ({
+          ...prev,
+          [videoId]: thumbnailUrl
+        }));
+         video.remove(); // Clean up the video element
+      }
+    });
+
+    video.addEventListener('error', (e) => {
+      console.error('Error generating thumbnail for video:', videoId, e);
+       setPlaylistCreatorVideoThumbnails(prev => ({
+         ...prev,
+         [videoId]: '/placeholder.svg'
+       }));
+       video.remove(); // Clean up the video element
+    });
+  };
+
   return (
     <div className="container mx-auto py-8 px-4">
-      <Card>
+      <Card className="max-w-2xl mx-auto">
         <CardHeader>
           <CardTitle>Create New Playlist</CardTitle>
         </CardHeader>
-        <form onSubmit={handleSubmit}>
-          <CardContent className="space-y-4">
+        <form onSubmit={handleCreatePlaylist}>
+          <CardContent className="space-y-6">
             <div className="space-y-2">
-              <Label htmlFor="title">Playlist Title</Label>
+              <Label htmlFor="title">Title</Label>
               <Input
                 id="title"
                 value={title}
                 onChange={(e) => setTitle(e.target.value)}
-                placeholder="Enter playlist title"
+                placeholder="My Awesome Playlist"
                 required
               />
             </div>
-
             <div className="space-y-2">
               <Label htmlFor="description">Description (Optional)</Label>
               <Textarea
                 id="description"
                 value={description}
                 onChange={(e) => setDescription(e.target.value)}
-                placeholder="Describe your playlist"
+                placeholder="A collection of my favorite maritime videos"
                 rows={3}
               />
             </div>
-
             <div className="flex items-center space-x-2">
-              <Checkbox id="isPublic" checked={isPublic} onCheckedChange={(checked) => setIsPublic(!!checked)} />
-              <Label htmlFor="isPublic">Make this playlist public</Label>
+              <Checkbox
+                id="isPublic"
+                checked={isPublic}
+                onCheckedChange={(checked) => setIsPublic(Boolean(checked))}
+              />
+              <Label htmlFor="isPublic">Public Playlist</Label>
             </div>
-
             <div className="space-y-2">
               <Label>Select Videos</Label>
               {loading ? (
@@ -179,20 +242,21 @@ export default function VideoPlaylistCreator() {
                         <img
                           src={
                             video.thumbnail_url ||
-                            `https://res.cloudinary.com/${process.env.NEXT_PUBLIC_CLOUDINARY_CLOUD_NAME || "/placeholder.svg"}/video/upload/so_0/${video.public_id}.jpg`
+                             playlistCreatorVideoThumbnails[video.id] ||
+                             `/placeholder.svg`
                           }
                           alt={video.title}
                           className="w-full h-full object-cover"
                         />
                         {selectedVideos.includes(video.id) && (
                           <div className="absolute top-2 right-2 bg-primary text-primary-foreground rounded-full p-1">
-                            <Plus className="h-4 w-4" />
+                            <Check className="h-4 w-4" />
                           </div>
                         )}
                       </div>
-                      <div className="p-2">
+                      <CardContent className="p-3">
                         <p className="font-medium text-sm line-clamp-1">{video.title}</p>
-                      </div>
+                      </CardContent>
                     </div>
                   ))}
                 </div>

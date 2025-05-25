@@ -12,7 +12,6 @@ import { Switch } from "@/components/ui/switch"
 import { Label } from "@/components/ui/label"
 import { Loader2 } from "lucide-react"
 import { NEWS_CATEGORIES } from "@/lib/constants"
-
 export default function EditNewsPage({ params }: { params: { id: string } }) {
   const router = useRouter()
   const { data: session, status } = useSession()

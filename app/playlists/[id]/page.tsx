@@ -55,6 +55,7 @@ export default function PlaylistDetailPage() {
   const [error, setError] = useState<string | null>(null)
   const [deleteDialogOpen, setDeleteDialogOpen] = useState(false)
   const [deleting, setDeleting] = useState(false)
+  const [playlistVideoThumbnails, setPlaylistVideoThumbnails] = useState<{ [key: string]: string }>({})
 
   useEffect(() => {
     const fetchPlaylistAndVideos = async () => {
@@ -94,6 +95,68 @@ export default function PlaylistDetailPage() {
 
     fetchPlaylistAndVideos()
   }, [params.id])
+
+  // Generate thumbnails for playlist videos
+  useEffect(() => {
+    videos.forEach((video) => {
+      if (!video.thumbnail_url) {
+        generateVideoThumbnail(video.url, video.id);
+      }
+    });
+  }, [videos]); // Re-run when videos change
+
+  // Generate video thumbnail function
+  const generateVideoThumbnail = (videoUrl: string, videoId: string) => {
+    const video = document.createElement('video');
+    video.src = videoUrl;
+    video.crossOrigin = 'anonymous';
+
+    // Try multiple timestamps
+    const timestamps = [1, 2, 3];
+    let currentTimestampIndex = 0;
+
+    const tryNextTimestamp = () => {
+      if (currentTimestampIndex < timestamps.length) {
+        video.currentTime = timestamps[currentTimestampIndex];
+        currentTimestampIndex++;
+      } else {
+        // All timestamps tried, use placeholder if no thumbnail generated
+         setPlaylistVideoThumbnails(prev => ({
+           ...prev,
+           [videoId]: '/placeholder.svg'
+         }));
+      }
+    };
+
+    video.addEventListener('loadeddata', () => {
+      tryNextTimestamp();
+    });
+
+    video.addEventListener('seeked', () => {
+      const canvas = document.createElement('canvas');
+      canvas.width = video.videoWidth;
+      canvas.height = video.videoHeight;
+      const ctx = canvas.getContext('2d');
+      if (ctx) {
+        ctx.drawImage(video, 0, 0, canvas.width, canvas.height);
+        const thumbnailUrl = canvas.toDataURL('image/jpeg', 0.8);
+        setPlaylistVideoThumbnails(prev => ({
+          ...prev,
+          [videoId]: thumbnailUrl
+        }));
+         video.remove(); // Clean up the video element
+      }
+    });
+
+    video.addEventListener('error', (e) => {
+      console.error('Error generating thumbnail for video:', videoId, e);
+       setPlaylistVideoThumbnails(prev => ({
+         ...prev,
+         [videoId]: '/placeholder.svg'
+       }));
+       video.remove(); // Clean up the video element
+    });
+  };
 
   const handleDeletePlaylist = async () => {
     if (!playlist) return
@@ -224,7 +287,8 @@ export default function PlaylistDetailPage() {
                   <img
                     src={
                       video.thumbnail_url ||
-                      `https://res.cloudinary.com/${process.env.NEXT_PUBLIC_CLOUDINARY_CLOUD_NAME || "/placeholder.svg"}/video/upload/so_0/${video.public_id}.jpg`
+                      playlistVideoThumbnails[video.id] ||
+                      `/placeholder.svg`
                     }
                     alt={video.title}
                     className="w-full h-full object-cover"
@@ -269,7 +333,8 @@ export default function PlaylistDetailPage() {
                     <img
                       src={
                         video.thumbnail_url ||
-                        `https://res.cloudinary.com/${process.env.NEXT_PUBLIC_CLOUDINARY_CLOUD_NAME || "/placeholder.svg"}/video/upload/so_0/${video.public_id}.jpg`
+                        playlistVideoThumbnails[video.id] ||
+                        `/placeholder.svg`
                       }
                       alt={video.title}
                       className="w-full h-full object-cover"
