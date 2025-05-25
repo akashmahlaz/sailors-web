@@ -311,14 +311,13 @@ const AudioGallery = forwardRef<AudioGalleryRef>((props, ref) => {
       <Card className="w-full bg-gray-50 dark:bg-gray-900 border-gray-200 dark:border-gray-800 shadow-none">
         <CardHeader className="flex flex-row items-center justify-between border-b border-gray-100 dark:border-gray-800 bg-gradient-to-r from-gray-50 to-white dark:from-gray-900 dark:to-gray-950">
           <div>
-            <CardTitle className="text-gray-900 dark:text-gray-100">Sea Shanties</CardTitle>
+            <CardTitle className="text-gray-900 dark:text-gray-100">Audios </CardTitle>
             <CardDescription className="text-gray-500 dark:text-gray-400">
-              {currentAudio ? `Now playing: ${currentAudio.title}` : "Select a sea shanty to play"}
+              {currentAudio ? `Now playing: ${currentAudio.title}` : "Select the audio to play"}
             </CardDescription>
           </div>
           <Button variant="outline" size="sm" onClick={fetchAudios} disabled={loading} className="border-gray-200 text-gray-700 hover:bg-gray-100 dark:border-gray-700 dark:text-gray-300 dark:hover:bg-gray-800">
             <RefreshCw className="h-4 w-4 mr-2" />
-            Refresh Tunes
           </Button>
         </CardHeader>
         <CardContent className="p-4">
