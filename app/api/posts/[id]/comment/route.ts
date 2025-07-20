@@ -16,7 +16,7 @@ export async function POST(req: Request, { params }: { params: { id: string } })
   // Store the comment in a comments array in the post document and increment the count
   await db.collection("posts").updateOne(
     { _id: new ObjectId(postId) },
-    { $push: { commentsList: comment }, $inc: { comments: 1 } }
+    { $push: { commentsList: comment }, $inc: { comments: 1 } } as any
   );
   return NextResponse.json({ success: true, comment });
 }

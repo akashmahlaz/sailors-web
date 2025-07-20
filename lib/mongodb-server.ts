@@ -38,6 +38,11 @@ if (process.env.NODE_ENV === "development") {
 // separate module, the client can be shared across functions.
 export default clientPromise
 
+// Export the mongo client function
+export async function getMongoClient() {
+  return await clientPromise
+}
+
 // Helper functions for collections
 export async function getPhotosCollection() {
   const client = await clientPromise

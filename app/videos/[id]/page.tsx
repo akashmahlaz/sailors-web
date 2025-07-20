@@ -79,7 +79,7 @@ export default function VideoDetailPage() {
 
           // Check if user has liked the video
           if (session?.user?.id && Array.isArray(currentVideo.likes)) {
-            setLiked(currentVideo.likes.some(like => like.userId === session.user.id))
+            setLiked(currentVideo.likes.some((like: any) => like.userId === session.user?.id))
           }
 
           // Record view

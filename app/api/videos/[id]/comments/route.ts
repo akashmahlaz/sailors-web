@@ -27,7 +27,7 @@ export async function POST(request: NextRequest, { params }: { params: { id: str
       likes: 0,
     }
 
-    await collection.updateOne({ _id: new ObjectId(videoId) }, { $push: { comments: comment } })
+    await collection.updateOne({ _id: new ObjectId(videoId) }, { $push: { comments: comment } } as any)
 
     return NextResponse.json({ success: true, comment })
   } catch (error) {

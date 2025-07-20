@@ -96,7 +96,7 @@ const VideoGallery = forwardRef<VideoGalleryRef, {}>((_, ref) => {
       setVideos(videosData)
 
       // Generate thumbnails for each video
-      videosData.forEach(video => {
+      videosData.forEach((video: any) => {
         if (!video.thumbnail_url) {
           generateVideoThumbnail(video.url, video.id)
         }

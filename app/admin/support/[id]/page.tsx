@@ -21,7 +21,7 @@ export default function SupportRequestDetailPage({ params }: { params: { id: str
   const [loading, setLoading] = useState(true)
   const [error, setError] = useState<string | null>(null)
   const [updating, setUpdating] = useState(false)
-  const [updateStatus, setUpdateStatus] = useState<"pending" | "in-review" | "resolved" | "dismissed" | "">("")
+  const [updateStatus, setUpdateStatus] = useState<"pending" | "in-review" | "resolved" | "dismissed">("pending")
   const [adminNotes, setAdminNotes] = useState("")
   const [resolution, setResolution] = useState("")
   const [updateSuccess, setUpdateSuccess] = useState(false)
@@ -300,7 +300,7 @@ export default function SupportRequestDetailPage({ params }: { params: { id: str
               <div className="space-y-4">
                 <div className="space-y-2">
                   <Label htmlFor="status">Status</Label>
-                  <Select value={updateStatus} onValueChange={setUpdateStatus}>
+                  <Select value={updateStatus} onValueChange={(value) => setUpdateStatus(value as "pending" | "in-review" | "resolved" | "dismissed")}>
                     <SelectTrigger id="status" className="border-gray-200 dark:border-gray-900">
                       <SelectValue placeholder="Select status" />
                     </SelectTrigger>

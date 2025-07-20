@@ -422,9 +422,9 @@ export default function Home() {
               </motion.p>
 
               <motion.div className="flex flex-wrap gap-4" variants={fadeIn}>
-                <Link href="/videos">
+                <Link href="/support">
                   <Button size="lg" className="bg-white text-slate-800 hover:bg-slate-50 border border-slate-200 dark:bg-slate-700 dark:hover:bg-slate-600 dark:text-white dark:border-slate-600 transition-colors">
-                    Explore Content <Compass className="ml-2 h-5 w-5 text-slate-600 dark:text-slate-300" />
+                    Seeking Support <Compass className="ml-2 h-5 w-5 text-slate-600 dark:text-slate-300" />
                   </Button>
                 </Link>
                 {!isAuthenticated ? (
@@ -698,7 +698,10 @@ export default function Home() {
             </Link>
           </div>
 
-          <VideoGallery limit={6} showSearch={false} showFilters={false} horizontal={true} className="mt-6" />
+          <VideoGallery 
+            ref={galleryRef}
+            {...{ limit: 6, showSearch: false, showFilters: false, horizontal: true, className: "mt-6" } as any}
+          />
         </div>
       </section>
 

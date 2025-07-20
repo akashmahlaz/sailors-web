@@ -483,7 +483,7 @@ export default function Home() {
             >
               {item.type === "video" ? (
             <video
-               ref={el => videoRefs.current[index] = el}
+               ref={(el) => { videoRefs.current[index] = el }}
               src={item.url}
               poster={item.thumbnail_url || trendingVideoThumbnails[item.id] || `/placeholder.svg`}
               autoPlay={trendingHover === index} // Autoplay only when hovered
@@ -620,7 +620,7 @@ export default function Home() {
             </Link>
           </div>
 
-          <VideoGallery limit={6} showSearch={false} showFilters={false} horizontal={true} className="mt-6" />
+          <VideoGallery ref={galleryRef} />
         </div>
       </section>
 

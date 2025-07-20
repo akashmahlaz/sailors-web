@@ -1,7 +1,7 @@
 import { type NextRequest, NextResponse } from "next/server"
 import { getUsersCollection, getAdminActivityLogsCollection } from "@/lib/mongodb"
 import { getServerSession } from "next-auth/next"
-import { authOptions } from "../../../auth/[...nextauth]/route"
+import { authOptions } from "@/lib/auth"
 import { ObjectId } from "mongodb"
 import { Session } from "next-auth"
 
@@ -9,7 +9,7 @@ export async function GET(request: NextRequest, { params }: { params: { id: stri
   try {
     const session = await getServerSession(authOptions)
 
-    if (!session || session.user.role !== "admin") {
+    if (!session || !session.user || session.user.role !== "admin") {
       return NextResponse.json({ error: "Unauthorized" }, { status: 401 })
     }
 
@@ -40,7 +40,7 @@ export async function PUT(request: NextRequest, { params }: { params: { id: stri
   try {
     const session = await getServerSession(authOptions)
 
-    if (!session || session.user.role !== "admin") {
+    if (!session || !session.user || session.user.role !== "admin") {
       return NextResponse.json({ error: "Unauthorized" }, { status: 401 })
     }
 
@@ -77,8 +77,8 @@ export async function PUT(request: NextRequest, { params }: { params: { id: stri
     // Log admin activity
     const adminActivityLogsCollection = await getAdminActivityLogsCollection()
     await adminActivityLogsCollection.insertOne({
-      adminId: session.user.id,
-      adminName: session.user.name,
+      adminId: session.user?.id,
+      adminName: session.user?.name,
       action: "update_user",
       target: "user",
       targetId: userId,
@@ -101,7 +101,7 @@ export async function DELETE(request: NextRequest, { params }: { params: { id: s
   try {
     const session = await getServerSession(authOptions)
 
-    if (!session || session.user.role !== "admin") {
+    if (!session || !session.user || session.user.role !== "admin") {
       return NextResponse.json({ error: "Unauthorized" }, { status: 401 })
     }
 
@@ -120,7 +120,7 @@ export async function DELETE(request: NextRequest, { params }: { params: { id: s
     }
 
     // Prevent deleting the current admin
-    if (existingUser._id.toString() === session.user.id) {
+    if (existingUser._id.toString() === session.user?.id) {
       return NextResponse.json({ error: "Cannot delete your own account" }, { status: 400 })
     }
 
@@ -130,8 +130,8 @@ export async function DELETE(request: NextRequest, { params }: { params: { id: s
     // Log admin activity
     const adminActivityLogsCollection = await getAdminActivityLogsCollection()
     await adminActivityLogsCollection.insertOne({
-      adminId: session.user.id,
-      adminName: session.user.name,
+      adminId: session.user?.id,
+      adminName: session.user?.name,
       action: "delete_user",
       target: "user",
       targetId: userId,

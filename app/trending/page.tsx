@@ -243,7 +243,7 @@ export default function TrendingPage() {
                   <div className="relative aspect-video overflow-hidden bg-slate-200 dark:bg-slate-800">
                     {item.type === "video" ? (
                        <video
-                         ref={el => videoRefs.current[index] = el}
+                         ref={(el) => { videoRefs.current[index] = el }}
                          src={item.url}
                          poster={item.thumbnail_url || trendingVideoThumbnails[item.id] || `/placeholder.svg`}
                          autoPlay={trendingHover === index} // Autoplay only when hovered

@@ -2,7 +2,7 @@ import { type NextRequest, NextResponse } from "next/server"
 import clientPromise from "@/lib/mongodb"
 import { ObjectId } from "mongodb"
 import { getServerSession } from "next-auth/next"
-import { authOptions } from "@/app/api/auth/[...nextauth]/route"
+import { authOptions } from "@/lib/auth"
 
 // Helper function to get the blogs collection
 async function getBlogsCollection() {
@@ -76,8 +76,8 @@ export async function PUT(request: NextRequest, { params }: { params: { id: stri
     }
 
     // Check if user owns the content or is an admin
-    const isOwner = blog.author_id === session.user.id
-    const isAdmin = session.user.role === 'admin'
+    const isOwner = blog.author_id === session.user?.id
+    const isAdmin = session.user?.role === 'admin'
     if (!isOwner && !isAdmin) {
       return NextResponse.json({ error: "You don't have permission to edit this blog" }, { status: 403 })
     }
@@ -133,8 +133,8 @@ export async function DELETE(request: NextRequest, { params }: { params: { id: s
     }
 
     // Check if user owns the content or is an admin
-    const isOwner = blog.author_id === session.user.id
-    const isAdmin = session.user.role === 'admin'
+    const isOwner = blog.author_id === session.user?.id
+    const isAdmin = session.user?.role === 'admin'
     if (!isOwner && !isAdmin) {
       return NextResponse.json({ error: "You don't have permission to delete this blog" }, { status: 403 })
     }

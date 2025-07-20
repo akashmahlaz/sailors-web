@@ -691,7 +691,7 @@ const AudioGallery = forwardRef<AudioGalleryRef>((props, ref) => {
                 <PlaylistManager
                   audios={audios}
                   onPlaylistSelect={handlePlaylistSelect}
-                  currentPlaylistId={currentPlaylist?.id}
+                  currentPlaylistId={(currentPlaylist as Playlist | null)?.id}
                 />
               )}
             </TabsContent>

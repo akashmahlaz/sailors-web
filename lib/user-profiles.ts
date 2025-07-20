@@ -1,8 +1,9 @@
 import { getUserProfilesCollection, getFollowsCollection } from "./mongodb"
+import { getVideosCollection, getPhotosCollection, getAudioCollection, getBlogsCollection, getPodcastsCollection, getNewsCollection } from "./mongodb-server"
 import { ObjectId } from "mongodb"
 
 export interface UserProfile {
-  _id?: string | ObjectId
+  _id?: ObjectId
   userId: string
   name: string
   email: string
@@ -103,10 +104,10 @@ export async function unfollowUser(followerId: string, followingId: string) {
   })
 
   // Update follower count for the user being unfollowed
-  await profilesCollection.updateOne({ userId: followingId }, { $pull: { followers: followerId } })
+  await profilesCollection.updateOne({ userId: followingId }, { $pull: { followers: followerId } } as any)
 
   // Update following count for the follower
-  await profilesCollection.updateOne({ userId: followerId }, { $pull: { following: followingId } })
+  await profilesCollection.updateOne({ userId: followerId }, { $pull: { following: followingId } } as any)
 
   return { success: true }
 }

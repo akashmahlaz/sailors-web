@@ -1,7 +1,7 @@
 import { type NextRequest, NextResponse } from "next/server"
 import { getBlogsCollection } from "@/lib/mongodb-server"
 import { getServerSession } from "next-auth/next"
-import { authOptions } from "@/app/api/auth/[...nextauth]/route"
+import { authOptions } from "@/lib/auth"
 
 export async function POST(request: NextRequest) {
   try {
@@ -26,7 +26,7 @@ export async function POST(request: NextRequest) {
       content,
       coverImageUrl: coverImageUrl || null,
       author: author || "Anonymous",
-      author_id: session.user.id, // Store the author's ID
+      author_id: session.user?.id, // Store the author's ID
       tags: tags || [],
       createdAt: new Date(),
       updatedAt: new Date(),
