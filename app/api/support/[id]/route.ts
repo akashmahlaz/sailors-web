@@ -2,6 +2,7 @@ import { type NextRequest, NextResponse } from "next/server"
 import { getSupportRequestsCollection } from "@/lib/support-requests"
 import { ObjectId } from "mongodb"
 import { getServerSession } from "@/lib/auth"
+import { sendStatusUpdateEmail } from "@/lib/email"
 
 export async function GET(request: NextRequest, { params }: { params: Promise<{ id: string }> }) {
   try {
@@ -74,6 +75,15 @@ export async function PUT(request: NextRequest, { params }: { params: Promise<{ 
     // Get support requests collection
     const collection = await getSupportRequestsCollection()
 
+    // Get the current request to check for status change and get submitter info
+    const currentRequest = await collection.findOne({ _id: new ObjectId(id) })
+    
+    if (!currentRequest) {
+      return NextResponse.json({ error: "Support request not found" }, { status: 404 })
+    }
+
+    const previousStatus = currentRequest.status
+
     // Update the support request
     const result = await collection.updateOne(
       { _id: new ObjectId(id) },
@@ -90,6 +100,24 @@ export async function PUT(request: NextRequest, { params }: { params: Promise<{ 
 
     if (result.matchedCount === 0) {
       return NextResponse.json({ error: "Support request not found" }, { status: 404 })
+    }
+
+    // Send email notification if status changed and user is not anonymous
+    if (previousStatus !== status && !currentRequest.isAnonymous && currentRequest.submitterEmail) {
+      try {
+        await sendStatusUpdateEmail({
+          recipientEmail: currentRequest.submitterEmail,
+          recipientName: currentRequest.submitterName || "User",
+          requestId: id,
+          requestTitle: currentRequest.title,
+          newStatus: status,
+          resolution: resolution || undefined,
+          type: "status_update",
+        })
+      } catch (emailError) {
+        console.error("Failed to send status update email:", emailError)
+        // Don't fail the request if email fails
+      }
     }
 
     return NextResponse.json({ success: true })

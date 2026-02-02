@@ -7,9 +7,19 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/com
 import { Button } from "@/components/ui/button"
 import { Badge } from "@/components/ui/badge"
 import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert"
-import { ArrowLeft, Calendar, Shield, FileText, Image, Video, Download, CheckCircle, Clock, AlertCircle } from "lucide-react"
+import { Textarea } from "@/components/ui/textarea"
+import { ArrowLeft, Calendar, Shield, FileText, Image, Video, Download, CheckCircle, Clock, AlertCircle, MessageSquare, Send } from "lucide-react"
 import Link from "next/link"
 import { format } from "date-fns"
+
+interface SupportRequestComment {
+  id: string
+  message: string
+  authorId: string
+  authorName: string
+  authorRole: "user" | "admin"
+  createdAt: string
+}
 
 interface SupportRequest {
   id: string
@@ -28,6 +38,7 @@ interface SupportRequest {
     format: string
     name?: string
   }>
+  comments?: SupportRequestComment[]
 }
 
 const statusConfig = {
@@ -37,8 +48,8 @@ const statusConfig = {
     color: "bg-yellow-100 text-yellow-800 border-yellow-200",
     description: "Your request has been received and is awaiting review"
   },
-  in_progress: {
-    label: "In Progress",
+  "in-review": {
+    label: "In Review",
     icon: AlertCircle,
     color: "bg-blue-100 text-blue-800 border-blue-200",
     description: "A ship's officer is actively reviewing your request"
@@ -49,8 +60,8 @@ const statusConfig = {
     color: "bg-green-100 text-green-800 border-green-200",
     description: "Your request has been resolved"
   },
-  closed: {
-    label: "Closed",
+  dismissed: {
+    label: "Dismissed",
     icon: Shield,
     color: "bg-gray-100 text-gray-800 border-gray-200",
     description: "This request has been closed"
@@ -65,6 +76,8 @@ export default function SupportRequestDetail() {
   const [request, setRequest] = useState<SupportRequest | null>(null)
   const [loading, setLoading] = useState(true)
   const [error, setError] = useState<string | null>(null)
+  const [newComment, setNewComment] = useState("")
+  const [addingComment, setAddingComment] = useState(false)
 
   useEffect(() => {
     if (status === "unauthenticated") {
@@ -80,20 +93,15 @@ export default function SupportRequestDetail() {
   const fetchRequest = async () => {
     try {
       setLoading(true)
-      const response = await fetch(`/api/support/my-requests?search=${params.id}`)
+      const response = await fetch(`/api/support/my-requests/${params.id}`)
 
       if (!response.ok) {
-        throw new Error("Failed to fetch support request")
+        const errorData = await response.json()
+        throw new Error(errorData.error || "Failed to fetch support request")
       }
 
       const data = await response.json()
-      const foundRequest = data.find((req: SupportRequest) => req.id === params.id)
-
-      if (!foundRequest) {
-        throw new Error("Support request not found")
-      }
-
-      setRequest(foundRequest)
+      setRequest(data)
     } catch (err) {
       console.error("Error fetching request:", err)
       setError(err instanceof Error ? err.message : "Failed to load support request")
@@ -102,14 +110,60 @@ export default function SupportRequestDetail() {
     }
   }
 
+  const handleAddComment = async () => {
+    if (!newComment.trim() || !params.id) return
+
+    try {
+      setAddingComment(true)
+      const response = await fetch(`/api/support/my-requests/${params.id}`, {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({ message: newComment.trim() }),
+      })
+
+      if (!response.ok) {
+        throw new Error("Failed to add comment")
+      }
+
+      const data = await response.json()
+      
+      // Update local state with new comment
+      setRequest((prev) => {
+        if (!prev) return null
+        return {
+          ...prev,
+          comments: [...(prev.comments || []), data.comment],
+        }
+      })
+
+      setNewComment("")
+    } catch (err) {
+      console.error("Error adding comment:", err)
+      setError(err instanceof Error ? err.message : "Failed to add comment")
+    } finally {
+      setAddingComment(false)
+    }
+  }
+
   const getStatusIcon = (status: string) => {
     const config = statusConfig[status as keyof typeof statusConfig]
+    if (!config) return <Clock className="h-5 w-5" />
     const Icon = config.icon
     return <Icon className="h-5 w-5" />
   }
 
   const getStatusBadge = (status: string) => {
     const config = statusConfig[status as keyof typeof statusConfig]
+    if (!config) {
+      return (
+        <Badge variant="outline" className="gap-2 px-4 py-1.5">
+          <Clock className="h-4 w-4" />
+          {status}
+        </Badge>
+      )
+    }
     const Icon = config.icon
     return (
       <Badge variant="outline" className={`${config.color} gap-2 px-4 py-1.5`}>
@@ -207,7 +261,12 @@ export default function SupportRequestDetail() {
     )
   }
 
-  const statusInfo = statusConfig[request.status as keyof typeof statusConfig]
+  const statusInfo = statusConfig[request.status as keyof typeof statusConfig] || {
+    label: request.status,
+    icon: Clock,
+    color: "bg-gray-100 text-gray-800 border-gray-200",
+    description: "Status update pending"
+  }
 
   return (
     <div className="min-h-screen bg-gradient-to-br from-gray-50 to-gray-100 dark:from-gray-900 dark:to-gray-950">
@@ -330,6 +389,75 @@ export default function SupportRequestDetail() {
               </CardContent>
             </Card>
           )}
+
+          {/* Comments Section */}
+          <Card>
+            <CardHeader>
+              <CardTitle className="flex items-center gap-2">
+                <MessageSquare className="h-5 w-5 text-blue-600" />
+                Communication
+              </CardTitle>
+              <CardDescription>
+                Messages between you and the support team
+              </CardDescription>
+            </CardHeader>
+            <CardContent>
+              {/* Existing Comments */}
+              {request.comments && request.comments.length > 0 ? (
+                <div className="space-y-4 mb-6">
+                  {request.comments.map((comment) => (
+                    <div
+                      key={comment.id}
+                      className={`p-4 rounded-lg ${
+                        comment.authorRole === "admin"
+                          ? "bg-blue-50 dark:bg-blue-950/20 border border-blue-200 dark:border-blue-800"
+                          : "bg-gray-50 dark:bg-gray-900 border border-gray-200 dark:border-gray-800"
+                      }`}
+                    >
+                      <div className="flex items-center justify-between mb-2">
+                        <span className="font-semibold text-sm">
+                          {comment.authorName}
+                          {comment.authorRole === "admin" && (
+                            <Badge variant="outline" className="ml-2 text-xs bg-blue-100 text-blue-800">
+                              Ship's Officer
+                            </Badge>
+                          )}
+                        </span>
+                        <span className="text-xs text-gray-500">
+                          {format(new Date(comment.createdAt), "MMM dd, yyyy 'at' h:mm a")}
+                        </span>
+                      </div>
+                      <p className="text-sm text-gray-700 dark:text-gray-300">{comment.message}</p>
+                    </div>
+                  ))}
+                </div>
+              ) : (
+                <div className="text-center py-6 text-gray-500 dark:text-gray-400 mb-6">
+                  <MessageSquare className="h-8 w-8 mx-auto mb-2 opacity-50" />
+                  <p>No messages yet. Send a message to communicate with the support team.</p>
+                </div>
+              )}
+
+              {/* New Comment Form */}
+              <div className="space-y-4 border-t pt-4">
+                <Textarea
+                  value={newComment}
+                  onChange={(e) => setNewComment(e.target.value)}
+                  placeholder="Type a message to the support team..."
+                  rows={3}
+                  className="border-gray-200 dark:border-gray-800"
+                />
+                <Button
+                  onClick={handleAddComment}
+                  disabled={addingComment || !newComment.trim()}
+                  className="w-full"
+                >
+                  <Send className="h-4 w-4 mr-2" />
+                  {addingComment ? "Sending..." : "Send Message"}
+                </Button>
+              </div>
+            </CardContent>
+          </Card>
 
           <Card>
             <CardHeader>

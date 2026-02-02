@@ -17,11 +17,10 @@ export async function GET(request: NextRequest) {
     const category = url.searchParams.get("category")
     const search = url.searchParams.get("search")
 
+    // Users can only see their own non-anonymous requests
     const query: Record<string, any> = {
-      $or: [
-        { submitterId: session.user.id },
-        { isAnonymous: false }
-      ]
+      submitterId: session.user.id,
+      isAnonymous: false
     }
 
     if (status) {
@@ -31,9 +30,13 @@ export async function GET(request: NextRequest) {
       query.category = category
     }
     if (search) {
-      query.$or = [
-        { title: { $regex: search, $options: "i" } },
-        { description: { $regex: search, $options: "i" } }
+      query.$and = [
+        {
+          $or: [
+            { title: { $regex: search, $options: "i" } },
+            { description: { $regex: search, $options: "i" } }
+          ]
+        }
       ]
     }
 

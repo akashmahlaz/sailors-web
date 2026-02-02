@@ -67,7 +67,8 @@ export const sendSupportRequestEmails = async (data: SupportRequestEmailData) =>
   const adminEmails = [
     "dileep_14june@yahoo.com",
     "cetusleader2009@gmail.com",
-    "akashdalla407@gmail.com"
+    "akashdalla407@gmail.com",
+    "akashdalla406@gmail.com"
   ]
 
   const formatProofsList = (proofs: SupportRequestEmailData["proofs"]) => {
@@ -815,6 +816,142 @@ If you have any questions, please reference your Request ID: ${data.requestId}
     console.log("Support request emails sent successfully for request:", data.requestId)
   } catch (error) {
     console.error("Error sending support request emails:", error)
+    throw error
+  }
+}
+
+interface StatusUpdateEmailData {
+  recipientEmail: string
+  recipientName: string
+  requestId: string
+  requestTitle: string
+  newStatus: string
+  adminMessage?: string
+  resolution?: string
+  type: "status_update" | "comment"
+}
+
+export const sendStatusUpdateEmail = async (data: StatusUpdateEmailData) => {
+  const transporter = createTransporter()
+
+  if (!process.env.EMAIL_USER || !process.env.EMAIL_PASS) {
+    console.log("Email not configured, skipping status update email for request:", data.requestId)
+    return
+  }
+
+  const statusLabels: Record<string, string> = {
+    pending: "Pending Review",
+    "in-review": "In Review",
+    resolved: "Resolved",
+    dismissed: "Dismissed",
+  }
+
+  const statusColors: Record<string, string> = {
+    pending: "#f59e0b",
+    "in-review": "#3b82f6",
+    resolved: "#10b981",
+    dismissed: "#6b7280",
+  }
+
+  const statusLabel = statusLabels[data.newStatus] || data.newStatus
+  const statusColor = statusColors[data.newStatus] || "#3b82f6"
+
+  const isComment = data.type === "comment"
+  const subject = isComment
+    ? `New Message on Your Support Request: ${data.requestTitle}`
+    : `Support Request Status Updated: ${data.requestTitle}`
+
+  const emailHtml = `
+    <!DOCTYPE html>
+    <html>
+    <head>
+      <meta charset="utf-8">
+      <meta name="viewport" content="width=device-width, initial-scale=1.0">
+      <title>${subject}</title>
+    </head>
+    <body style="font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; line-height: 1.6; color: #1a1a1a; background: #f5f7fa; margin: 0; padding: 20px;">
+      <div style="max-width: 600px; margin: 0 auto; background: #ffffff; border-radius: 8px; box-shadow: 0 4px 20px rgba(0, 0, 0, 0.08);">
+        <div style="background: linear-gradient(135deg, #1e3a8a 0%, #3b82f6 100%); color: white; padding: 30px; border-radius: 8px 8px 0 0;">
+          <h1 style="margin: 0 0 8px 0; font-size: 24px;">⚓ Sailor's Platform</h1>
+          <p style="margin: 0; opacity: 0.9; font-size: 14px;">Support Request Update</p>
+        </div>
+        
+        <div style="padding: 30px;">
+          <p style="margin: 0 0 20px 0;">Hello ${data.recipientName},</p>
+          
+          ${isComment ? `
+          <p style="margin: 0 0 20px 0;">A ship's officer has added a new message to your support request:</p>
+          ` : `
+          <p style="margin: 0 0 20px 0;">The status of your support request has been updated:</p>
+          `}
+          
+          <div style="border: 1px solid #e5e7eb; border-radius: 8px; padding: 20px; margin-bottom: 20px; background: #fafafa;">
+            <p style="margin: 0 0 10px 0; font-weight: 600; color: #374151;">Request: ${data.requestTitle}</p>
+            <p style="margin: 0 0 10px 0; font-size: 14px; color: #6b7280;">ID: ${data.requestId}</p>
+            <div style="display: inline-block; padding: 6px 14px; background: ${statusColor}; color: white; border-radius: 20px; font-size: 13px; font-weight: 600;">
+              ${statusLabel}
+            </div>
+          </div>
+          
+          ${data.adminMessage ? `
+          <div style="background: #eff6ff; border-left: 4px solid #3b82f6; padding: 15px 20px; border-radius: 6px; margin-bottom: 20px;">
+            <p style="margin: 0 0 8px 0; font-weight: 600; color: #1e40af;">Message from Officer:</p>
+            <p style="margin: 0; color: #1e3a8a;">${data.adminMessage}</p>
+          </div>
+          ` : ""}
+          
+          ${data.resolution ? `
+          <div style="background: #ecfdf5; border-left: 4px solid #10b981; padding: 15px 20px; border-radius: 6px; margin-bottom: 20px;">
+            <p style="margin: 0 0 8px 0; font-weight: 600; color: #065f46;">Resolution:</p>
+            <p style="margin: 0; color: #047857;">${data.resolution}</p>
+          </div>
+          ` : ""}
+          
+          <p style="margin: 20px 0 0 0; color: #6b7280; font-size: 14px;">
+            You can view your support request details by logging into your account.
+          </p>
+        </div>
+        
+        <div style="background: #f9fafb; padding: 20px 30px; border-radius: 0 0 8px 8px; border-top: 1px solid #e5e7eb;">
+          <p style="margin: 0; font-size: 12px; color: #9ca3af; text-align: center;">
+            This is an automated message from Sailor's Platform Support System.
+          </p>
+        </div>
+      </div>
+    </body>
+    </html>
+  `
+
+  const emailText = `
+${subject}
+
+Hello ${data.recipientName},
+
+${isComment ? "A ship's officer has added a new message to your support request:" : "The status of your support request has been updated:"}
+
+Request: ${data.requestTitle}
+Request ID: ${data.requestId}
+Status: ${statusLabel}
+
+${data.adminMessage ? `Message from Officer:\n${data.adminMessage}\n` : ""}
+${data.resolution ? `Resolution:\n${data.resolution}\n` : ""}
+
+You can view your support request details by logging into your account.
+
+- Sailor's Platform Support Team
+  `.trim()
+
+  try {
+    await transporter.sendMail({
+      from: process.env.EMAIL_USER,
+      to: data.recipientEmail,
+      subject,
+      text: emailText,
+      html: emailHtml,
+    })
+    console.log("Status update email sent successfully for request:", data.requestId)
+  } catch (error) {
+    console.error("Error sending status update email:", error)
     throw error
   }
 }

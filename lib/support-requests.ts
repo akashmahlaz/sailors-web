@@ -1,5 +1,14 @@
 import clientPromise from "@/lib/mongodb-server"
 
+export interface SupportRequestComment {
+  id: string
+  message: string
+  authorId: string
+  authorName: string
+  authorRole: "user" | "admin"
+  createdAt: string
+}
+
 export interface SupportRequest {
   id: string
   title: string
@@ -10,12 +19,19 @@ export interface SupportRequest {
   submitterName?: string | null
   submitterEmail?: string | null
   status: "pending" | "in-review" | "resolved" | "dismissed"
-  proofs: any[]
+  proofs: Array<{
+    url: string
+    publicId: string
+    resourceType: string
+    format: string
+    name?: string
+  }>
   createdAt: string
   updatedAt?: string
   adminNotes?: string
   adminId?: string
   resolution?: string
+  comments?: SupportRequestComment[]
 }
 
 export async function getSupportRequestsCollection() {

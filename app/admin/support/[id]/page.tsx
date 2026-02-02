@@ -2,7 +2,7 @@
 
 import { useEffect, useState } from "react"
 import { useSession } from "next-auth/react"
-import { useRouter } from "next/navigation"
+import { useRouter, useParams } from "next/navigation"
 import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from "@/components/ui/card"
 import { Button } from "@/components/ui/button"
 import { Badge } from "@/components/ui/badge"
@@ -10,13 +10,15 @@ import { Textarea } from "@/components/ui/textarea"
 import { Label } from "@/components/ui/label"
 import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert"
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select"
-import { AlertCircle, ArrowLeft, Download, Eye, LifeBuoy, Shield } from "lucide-react"
+import { AlertCircle, ArrowLeft, Download, Eye, LifeBuoy, Shield, MessageSquare, Send } from "lucide-react"
 import Link from "next/link"
-import type { SupportRequest } from "@/lib/support-requests"
+import type { SupportRequest, SupportRequestComment } from "@/lib/support-requests"
+import { format } from "date-fns"
 
-export default function SupportRequestDetailPage({ params }: { params: { id: string } }) {
+export default function SupportRequestDetailPage() {
   const { data: session, status } = useSession()
   const router = useRouter()
+  const params = useParams()
   const [supportRequest, setSupportRequest] = useState<SupportRequest | null>(null)
   const [loading, setLoading] = useState(true)
   const [error, setError] = useState<string | null>(null)
@@ -25,6 +27,8 @@ export default function SupportRequestDetailPage({ params }: { params: { id: str
   const [adminNotes, setAdminNotes] = useState("")
   const [resolution, setResolution] = useState("")
   const [updateSuccess, setUpdateSuccess] = useState(false)
+  const [newComment, setNewComment] = useState("")
+  const [addingComment, setAddingComment] = useState(false)
 
   // Check if user is admin, redirect if not
   useEffect(() => {
@@ -38,7 +42,8 @@ export default function SupportRequestDetailPage({ params }: { params: { id: str
     const fetchSupportRequest = async () => {
       try {
         setLoading(true)
-        const response = await fetch(`/api/support/${params.id}`)
+        const id = params.id as string
+        const response = await fetch(`/api/support/${id}`)
 
         if (!response.ok) {
           throw new Error("Failed to fetch support request")
@@ -57,7 +62,7 @@ export default function SupportRequestDetailPage({ params }: { params: { id: str
       }
     }
 
-    if (status === "authenticated" && session?.user?.role === "admin") {
+    if (status === "authenticated" && session?.user?.role === "admin" && params.id) {
       fetchSupportRequest()
     }
   }, [params.id, session, status])
@@ -68,7 +73,8 @@ export default function SupportRequestDetailPage({ params }: { params: { id: str
       setUpdating(true)
       setError(null)
 
-      const response = await fetch(`/api/support/${params.id}`, {
+      const id = params.id as string
+      const response = await fetch(`/api/support/${id}`, {
         method: "PUT",
         headers: {
           "Content-Type": "application/json",
@@ -107,6 +113,45 @@ export default function SupportRequestDetailPage({ params }: { params: { id: str
       setError(err instanceof Error ? err.message : "Failed to update support request")
     } finally {
       setUpdating(false)
+    }
+  }
+
+  // Add admin comment
+  const handleAddComment = async () => {
+    if (!newComment.trim() || !params.id) return
+
+    try {
+      setAddingComment(true)
+      const id = params.id as string
+      const response = await fetch(`/api/support/${id}/comments`, {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({ message: newComment.trim() }),
+      })
+
+      if (!response.ok) {
+        throw new Error("Failed to add comment")
+      }
+
+      const data = await response.json()
+      
+      // Update local state with new comment
+      setSupportRequest((prev) => {
+        if (!prev) return null
+        return {
+          ...prev,
+          comments: [...(prev.comments || []), data.comment],
+        }
+      })
+
+      setNewComment("")
+    } catch (err) {
+      console.error("Error adding comment:", err)
+      setError(err instanceof Error ? err.message : "Failed to add comment")
+    } finally {
+      setAddingComment(false)
     }
   }
 
@@ -348,6 +393,67 @@ export default function SupportRequestDetailPage({ params }: { params: { id: str
                 {updating ? "Updating..." : "Update Support Request"}
               </Button>
             </CardFooter>
+          </Card>
+
+          {/* Comments Section */}
+          <Card className="border-gray-200 shadow-lg shadow-gray-100 dark:border-gray-900 dark:shadow-none">
+            <CardHeader className="border-b border-gray-100 dark:border-gray-900 bg-gradient-to-r from-gray-50 to-white dark:from-slate-900 dark:to-gray-950">
+              <CardTitle className="text-gray-900 dark:text-gray-100 flex items-center gap-2">
+                <MessageSquare className="h-5 w-5" />
+                Communication
+              </CardTitle>
+              <CardDescription>Send messages to the requester (visible to them)</CardDescription>
+            </CardHeader>
+
+            <CardContent className="pt-6">
+              {/* Existing Comments */}
+              {supportRequest.comments && supportRequest.comments.length > 0 && (
+                <div className="space-y-4 mb-6">
+                  {supportRequest.comments.map((comment) => (
+                    <div
+                      key={comment.id}
+                      className={`p-4 rounded-lg ${
+                        comment.authorRole === "admin"
+                          ? "bg-blue-50 dark:bg-blue-950/20 border border-blue-200 dark:border-blue-800"
+                          : "bg-gray-50 dark:bg-gray-900 border border-gray-200 dark:border-gray-800"
+                      }`}
+                    >
+                      <div className="flex items-center justify-between mb-2">
+                        <span className="font-semibold text-sm">
+                          {comment.authorName}
+                          {comment.authorRole === "admin" && (
+                            <Badge variant="outline" className="ml-2 text-xs">Admin</Badge>
+                          )}
+                        </span>
+                        <span className="text-xs text-gray-500">
+                          {format(new Date(comment.createdAt), "MMM dd, yyyy 'at' h:mm a")}
+                        </span>
+                      </div>
+                      <p className="text-sm text-gray-700 dark:text-gray-300">{comment.message}</p>
+                    </div>
+                  ))}
+                </div>
+              )}
+
+              {/* New Comment Form */}
+              <div className="space-y-4">
+                <Textarea
+                  value={newComment}
+                  onChange={(e) => setNewComment(e.target.value)}
+                  placeholder="Type a message to send to the requester..."
+                  rows={3}
+                  className="border-gray-200 dark:border-gray-900"
+                />
+                <Button
+                  onClick={handleAddComment}
+                  disabled={addingComment || !newComment.trim()}
+                  className="w-full"
+                >
+                  <Send className="h-4 w-4 mr-2" />
+                  {addingComment ? "Sending..." : "Send Message"}
+                </Button>
+              </div>
+            </CardContent>
           </Card>
         </div>
 

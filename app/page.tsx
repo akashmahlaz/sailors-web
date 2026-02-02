@@ -423,20 +423,20 @@ export default function Home() {
 
               <motion.div className="flex flex-wrap gap-4" variants={fadeIn}>
                 <Link href="/support">
-                  <Button size="lg" className="bg-white text-slate-800 hover:bg-slate-50 border border-slate-200 dark:bg-slate-700 dark:hover:bg-slate-600 dark:text-white dark:border-slate-600 transition-colors">
-                    Seeking Support <Compass className="ml-2 h-5 w-5 text-slate-600 dark:text-slate-300" />
+                  <Button size="lg" className="bg-white text-slate-800 hover:bg-slate-50 p-8 font-semibold text-xl rounded-full dark:bg-slate-950 dark:hover:bg-slate-600 dark:text-white dark:border-slate-600 transition-colors">
+                    Get Support <Compass className="ml-2 h-5 w-5 text-slate-600 dark:text-slate-300" />
                   </Button>
                 </Link>
                 {!isAuthenticated ? (
                   <Link href="/signup">
-                    <Button size="lg" variant="outline" className="rounded-xl border-slate-200 bg-slate-700/80 text-white hover:bg-slate-600/80 hover:text-white border transition-colors dark:border-white dark:bg-transparent">
+                    <Button size="lg" variant="outline" className="rounded-xl p-8 font-semibold text-xl border-slate-200 bg-slate-700/80 text-white hover:bg-slate-600/80 hover:text-white border transition-colors dark:border-white dark:bg-transparent">
                       Join Us Now <Anchor className="ml-2 h-5 w-5 text-slate-200" />
                     </Button>
                   </Link>
                 ) : (
                   <Link href="/community">
-                    <Button size="lg" variant="outline" className="border-slate-200 bg-slate-700/80 text-white hover:bg-slate-600/80 hover:text-white border transition-colors dark:border-white dark:bg-transparent">
-                      Community <UserCircle2 className="ml-2 h-5 w-5 text-slate-200" />
+                    <Button size="lg" variant="outline" className="p-8 font-semibold text-xl  rounded-full bg-slate-700/80 text-white hover:bg-slate-600/80 hover:text-white transition-colors dark: dark:bg-white dark:text-slate-900">
+                      Community <UserCircle2 className="ml-2 h-8 w-8 text-xl text-slate-900" />
                     </Button>
                   </Link>
                 )}

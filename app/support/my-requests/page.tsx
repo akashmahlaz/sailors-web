@@ -40,8 +40,8 @@ const statusConfig = {
     color: "bg-yellow-100 text-yellow-800 border-yellow-200",
     description: "Your request has been received and is awaiting review"
   },
-  in_progress: {
-    label: "In Progress",
+  "in-review": {
+    label: "In Review",
     icon: AlertCircle,
     color: "bg-blue-100 text-blue-800 border-blue-200",
     description: "A ship's officer is actively reviewing your request"
@@ -52,8 +52,8 @@ const statusConfig = {
     color: "bg-green-100 text-green-800 border-green-200",
     description: "Your request has been resolved"
   },
-  closed: {
-    label: "Closed",
+  dismissed: {
+    label: "Dismissed",
     icon: Shield,
     color: "bg-gray-100 text-gray-800 border-gray-200",
     description: "This request has been closed"
@@ -137,12 +137,21 @@ export default function MySupportRequests() {
 
   const getStatusIcon = (status: string) => {
     const config = statusConfig[status as keyof typeof statusConfig]
+    if (!config) return <Clock className="h-4 w-4" />
     const Icon = config.icon
     return <Icon className="h-4 w-4" />
   }
 
   const getStatusBadge = (status: string) => {
     const config = statusConfig[status as keyof typeof statusConfig]
+    if (!config) {
+      return (
+        <Badge variant="outline" className="bg-gray-100 text-gray-800 border-gray-200 gap-1">
+          <Clock className="h-3 w-3" />
+          {status}
+        </Badge>
+      )
+    }
     const Icon = config.icon
     return (
       <Badge variant="outline" className={`${config.color} gap-1`}>
@@ -214,7 +223,7 @@ export default function MySupportRequests() {
             <TabsList className="grid w-full grid-cols-4 lg:w-auto lg:grid-cols-4">
               <TabsTrigger value="all">All</TabsTrigger>
               <TabsTrigger value="pending">Pending</TabsTrigger>
-              <TabsTrigger value="in_progress">In Progress</TabsTrigger>
+              <TabsTrigger value="in-review">In Review</TabsTrigger>
               <TabsTrigger value="resolved">Resolved</TabsTrigger>
             </TabsList>
           </Tabs>
