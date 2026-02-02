@@ -1,13 +1,12 @@
 import { type NextRequest, NextResponse } from "next/server"
 import { getSupportRequestsCollection } from "@/lib/support-requests"
 import { ObjectId } from "mongodb"
-import { getServerSession } from "next-auth"
-import { authOptions } from "@/lib/auth"
+import { getServerSession } from "@/lib/auth"
 
-export async function GET(request: NextRequest, { params }: { params: { id: string } }) {
+export async function GET(request: NextRequest, { params }: { params: Promise<{ id: string }> }) {
   try {
-    const session = await getServerSession(authOptions)
-    const id = params.id
+    const session = await getServerSession()
+    const { id } = await params
 
     // Get support requests collection
     const collection = await getSupportRequestsCollection()
@@ -60,16 +59,16 @@ export async function GET(request: NextRequest, { params }: { params: { id: stri
   }
 }
 
-export async function PUT(request: NextRequest, { params }: { params: { id: string } }) {
+export async function PUT(request: NextRequest, { params }: { params: Promise<{ id: string }> }) {
   try {
-    const session = await getServerSession(authOptions)
+    const session = await getServerSession()
 
     // Only admins can update support requests
     if (!session || session.user?.role !== "admin") {
       return NextResponse.json({ error: "Unauthorized" }, { status: 403 })
     }
 
-    const id = params.id
+    const { id } = await params
     const { status, adminNotes, resolution } = await request.json()
 
     // Get support requests collection

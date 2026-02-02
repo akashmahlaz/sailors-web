@@ -1,11 +1,10 @@
 import { type NextRequest, NextResponse } from "next/server"
 import { getAdminNotificationsCollection } from "@/lib/mongodb"
-import { getServerSession } from "next-auth/next"
-import { authOptions } from "@/lib/auth"
+import { getServerSession } from "@/lib/auth"
 
 export async function PUT(request: NextRequest) {
   try {
-    const session = await getServerSession(authOptions)
+    const session = await getServerSession()
 
     if (!session || !session.user || session.user.role !== "admin") {
       return NextResponse.json({ error: "Unauthorized" }, { status: 401 })

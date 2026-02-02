@@ -1,10 +1,9 @@
 import { NextRequest, NextResponse } from "next/server"
 import { getFollowing } from "@/lib/user-profiles"
 
-export async function GET(request: NextRequest, { params }: { params: { id: string } }) {
+export async function GET(request: NextRequest, { params }: { params: Promise<{ id: string }> }) {
   try {
-    const resolvedParams = await Promise.resolve(params)
-    const userId = resolvedParams.id
+    const { id: userId } = await params
 
     const following = await getFollowing(userId)
 

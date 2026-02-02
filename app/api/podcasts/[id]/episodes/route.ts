@@ -16,9 +16,9 @@ async function getPodcastsCollection() {
   return db.collection("podcasts")
 }
 
-export async function POST(request: NextRequest, { params }: { params: { id: string } }) {
+export async function POST(request: NextRequest, { params }: { params: Promise<{ id: string }> }) {
   try {
-    const podcastId = params.id
+    const { id: podcastId } = await params
     const { title, description, audioUrl, publicId, duration, episodeNumber, season } = await request.json()
 
     if (!title || !audioUrl) {
@@ -71,10 +71,9 @@ export async function POST(request: NextRequest, { params }: { params: { id: str
   }
 }
 
-export async function GET(request: NextRequest, context: { params: { id: string } }) {
+export async function GET(request: NextRequest, { params }: { params: Promise<{ id: string }> }) {
   try {
-    const { params } = context;
-    const podcastId = params.id;
+    const { id: podcastId } = await params
 
     // Get podcast episodes collection
     const collection = await getPodcastEpisodesCollection()

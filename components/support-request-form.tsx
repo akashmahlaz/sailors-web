@@ -5,6 +5,7 @@ import type React from "react"
 import { useState } from "react"
 import { useRouter } from "next/navigation"
 import { useSession } from "next-auth/react"
+import Link from "next/link"
 import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from "@/components/ui/card"
 import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
@@ -140,6 +141,10 @@ export default function SupportRequestForm() {
               <AlertTitle>Success</AlertTitle>
               <AlertDescription>
                 Your support request has been submitted successfully. A ship's officer will review it shortly.
+                <br />
+                <Link href="/support/my-requests" className="underline font-medium hover:no-underline">
+                  View your requests →
+                </Link>
               </AlertDescription>
             </Alert>
           )}

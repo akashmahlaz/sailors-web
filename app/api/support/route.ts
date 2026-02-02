@@ -1,11 +1,11 @@
 import { type NextRequest, NextResponse } from "next/server"
 import { getSupportRequestsCollection } from "@/lib/mongodb-server"
-import { getServerSession } from "next-auth"
-import { authOptions } from "@/lib/auth"
+import { getServerSession } from "@/lib/auth"
+import { sendSupportRequestEmails } from "@/lib/email"
 
 export async function POST(request: NextRequest) {
   try {
-    const session = await getServerSession(authOptions)
+    const session = await getServerSession()
 
     const { title, description, category, isAnonymous, proofs } = await request.json()
 
@@ -33,10 +33,28 @@ export async function POST(request: NextRequest) {
 
     // Store support request in MongoDB
     const result = await collection.insertOne(supportRequest)
+    const requestId = result.insertedId.toString()
+
+    try {
+      await sendSupportRequestEmails({
+        title,
+        description,
+        category,
+        isAnonymous,
+        submitterName: supportRequest.submitterName ?? undefined,
+        submitterEmail: supportRequest.submitterEmail ?? undefined,
+        submitterId: supportRequest.submitterId ?? undefined,
+        proofs: proofs || [],
+        requestId,
+        createdAt: supportRequest.createdAt,
+      })
+    } catch (emailError) {
+      console.error("Failed to send email notifications:", emailError)
+    }
 
     return NextResponse.json({
       success: true,
-      id: result.insertedId.toString(),
+      id: requestId,
     })
   } catch (error) {
     console.error("Error saving support request:", error)
@@ -52,7 +70,7 @@ export async function POST(request: NextRequest) {
 
 export async function GET(request: NextRequest) {
   try {
-    const session = await getServerSession(authOptions)
+    const session = await getServerSession()
 
     // Only admins can view all support requests
     if (!session || session.user?.role !== "admin") {

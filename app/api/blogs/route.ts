@@ -1,12 +1,11 @@
 import { type NextRequest, NextResponse } from "next/server"
 import { getBlogsCollection } from "@/lib/mongodb-server"
-import { getServerSession } from "next-auth/next"
-import { authOptions } from "@/lib/auth"
+import { getServerSession } from "@/lib/auth"
 
 export async function POST(request: NextRequest) {
   try {
     // Check if user is authenticated
-    const session = await getServerSession(authOptions)
+    const session = await getServerSession()
     if (!session) {
       return NextResponse.json({ error: "Unauthorized" }, { status: 401 })
     }

@@ -3,10 +3,10 @@ import { getMongoClient } from "@/lib/mongodb-server";
 import { ObjectId } from "mongodb";
 
 // POST /api/posts/[id]/comment
-export async function POST(req: Request, { params }: { params: { id: string } }) {
+export async function POST(req: Request, { params }: { params: Promise<{ id: string }> }) {
   const client = await getMongoClient();
   const db = client.db();
-  const postId = params.id;
+  const { id: postId } = await params;
   const body = await req.json();
   const comment = {
     content: body.content,

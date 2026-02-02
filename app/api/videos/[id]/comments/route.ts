@@ -2,9 +2,9 @@ import { type NextRequest, NextResponse } from "next/server"
 import { getVideosCollection } from "@/lib/mongodb-server"
 import { ObjectId } from "mongodb"
 
-export async function POST(request: NextRequest, { params }: { params: { id: string } }) {
+export async function POST(request: NextRequest, { params }: { params: Promise<{ id: string }> }) {
   try {
-    const videoId = params.id
+    const { id: videoId } = await params
     const { userId, userName, userImage, content } = await request.json()
 
     if (!videoId || !ObjectId.isValid(videoId)) {
@@ -36,9 +36,9 @@ export async function POST(request: NextRequest, { params }: { params: { id: str
   }
 }
 
-export async function GET(request: NextRequest, { params }: { params: { id: string } }) {
+export async function GET(request: NextRequest, { params }: { params: Promise<{ id: string }> }) {
   try {
-    const videoId = params.id
+    const { id: videoId } = await params
 
     if (!videoId || !ObjectId.isValid(videoId)) {
       return NextResponse.json({ error: "Invalid video ID" }, { status: 400 })

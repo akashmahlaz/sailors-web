@@ -2,7 +2,7 @@
 
 import Link from "next/link"
 import { usePathname } from "next/navigation"
-import { signOut, useSession } from "next-auth/react"
+import { useSession, signOut } from "next-auth/react"
 import { Button } from "@/components/ui/button"
 import {
   LogOut,
@@ -56,6 +56,14 @@ export default function NavBar() {
         { href: "/news", label: "Maritime News", icon: Newspaper },
         { href: "/blog", label: "Blogs", icon: FileText },
         { href: "/podcasts", label: "Sailor's Podcast", icon: Mic },
+      ],
+    },
+    {
+      label: "Support",
+      icon: LifeBuoy,
+      subLinks: [
+        { href: "/support", label: "Submit Request", icon: LifeBuoy },
+        { href: "/support/my-requests", label: "My Requests", icon: UserCircle },
       ],
     },
   ]
@@ -120,18 +128,6 @@ export default function NavBar() {
             </div>
           ))}
 
-          {/* Support Link */}
-          <Link
-            href="/support"
-            className={`flex items-center text-sm font-medium px-3 py-1.5 rounded-lg transition-all duration-300 ${
-              pathname.startsWith("/support")
-                ? "bg-gray-200 text-gray-900 shadow-md dark:bg-gray-700 dark:text-white"
-                : "text-gray-700 hover:text-gray-900 hover:bg-gray-100 dark:text-gray-300 dark:hover:text-white dark:hover:bg-gray-700"
-            }`}
-          >
-            <LifeBuoy className="mr-2 h-5 w-5" />
-            Support
-          </Link>
 
           {/* Theme Toggle */}
           <div className="ml-2">
@@ -235,19 +231,6 @@ export default function NavBar() {
                 </div>
               ))}
 
-              {/* Support Link */}
-              <Link
-                href="/support"
-                className={`flex items-center py-2 text-sm rounded-lg transition-colors ${
-                  pathname.startsWith("/support")
-                    ? "bg-gray-200 text-gray-900 dark:bg-gray-700 dark:text-white"
-                    : "text-gray-800 hover:bg-gray-100 dark:text-gray-300 dark:hover:bg-gray-700"
-                }`}
-                onClick={() => setMobileMenuOpen(false)}
-              >
-                <LifeBuoy className="mr-2 h-4 w-4" />
-                Support
-              </Link>
 
               {/* Theme Toggle */}
               <div className="flex items-center py-2">

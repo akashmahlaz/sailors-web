@@ -1,6 +1,5 @@
 import { type NextRequest, NextResponse } from "next/server"
-import { getServerSession } from "next-auth/next"
-import { authOptions } from "@/lib/auth"
+import { getServerSession } from "@/lib/auth"
 import { ObjectId } from "mongodb"
 import clientPromise from "@/lib/mongodb"
 
@@ -20,7 +19,7 @@ export async function DELETE(request: NextRequest) {
     }
 
     // Check if user is authenticated and is an admin
-    const session = await getServerSession(authOptions)
+    const session = await getServerSession()
     if (!session || !session.user || session.user.role !== "admin") {
       return NextResponse.json({ error: "Unauthorized" }, { status: 401 })
     }

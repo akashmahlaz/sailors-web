@@ -1,8 +1,7 @@
 import { type NextRequest, NextResponse } from "next/server"
 import clientPromise from "@/lib/mongodb"
 import { ObjectId } from "mongodb"
-import { getServerSession } from "next-auth/next"
-import { authOptions } from "@/lib/auth"
+import { getServerSession } from "@/lib/auth"
 
 // Helper function to get the news collection
 async function getNewsCollection() {
@@ -13,14 +12,14 @@ async function getNewsCollection() {
 
 // Helper function to check if user is admin
 async function isAdmin() {
-  const session = await getServerSession(authOptions)
+  const session = await getServerSession()
   return session?.user?.role === "admin"
 }
 
 // Update the GET method to include media items in the response
-export async function GET(request: NextRequest, { params }: { params: { id: string } }) {
+export async function GET(request: NextRequest, { params }: { params: Promise<{ id: string }> }) {
   try {
-    const id = await params.id
+    const { id } = await params
 
     // Get news collection
     const collection = await getNewsCollection()
@@ -67,14 +66,14 @@ export async function GET(request: NextRequest, { params }: { params: { id: stri
 }
 
 // Update the PUT method to handle media items
-export async function PUT(request: NextRequest, { params }: { params: { id: string } }) {
+export async function PUT(request: NextRequest, { params }: { params: Promise<{ id: string }> }) {
   try {
     // Check if user is admin
     if (!(await isAdmin())) {
       return NextResponse.json({ error: "Only admins can edit news" }, { status: 403 })
     }
 
-    const id = params.id
+    const { id } = await params
     const { title, content, summary, coverImageUrl, author, category, tags, isBreaking, mediaItems } =
       await request.json()
 
@@ -121,14 +120,14 @@ export async function PUT(request: NextRequest, { params }: { params: { id: stri
   }
 }
 
-export async function DELETE(request: NextRequest, { params }: { params: { id: string } }) {
+export async function DELETE(request: NextRequest, { params }: { params: Promise<{ id: string }> }) {
   try {
     // Check if user is admin
     if (!(await isAdmin())) {
       return NextResponse.json({ error: "Only admins can delete news" }, { status: 403 })
     }
 
-    const id = params.id
+    const { id } = await params
 
     // Get news collection
     const collection = await getNewsCollection()

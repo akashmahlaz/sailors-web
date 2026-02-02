@@ -1,18 +1,17 @@
 import { type NextRequest, NextResponse } from "next/server"
 import { getAdminNotificationsCollection } from "@/lib/mongodb"
-import { getServerSession } from "next-auth/next"
-import { authOptions } from "@/lib/auth"
+import { getServerSession } from "@/lib/auth"
 import { ObjectId } from "mongodb"
 
-export async function PUT(request: NextRequest, { params }: { params: { id: string } }) {
+export async function PUT(request: NextRequest, { params }: { params: Promise<{ id: string }> }) {
   try {
-    const session = await getServerSession(authOptions)
+    const session = await getServerSession()
 
     if (!session || !session.user || session.user.role !== "admin") {
       return NextResponse.json({ error: "Unauthorized" }, { status: 401 })
     }
 
-    const notificationId = params.id
+    const { id: notificationId } = await params
 
     if (!ObjectId.isValid(notificationId)) {
       return NextResponse.json({ error: "Invalid notification ID" }, { status: 400 })

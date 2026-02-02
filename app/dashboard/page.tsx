@@ -7,7 +7,7 @@ import { Button } from "@/components/ui/button"
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card"
 import { signOut } from "next-auth/react"
 import Link from "next/link"
-import { UserCircle } from "lucide-react"
+import { UserCircle, LifeBuoy } from "lucide-react"
 
 interface UserProfile {
   joinedAt: string
@@ -75,9 +75,18 @@ export default function Dashboard() {
             </div>
             <div className="grid gap-4 grid-cols-1 sm:grid-cols-2 lg:grid-cols-4">
                <Button onClick={() => router.push("/")} className="bg-primary hover:bg-primary/90 text-primary-foreground font-medium shadow-sm transition-colors duration-200">
-                Home 
+                Home
               </Button>
-              
+
+              <Button onClick={() => router.push("/support")} className="bg-primary hover:bg-primary/90 text-primary-foreground font-medium shadow-sm transition-colors duration-200">
+                <LifeBuoy className="mr-2 h-4 w-4" />
+                Submit Request
+              </Button>
+
+              <Button onClick={() => router.push("/support/my-requests")} className="bg-primary hover:bg-primary/90 text-primary-foreground font-medium shadow-sm transition-colors duration-200">
+                My Requests
+              </Button>
+
               <Button onClick={() => router.push("/podcasts")} className="bg-primary hover:bg-primary/90 text-primary-foreground font-medium shadow-sm transition-colors duration-200">
                 Podcasts
               </Button>
@@ -88,13 +97,13 @@ export default function Dashboard() {
                 Videos
               </Button>
               <Button onClick={() => router.push("/audio")} className="bg-primary hover:bg-primary/90 text-primary-foreground font-medium shadow-sm transition-colors duration-200">
-                Audio   
+                Audio
               </Button>
               <Button onClick={() => router.push("/photos")} className="bg-primary hover:bg-primary/90 text-primary-foreground font-medium shadow-sm transition-colors duration-200">
                 Photos
               </Button>
              <Button onClick={() => router.push("/blog")} className="bg-primary hover:bg-primary/90 text-primary-foreground font-medium shadow-sm transition-colors duration-200">
-                Blog  
+                Blog
               </Button>
               <Button className="bg-primary hover:bg-primary/90 text-primary-foreground font-medium shadow-sm transition-colors duration-200">
                  <Link

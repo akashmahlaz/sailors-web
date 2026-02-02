@@ -1,0 +1,11 @@
+{
+  "permissions": {
+    "allow": [
+      "Bash(pnpm install)",
+      "Bash(pnpm approve-builds)",
+      "Bash(pnpm config set auto-install-peers true)",
+      "Bash(pnpm install sharp)",
+      "Bash(pnpm add next-auth@^5.0.0)"
+    ]
+  }
+}

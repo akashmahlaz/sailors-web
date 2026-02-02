@@ -1,8 +1,7 @@
 import { type NextRequest, NextResponse } from "next/server"
 import clientPromise from "@/lib/mongodb"
 import { ObjectId } from "mongodb"
-import { getServerSession } from "next-auth/next"
-import { authOptions } from "@/lib/auth"
+import { getServerSession } from "@/lib/auth"
 
 // Helper function to get the blogs collection
 async function getBlogsCollection() {
@@ -11,9 +10,9 @@ async function getBlogsCollection() {
   return db.collection("blogs")
 }
 
-export async function GET(request: NextRequest, { params }: { params: { id: string } }) {
+export async function GET(request: NextRequest, { params }: { params: Promise<{ id: string }> }) {
   try {
-    const id = params.id
+    const { id } = await params
 
     // Get blogs collection
     const collection = await getBlogsCollection()
@@ -51,10 +50,10 @@ export async function GET(request: NextRequest, { params }: { params: { id: stri
   }
 }
 
-export async function PUT(request: NextRequest, { params }: { params: { id: string } }) {
+export async function PUT(request: NextRequest, { params }: { params: Promise<{ id: string }> }) {
   try {
-    const id = params.id
-    const session = await getServerSession(authOptions)
+    const { id } = await params
+    const session = await getServerSession()
     
     if (!session) {
       return NextResponse.json({ error: "Unauthorized" }, { status: 401 })
@@ -114,10 +113,10 @@ export async function PUT(request: NextRequest, { params }: { params: { id: stri
   }
 }
 
-export async function DELETE(request: NextRequest, { params }: { params: { id: string } }) {
+export async function DELETE(request: NextRequest, { params }: { params: Promise<{ id: string }> }) {
   try {
-    const id = params.id
-    const session = await getServerSession(authOptions)
+    const { id } = await params
+    const session = await getServerSession()
     
     if (!session) {
       return NextResponse.json({ error: "Unauthorized" }, { status: 401 })

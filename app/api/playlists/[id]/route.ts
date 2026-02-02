@@ -2,9 +2,9 @@ import { type NextRequest, NextResponse } from "next/server"
 import { getPlaylistsCollection } from "@/lib/mongodb-server"
 import { ObjectId } from "mongodb"
 
-export async function GET(request: NextRequest, { params }: { params: { id: string } }) {
+export async function GET(request: NextRequest, { params }: { params: Promise<{ id: string }> }) {
   try {
-    const id = params.id
+    const { id } = await params
     if (!id) {
       return NextResponse.json({ error: "Playlist ID is required" }, { status: 400 })
     }
@@ -46,9 +46,9 @@ export async function GET(request: NextRequest, { params }: { params: { id: stri
   }
 }
 
-export async function PUT(request: NextRequest, { params }: { params: { id: string } }) {
+export async function PUT(request: NextRequest, { params }: { params: Promise<{ id: string }> }) {
   try {
-    const id = params.id
+    const { id } = await params
     if (!id) {
       return NextResponse.json({ error: "Playlist ID is required" }, { status: 400 })
     }
@@ -93,9 +93,9 @@ export async function PUT(request: NextRequest, { params }: { params: { id: stri
   }
 }
 
-export async function DELETE(request: NextRequest, { params }: { params: { id: string } }) {
+export async function DELETE(request: NextRequest, { params }: { params: Promise<{ id: string }> }) {
   try {
-    const id = params.id
+    const { id } = await params
     if (!id) {
       return NextResponse.json({ error: "Playlist ID is required" }, { status: 400 })
     }
