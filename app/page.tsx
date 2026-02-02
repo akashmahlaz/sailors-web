@@ -429,13 +429,13 @@ export default function Home() {
                 </Link>
                 {!isAuthenticated ? (
                   <Link href="/signup">
-                    <Button size="lg" variant="outline" className="rounded-xl p-8 font-semibold text-xl border-slate-200 bg-slate-700/80 text-white hover:bg-slate-600/80 hover:text-white border transition-colors dark:border-white dark:bg-transparent">
-                      Join Us Now <Anchor className="ml-2 h-5 w-5 text-slate-200" />
+                    <Button size="lg" variant="outline" className="p-8 font-semibold text-xl rounded-full border-none bg-slate-900 text-white hover:bg-slate-600/80 hover:text-white transition-colors  dark:bg-white dark:text-slate-900">
+                      Join Us <Anchor className="ml-2 h-8 w-8 dark:text-slate-800" />
                     </Button>
                   </Link>
                 ) : (
                   <Link href="/community">
-                    <Button size="lg" variant="outline" className="p-8 font-semibold text-xl  rounded-full bg-slate-700/80 text-white hover:bg-slate-600/80 hover:text-white transition-colors dark: dark:bg-white dark:text-slate-900">
+                    <Button size="lg" variant="outline" className="p-8 font-semibold text-xl rounded-full bg-slate-700/80 text-white hover:bg-slate-600/80 hover:text-white transition-colors dark: dark:bg-white dark:text-slate-900">
                       Community <UserCircle2 className="ml-2 h-8 w-8 text-xl text-slate-900" />
                     </Button>
                   </Link>
